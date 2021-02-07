@@ -1,0 +1,8 @@
+{
+  "private": true,
+  "workspaces": [
+    "workspaces/ghsa-offline",
+    "workspaces/ghsa-offline-updater"
+  ],
+  "version": "0.0.0"
+}
