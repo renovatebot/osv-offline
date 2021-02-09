@@ -1,0 +1,16 @@
+{
+  "references": [
+    {
+      "path": "./packages/ghsa-offline"
+    },
+    {
+      "path": "./packages/ghsa-offline-db"
+    },
+    {
+      "path": "./packages/ghsa-offline-updater"
+    }
+  ],
+  "files": [],
+  "include": [],
+  "exclude": ["**/node_modules"]
+}

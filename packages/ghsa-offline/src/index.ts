@@ -1,0 +1,1 @@
+export { getNpmPackage } from './db';

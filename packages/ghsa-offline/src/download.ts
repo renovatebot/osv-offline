@@ -1,0 +1,1 @@
+const releaseAsset = 'ghsa.sqlite';
