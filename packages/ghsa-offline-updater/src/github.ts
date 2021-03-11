@@ -29,6 +29,14 @@ export class GitHub {
     });
     await Promise.all(
       releases.data.map(async (release) => {
+        await Promise.all(
+          release.assets.map(async (asset) => {
+            await this.octoKit.repos.deleteReleaseAsset({
+              ...this.baseParameters,
+              asset_id: asset.id,
+            });
+          })
+        );
         await this.octoKit.repos.deleteRelease({
           ...this.baseParameters,
           release_id: release.id,

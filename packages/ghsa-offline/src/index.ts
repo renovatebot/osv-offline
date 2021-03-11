@@ -1,1 +1,1 @@
-export { getNpmPackage } from './db';
+export { getComposerPackage } from './db';
