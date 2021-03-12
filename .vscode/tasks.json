@@ -1,0 +1,11 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build",
+      "type": "process",
+      "command": "npm",
+      "args": ["run", "build"]
+    }
+  ]
+}

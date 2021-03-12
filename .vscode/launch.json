@@ -8,8 +8,10 @@
       "type": "node",
       "request": "launch",
       "name": "Run updater",
+      "preLaunchTask": "build",
       "runtimeArgs": ["-r", "ts-node/register"],
       "args": ["${workspaceFolder}/packages/ghsa-offline-updater/src/index.ts"],
+      "console": "integratedTerminal",
       "env": { "TS_NODE_PROJECT": "${workspaceFolder}/tsconfig.packages.json" },
       "envFile": "${workspaceFolder}/.env"
     }
