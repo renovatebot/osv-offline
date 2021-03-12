@@ -1,0 +1,5 @@
+{
+  "dockerFile": "Dockerfile",
+  "postStartCommand": "npm install",
+  "extensions": ["orta.vscode-jest", "dbaeumer.vscode-eslint", "esbenp.prettier-vscode"]
+}
