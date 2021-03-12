@@ -2,6 +2,7 @@
   "name": "ghsa-offline-db",
   "version": "0.0.1",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "license": "MIT",
   "devDependencies": {
     "@tsconfig/node14": "1.0.0",
