@@ -19,9 +19,9 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      - run: npm install -g npm
-
       - run: npm ci
+
+      - run: npm run build
 
       - run: npm run start
         env:
