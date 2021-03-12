@@ -1,18 +1,21 @@
-import * as fs from 'fs/promises';
+import fs from 'fs-extra';
 import { GithubSecurityAdvisory } from './types';
-import { packageRepository, vulnerabilityRepository } from 'ghsa-offline-db';
+import {
+  dbPath,
+  packageRepository,
+  vulnerabilityRepository,
+} from 'ghsa-offline-db';
 import { GitHub } from './github';
 import {
   convertToPackage,
   convertToVulnerability,
   VulnList,
 } from './vuln-list';
-
-const dbPath = './ghsa.sqlite';
+import signale from 'signale';
 
 (async () => {
   try {
-    await fs.rm(dbPath);
+    await fs.remove(dbPath);
   } catch (e) {}
 
   var vulnList = new VulnList();
@@ -29,6 +32,7 @@ const dbPath = './ghsa.sqlite';
         await (await packageRepository).saveIfNotExist(p);
         const v = convertToVulnerability(ghsa);
         await (await vulnerabilityRepository).save(v);
+        signale.success(`${p.packageName}: ${v.id}`);
       }
     )
   );

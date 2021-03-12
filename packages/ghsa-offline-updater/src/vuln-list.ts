@@ -1,6 +1,6 @@
 import { tmpdir } from 'os';
 import path from 'path';
-import * as fs from 'fs/promises';
+import fs from 'fs-extra';
 import simpleGit, { SimpleGit } from 'simple-git';
 import { fdir, PathsOutput } from 'fdir';
 import { GithubSecurityAdvisory, Version } from './types';
@@ -10,16 +10,8 @@ export class VulnList {
   private readonly repoPath = path.join(tmpdir(), 'vuln-list');
 
   async clone(): Promise<void> {
-    let repoExists: boolean;
-    try {
-      await fs.stat(this.repoPath);
-      repoExists = true;
-    } catch (e) {
-      repoExists = false;
-    }
-
     let git: SimpleGit;
-    if (repoExists) {
+    if (fs.existsSync(this.repoPath)) {
       git = simpleGit(this.repoPath);
       await git.pull();
     } else {
