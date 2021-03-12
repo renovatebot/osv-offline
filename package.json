@@ -5,8 +5,8 @@
   ],
   "version": "0.0.1",
   "scripts": {
-    "build": "tsc --build --force tsconfig.json",
-    "clean": "rm packages/ghsa-offline-updater/ghsa.sqlite",
+    "build": "tsc --build",
+    "clean": "tsc --build --clean",
     "start": "cross-env TS_NODE_PROJECT=./tsconfig.packages.json ts-node ./packages/ghsa-offline-updater/src/index.ts"
   },
   "devDependencies": {
