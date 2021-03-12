@@ -1,17 +1,16 @@
 {
   "private": true,
   "workspaces": [
-    "packages/ghsa-offline",
-    "packages/ghsa-offline-db",
-    "packages/ghsa-offline-updater"
+    "./packages/*"
   ],
   "version": "0.0.1",
   "scripts": {
     "build": "tsc --build --force tsconfig.json",
     "clean": "rm packages/ghsa-offline-updater/ghsa.sqlite",
-    "start": "TS_NODE_PROJECT=./tsconfig.packages.json ts-node ./packages/ghsa-offline-updater/src/index.ts"
+    "start": "cross-env TS_NODE_PROJECT=./tsconfig.packages.json ts-node ./packages/ghsa-offline-updater/src/index.ts"
   },
   "devDependencies": {
-    "@tsconfig/node14": "1.0.0"
+    "@tsconfig/node14": "1.0.0",
+    "cross-env": "7.0.3"
   }
 }
