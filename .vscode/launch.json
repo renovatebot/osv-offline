@@ -9,10 +9,9 @@
       "request": "launch",
       "name": "Run updater",
       "runtimeArgs": ["-r", "ts-node/register"],
-      "args": [
-        "${workspaceFolder}/packages/ghsa-offline-updater/src/index.ts"
-      ],
-      "env": { "TS_NODE_PROJECT": "${workspaceFolder}/tsconfig.packages.json" }
+      "args": ["${workspaceFolder}/packages/ghsa-offline-updater/src/index.ts"],
+      "env": { "TS_NODE_PROJECT": "${workspaceFolder}/tsconfig.packages.json" },
+      "envFile": "${workspaceFolder}/.env"
     }
   ]
 }
