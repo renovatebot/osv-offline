@@ -16,11 +16,15 @@ import signale from 'signale';
 (async () => {
   try {
     await fs.remove(dbPath);
-  } catch (e) {}
+    signale.info('Deleted existing database');
+  } catch (e) {
+    signale.info('No existing database found');
+  }
 
   var vulnList = new VulnList();
   await vulnList.clone();
   const files = await vulnList.crawl();
+  signale.info(`found ${files.length} vulnerabilities`);
 
   await Promise.all(
     files.map(
@@ -32,11 +36,12 @@ import signale from 'signale';
         await (await packageRepository).saveIfNotExist(p);
         const v = convertToVulnerability(ghsa);
         await (await vulnerabilityRepository).save(v);
-        signale.success(`${p.packageName}: ${v.id}`);
+        signale.info(`${p.ecosystem}-${p.packageName}-${v.identifiers![0]}`);
       }
     )
   );
 
+  signale.info('Uploading database');
   var gh = new GitHub();
   await gh.uploadDatabase(dbPath);
 })();

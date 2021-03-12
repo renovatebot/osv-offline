@@ -1,6 +1,7 @@
 import fs from 'fs-extra';
 import { Octokit } from '@octokit/rest';
 import { DateTime } from 'luxon';
+import signale from 'signale';
 
 export class GitHub {
   private readonly octokit: Octokit;
@@ -18,15 +19,20 @@ export class GitHub {
   async uploadDatabase(path: string) {
     await this.deleteOldReleases();
     const latestCommit = await this.getLatestCommit();
+    signale.info(`Latest commit is ${latestCommit}`);
     const tag = await this.createTag(latestCommit);
+    signale.info(`Created tag ${tag.data.tag}`);
     const release = await this.createRelease(tag.data.tag);
+    signale.info(`Created release ${release.data.id}`);
     await this.createReleaseAsset(release.data.id, path);
   }
 
   private async deleteOldReleases() {
+    signale.info('Deleting old releases');
     const releases = await this.octokit.repos.listReleases({
       ...this.baseParameters,
     });
+    signale.info(`Found ${releases.data.length} releases`);
     await Promise.all(
       releases.data.map(async (release) => {
         await Promise.all(

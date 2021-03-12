@@ -11,6 +11,7 @@ export const dbPath = path.join(dbDirectory, 'ghsa.sqlite');
 
 const connection = createConnection({
   type: 'better-sqlite3',
+  synchronize: true,
   database: dbPath,
   entities: [Package, Vulnerability],
 });

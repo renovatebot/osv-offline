@@ -78,6 +78,9 @@ export function convertToVulnerability(
     patchedVersions: versions.map((tuple) => tuple.patchedVersion),
     vulnerableVersions: versions.map((tuple) => tuple.applicableVersions),
     references: ghsa.Advisory.References.map((reference) => reference.Url),
+    identifiers: ghsa.Advisory.Identifiers.map(
+      (identifier) => identifier.Value
+    ),
     severity: ghsa.Severity,
   };
 }
