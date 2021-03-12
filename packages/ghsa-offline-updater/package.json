@@ -20,7 +20,7 @@
     "@octokit/rest": "18.3.5",
     "fdir": "5.0.0",
     "fs-extra": "9.1.0",
-    "ghsa-offline": "0.0.1",
+    "ghsa-offline-db": "0.0.1",
     "luxon": "1.26.0",
     "signale": "1.4.0",
     "simple-git": "2.36.2"
