@@ -19,8 +19,8 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      - run: yarn install --frozen-lockfile
+      - run: npm ci
 
-      - run: yarn start
+      - run: npm run start
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
