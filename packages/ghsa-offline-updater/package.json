@@ -10,7 +10,7 @@
     "@tsconfig/node14": "1.0.0",
     "@types/fs-extra": "9.0.10",
     "@types/luxon": "1.26.3",
-    "@types/node": "14.14.35",
+    "@types/node": "14.14.37",
     "@types/signale": "1.4.1",
     "prettier": "2.2.1",
     "ts-node": "9.1.1",
