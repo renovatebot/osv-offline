@@ -14,6 +14,6 @@
   "dependencies": {
     "better-sqlite3": "7.1.4",
     "reflect-metadata": "0.1.13",
-    "typeorm": "0.2.31"
+    "typeorm": "0.2.32"
   }
 }
