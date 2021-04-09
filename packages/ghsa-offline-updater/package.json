@@ -9,7 +9,7 @@
   "devDependencies": {
     "@tsconfig/node14": "1.0.0",
     "@types/fs-extra": "9.0.10",
-    "@types/luxon": "1.26.2",
+    "@types/luxon": "1.26.3",
     "@types/node": "14.14.35",
     "@types/signale": "1.4.1",
     "prettier": "2.2.1",
