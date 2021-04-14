@@ -23,6 +23,6 @@
     "ghsa-offline-db": "0.0.1",
     "luxon": "1.26.0",
     "signale": "1.4.0",
-    "simple-git": "2.37.0"
+    "simple-git": "2.38.0"
   }
 }
