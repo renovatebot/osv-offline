@@ -13,7 +13,7 @@
     "build": "tsc --build",
     "clean": "tsc --build --clean",
     "start": "cross-env TS_NODE_PROJECT=./packages/tsconfig.json ts-node ./packages/ghsa-offline-updater/src/index.ts",
-    "release": "multi-semantic-release"
+    "release": "multi-semantic-release --ignore-packages=packages/ghsa-offline-updater"
   },
   "devDependencies": {
     "@tsconfig/node14": "1.0.0",
