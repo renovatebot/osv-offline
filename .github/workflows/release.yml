@@ -22,7 +22,7 @@ jobs:
 
       - run: npm run build
 
-      - run: npm run release --workspaces
+      - run: npm run release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

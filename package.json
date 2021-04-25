@@ -4,7 +4,7 @@
   "workspaces": [
     "./packages/*"
   ],
-  "version": "0.0.0-development",
+  "version": "0.0.0-semantic-release",
   "repository": {
     "type": "git",
     "url": "https://github.com/JamieMagee/ghsa-offline.git"
@@ -12,10 +12,12 @@
   "scripts": {
     "build": "tsc --build",
     "clean": "tsc --build --clean",
-    "start": "cross-env TS_NODE_PROJECT=./tsconfig.packages.json ts-node ./packages/ghsa-offline-updater/src/index.ts"
+    "start": "cross-env TS_NODE_PROJECT=./packages/tsconfig.json ts-node ./packages/ghsa-offline-updater/src/index.ts",
+    "release": "multi-semantic-release"
   },
   "devDependencies": {
     "@tsconfig/node14": "1.0.0",
-    "cross-env": "7.0.3"
+    "cross-env": "7.0.3",
+    "multi-semantic-release": "^2.8.0"
   }
 }
