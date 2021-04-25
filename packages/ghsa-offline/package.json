@@ -5,7 +5,7 @@
   "types": "dist/index.d.ts",
   "license": "MIT",
   "scripts": {
-    "release": "semantic-release -d"
+    "release": "semantic-release"
   },
   "dependencies": {
     "@octokit/rest": "18.5.3",

@@ -5,7 +5,7 @@
   "types": "dist/index.d.ts",
   "license": "MIT",
   "scripts": {
-    "release": "semantic-release -d"
+    "release": "semantic-release"
   },
    "dependencies": {
     "better-sqlite3": "7.1.5",
