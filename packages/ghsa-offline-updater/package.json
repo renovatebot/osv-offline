@@ -1,6 +1,6 @@
 {
   "name": "@jamiemagee/ghsa-offline-updater",
-  "version": "0.0.1",
+  "version": "0.0.0-semantic-release",
   "main": "src/index.ts",
   "license": "MIT",
   "private": true,
@@ -12,7 +12,7 @@
     "@octokit/rest": "18.5.3",
     "fdir": "5.0.0",
     "fs-extra": "9.1.0",
-    "@jamiemagee/ghsa-offline-db": "0.0.1",
+    "@jamiemagee/ghsa-offline-db": "1.0.0",
     "luxon": "1.26.0",
     "signale": "1.4.0",
     "simple-git": "2.38.0"

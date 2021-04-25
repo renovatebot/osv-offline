@@ -1,6 +1,6 @@
 {
   "name": "@jamiemagee/ghsa-offline-db",
-  "version": "0.0.1",
+  "version": "0.0.0-semantic-release",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "license": "MIT",
