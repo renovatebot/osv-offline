@@ -1,7 +1,7 @@
 name: Upload Database
 
 env:
-  NODE_VERSION: 15
+  NODE_VERSION: 16
 
 on:
   schedule:

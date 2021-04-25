@@ -1,12 +1,12 @@
-name: Build
+name: Release
 
 env:
   NODE_VERSION: 16
 
 on:
   push:
-  pull_request:
-
+    branches:
+      - main
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -21,3 +21,5 @@ jobs:
       - run: npm ci
 
       - run: npm run build
+
+      - run: npm run release --workspaces

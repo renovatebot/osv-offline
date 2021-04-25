@@ -4,7 +4,7 @@ import fs from 'fs-extra';
 import simpleGit, { SimpleGit } from 'simple-git';
 import { fdir, PathsOutput } from 'fdir';
 import { GithubSecurityAdvisory, Version } from './types';
-import { Package, Vulnerability } from 'ghsa-offline-db';
+import { Package, Vulnerability } from '@jamiemagee/ghsa-offline-db';
 
 export class VulnList {
   private readonly repoPath = path.join(tmpdir(), 'vuln-list');

@@ -4,7 +4,7 @@ import {
   dbPath,
   packageRepository,
   vulnerabilityRepository,
-} from 'ghsa-offline-db';
+} from '@jamiemagee/ghsa-offline-db';
 import { GitHub } from './github';
 import {
   convertToPackage,

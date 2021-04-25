@@ -1,20 +1,25 @@
 {
-  "name": "ghsa-offline",
+  "name": "@jamiemagee/ghsa-offline",
   "version": "0.0.1",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "license": "MIT",
-  "devDependencies": {
-    "@types/fs-extra": "9.0.11",
-    "@types/node": "14.14.41",
-    "prettier": "2.2.1",
-    "ts-node": "9.1.1",
-    "typescript": "4.2.4"
+  "scripts": {
+    "release": "semantic-release -d"
   },
   "dependencies": {
     "@octokit/rest": "18.5.3",
     "fs-extra": "9.1.0",
     "got": "11.8.2",
-    "ghsa-offline-db": "0.0.1"
+    "@jamiemagee/ghsa-offline-db": "0.0.1"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "9.0.11",
+    "@types/node": "14.14.41",
+    "prettier": "2.2.1",
+    "semantic-release": "17.4.2",
+    "semantic-release-monorepo": "7.0.5",
+    "ts-node": "9.1.1",
+    "typescript": "4.2.4"
   }
 }

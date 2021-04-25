@@ -1,6 +1,6 @@
 import { downloadDb } from './download';
 import * as db from './db';
-import { Package } from 'ghsa-offline-db';
+import { Package } from '@jamiemagee/ghsa-offline-db';
 
 export class GhsaOffline {
   private constructor() {}

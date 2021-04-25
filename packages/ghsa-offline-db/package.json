@@ -1,19 +1,22 @@
 {
-  "name": "ghsa-offline-db",
+  "name": "@jamiemagee/ghsa-offline-db",
   "version": "0.0.1",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "license": "MIT",
+  "scripts": {
+    "release": "semantic-release -d"
+  },
+   "dependencies": {
+    "better-sqlite3": "7.1.5",
+    "reflect-metadata": "0.1.13",
+    "typeorm": "0.2.32"
+  },
   "devDependencies": {
     "@tsconfig/node14": "1.0.0",
     "@types/node": "14.14.41",
     "prettier": "2.2.1",
     "ts-node": "9.1.1",
     "typescript": "4.2.4"
-  },
-  "dependencies": {
-    "better-sqlite3": "7.1.5",
-    "reflect-metadata": "0.1.13",
-    "typeorm": "0.2.32"
   }
 }

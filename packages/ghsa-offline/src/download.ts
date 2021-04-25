@@ -3,7 +3,7 @@ import { Octokit } from '@octokit/rest';
 import got from 'got';
 import { Stream } from 'stream';
 import { promisify } from 'util';
-import { dbPath, dbDirectory, dbFileName } from 'ghsa-offline-db';
+import { dbPath, dbDirectory, dbFileName } from '@jamiemagee/ghsa-offline-db';
 
 const pipeline = promisify(Stream.pipeline);
 

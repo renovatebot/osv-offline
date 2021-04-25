@@ -1,4 +1,4 @@
-import { packageRepository } from 'ghsa-offline-db';
+import { packageRepository } from '@jamiemagee/ghsa-offline-db';
 
 export const getComposerPackage = (packageName: string) =>
   packageRepository.then((packageRepository) => {
