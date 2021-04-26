@@ -16,8 +16,8 @@
     "release": "multi-semantic-release --ignore-packages=packages/ghsa-offline-updater"
   },
   "devDependencies": {
+    "@qiwi/multi-semantic-release": "3.14.2",
     "@tsconfig/node14": "1.0.0",
-    "cross-env": "7.0.3",
-    "multi-semantic-release": "2.8.0"
+    "cross-env": "7.0.3"
   }
 }
