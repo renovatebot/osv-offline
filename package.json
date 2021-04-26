@@ -12,7 +12,7 @@
   "scripts": {
     "build": "tsc --build",
     "clean": "tsc --build --clean",
-    "start": "cross-env TS_NODE_PROJECT=./packages/tsconfig.json ts-node ./packages/ghsa-offline-updater/src/index.ts",
+    "start": "cross-env TS_NODE_PROJECT=./tsconfig.packages.json ts-node ./packages/ghsa-offline-updater/src/index.ts",
     "release": "multi-semantic-release --ignore-packages=packages/ghsa-offline-updater"
   },
   "devDependencies": {
