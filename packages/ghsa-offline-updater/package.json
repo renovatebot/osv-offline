@@ -13,7 +13,7 @@
     "fdir": "5.0.0",
     "fs-extra": "10.0.0",
     "@jamiemagee/ghsa-offline-db": "*",
-    "luxon": "1.26.0",
+    "luxon": "1.27.0",
     "signale": "1.4.0",
     "simple-git": "2.39.0"
   },
