@@ -9,7 +9,7 @@
     "release": ""
   },
   "dependencies": {
-    "@octokit/rest": "18.5.4",
+    "@octokit/rest": "18.5.5",
     "fdir": "5.1.0",
     "fs-extra": "10.0.0",
     "@jamiemagee/ghsa-offline-db": "*",
