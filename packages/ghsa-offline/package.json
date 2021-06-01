@@ -5,7 +5,7 @@
   "types": "dist/index.d.ts",
   "license": "MIT",
   "dependencies": {
-    "@octokit/rest": "18.5.5",
+    "@octokit/rest": "18.5.6",
     "fs-extra": "10.0.0",
     "got": "11.8.2",
     "@jamiemagee/ghsa-offline-db": "*"
