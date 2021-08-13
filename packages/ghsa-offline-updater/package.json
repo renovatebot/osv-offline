@@ -15,7 +15,7 @@
     "@jamiemagee/ghsa-offline-db": "*",
     "luxon": "1.28.0",
     "signale": "1.4.0",
-    "simple-git": "2.42.0"
+    "simple-git": "2.43.0"
   },
   "devDependencies": {
     "@tsconfig/node14": "1.0.1",
