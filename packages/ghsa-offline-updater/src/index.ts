@@ -27,21 +27,23 @@ import signale from 'signale';
   signale.info(`found ${files.length} vulnerabilities`);
 
   await Promise.all(
-    files.map(
-      async (file): Promise<void> => {
-        var content = await fs.readFile(file, { encoding: 'utf-8' });
-        const ghsa: GithubSecurityAdvisory = JSON.parse(content);
+    files.map(async (file): Promise<void> => {
+      var content = await fs.readFile(file, { encoding: 'utf-8' });
+      const ghsa: GithubSecurityAdvisory = JSON.parse(content);
 
-        const p = convertToPackage(ghsa);
-        await (await packageRepository).saveIfNotExist(p);
-        const v = convertToVulnerability(ghsa);
-        await (await vulnerabilityRepository).save(v);
-        signale.info(`${p.ecosystem}-${p.packageName}-${v.identifiers![0]}`);
-      }
-    )
+      const p = convertToPackage(ghsa);
+      await (await packageRepository).saveIfNotExist(p);
+      const v = convertToVulnerability(ghsa);
+      await (await vulnerabilityRepository).save(v);
+      signale.info(`${p.ecosystem}-${p.packageName}-${v.identifiers![0]}`);
+    })
   );
 
-  signale.info('Uploading database');
-  var gh = new GitHub();
-  await gh.uploadDatabase(dbPath);
+  if (process.env.GITHUB_TOKEN) {
+    signale.info('Uploading database');
+    var gh = new GitHub();
+    await gh.uploadDatabase(dbPath);
+  } else {
+    signale.warn('Skipping upload');
+  }
 })();
