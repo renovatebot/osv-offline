@@ -10,6 +10,16 @@ export const getComposerPackage = (packageName: string) =>
       .getOne();
   });
 
+export const getGoPackage = (packageName: string) =>
+  packageRepository.then((packageRepository) => {
+    return packageRepository
+      .createQueryBuilder('p')
+      .leftJoinAndSelect('p.vulnerabilities', 'v')
+      .where('p.ecosystem = :ecosystem', { ecosystem: 'GO' })
+      .where('p.packageName = :packageName', { packageName: packageName })
+      .getOne();
+  });
+
 export const getMavenPackage = (packageName: string) =>
   packageRepository.then((packageRepository) => {
     return packageRepository
@@ -56,6 +66,16 @@ export const getRubyGemsPackage = (packageName: string) =>
       .createQueryBuilder('p')
       .leftJoinAndSelect('p.vulnerabilities', 'v')
       .where('p.ecosystem = :ecosystem', { ecosystem: 'RUBYGEMS' })
+      .where('p.packageName = :packageName', { packageName: packageName })
+      .getOne();
+  });
+
+export const getRustPackage = (packageName: string) =>
+  packageRepository.then((packageRepository) => {
+    return packageRepository
+      .createQueryBuilder('p')
+      .leftJoinAndSelect('p.vulnerabilities', 'v')
+      .where('p.ecosystem = :ecosystem', { ecosystem: 'RUST' })
       .where('p.packageName = :packageName', { packageName: packageName })
       .getOne();
   });

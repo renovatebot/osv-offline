@@ -36,7 +36,15 @@ export type Package = {
   /**
    * The ecosystem the package belongs to, e.g. RUBYGEMS, NPM.
    */
-  Ecosystem: 'COMPOSER' | 'MAVEN' | 'NPM' | 'NUGET' | 'PIP' | 'RUBYGEMS';
+  Ecosystem:
+    | 'COMPOSER'
+    | 'GO'
+    | 'MAVEN'
+    | 'NPM'
+    | 'NUGET'
+    | 'PIP'
+    | 'RUBYGEMS'
+    | 'RUST';
 
   /**
    * The package name.

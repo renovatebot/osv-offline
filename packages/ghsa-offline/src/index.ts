@@ -19,6 +19,10 @@ export class GhsaOffline {
     return db.getComposerPackage(packageName);
   }
 
+  getGoPackage(packageName: string): Promise<Package | undefined> {
+    return db.getGoPackage(packageName);
+  }
+
   getMavenPackage(packageName: string): Promise<Package | undefined> {
     return db.getMavenPackage(packageName);
   }
@@ -37,5 +41,9 @@ export class GhsaOffline {
 
   getRubyGemsPackage(packageName: string): Promise<Package | undefined> {
     return db.getRubyGemsPackage(packageName);
+  }
+
+  getRustPackage(packageName: string): Promise<Package | undefined> {
+    return db.getRustPackage(packageName);
   }
 }

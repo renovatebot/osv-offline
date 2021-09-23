@@ -1,10 +1,4 @@
-import {
-  BaseEntity,
-  Entity,
-  JoinColumn,
-  OneToMany,
-  PrimaryColumn,
-} from 'typeorm';
+import { BaseEntity, Entity, OneToMany, PrimaryColumn } from 'typeorm';
 import { Vulnerability } from './Vulnerability';
 
 @Entity()

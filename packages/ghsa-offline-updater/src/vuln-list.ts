@@ -40,9 +40,10 @@ export class VulnList {
   }
 }
 
-export function parseVersions(
-  version: Version
-): { patchedVersion: string; applicableVersions: string } {
+export function parseVersions(version: Version): {
+  patchedVersion: string;
+  applicableVersions: string;
+} {
   if (version.FirstPatchedVersion.Identifier.startsWith('< ')) {
     return {
       patchedVersion: version.FirstPatchedVersion.Identifier.substring(2),

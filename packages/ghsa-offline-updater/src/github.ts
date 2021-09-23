@@ -91,7 +91,7 @@ export class GitHub {
     await this.octokit.repos.uploadReleaseAsset({
       ...this.baseParameters,
       release_id: releaseId,
-      data: ((await fs.readFile(path)) as unknown) as string,
+      data: (await fs.readFile(path)) as unknown as string,
       headers: {
         'content-type': 'application/octet-stream',
         'content-length': (await fs.stat(path)).size,
