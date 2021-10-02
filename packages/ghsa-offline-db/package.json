@@ -7,7 +7,7 @@
    "dependencies": {
     "better-sqlite3": "7.4.3",
     "reflect-metadata": "0.1.13",
-    "typeorm": "0.2.37"
+    "typeorm": "0.2.38"
   },
   "devDependencies": {
     "@tsconfig/node14": "1.0.1",
