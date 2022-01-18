@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@octokit/rest": "18.12.0",
-    "fdir": "5.1.0",
+    "fdir": "5.2.0",
     "fs-extra": "10.0.0",
     "@jamiemagee/ghsa-offline-db": "*",
     "luxon": "2.3.0",
