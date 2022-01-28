@@ -49,9 +49,11 @@ export class GitHub {
         });
       })
     );
-    const tags = await this.octokit.repos.listTags({ ...this.baseParameters });
+    const tags = (
+      await this.octokit.repos.listTags({ ...this.baseParameters })
+    ).data.filter((tag) => tag.name.startsWith('1-'));
     await Promise.all(
-      tags.data.map(async (tag) => {
+      tags.map(async (tag) => {
         await this.octokit.git.deleteRef({
           ...this.baseParameters,
           ref: `tags/${tag.name}`,
