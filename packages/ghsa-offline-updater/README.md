@@ -8,4 +8,4 @@
 
 This package is licensed under [the MIT license](https://opensource.org/licenses/MIT).
 
-The GitHub Advisory Database is licensed under [the Create Commons Attribution 4.0 license](https://creativecommons.org/licenses/by/4.0/) ([source](https://docs.github.com/en/github/site-policy/github-additional-product-terms#b-license-to-the-github-advisory-database)).
+The GitHub Advisory Database is licensed under [the Create Commons Attribution 4.0 license](https://creativecommons.org/licenses/by/4.0/) ([source](https://docs.github.com/en/github/site-policy/github-terms-for-additional-products-and-features#advisory-database)).
