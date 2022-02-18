@@ -12,12 +12,23 @@
   "scripts": {
     "build": "tsc --build",
     "clean": "tsc --build --clean",
+    "eslint": "eslint .",
     "start": "cross-env TS_NODE_PROJECT=./tsconfig.packages.json ts-node ./packages/ghsa-offline-updater/src/index.ts",
     "release": "multi-semantic-release --ignore-packages=packages/ghsa-offline-updater"
   },
   "devDependencies": {
     "@qiwi/multi-semantic-release": "3.17.1",
     "@tsconfig/node14": "1.0.1",
-    "cross-env": "7.0.3"
+    "@types/eslint": "^8.4.1",
+    "@types/jest": "^27.4.0",
+    "@typescript-eslint/eslint-plugin": "5.12.0",
+    "@typescript-eslint/parser": "5.12.0",
+    "cross-env": "7.0.3",
+    "eslint-config-prettier": "8.3.0",
+    "eslint-plugin-import": "2.25.4",
+    "eslint-plugin-jest": "26.1.1",
+    "eslint-plugin-promise": "6.0.0",
+    "jest": "^27.5.1",
+    "ts-jest": "^27.1.3"
   }
 }

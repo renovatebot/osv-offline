@@ -1,10 +1,10 @@
 import { BaseEntity, Entity, OneToMany, PrimaryColumn } from 'typeorm';
-import { Vulnerability } from './Vulnerability';
+import { Vulnerability } from './vulnerability';
 
 @Entity()
 export class Package extends BaseEntity {
   @PrimaryColumn()
-  ecosystem!: string;
+  ecosystem!: Ecosystem;
 
   @PrimaryColumn()
   packageName!: string;
@@ -12,3 +12,13 @@ export class Package extends BaseEntity {
   @OneToMany('Vulnerability', 'package')
   vulnerabilities!: Vulnerability[];
 }
+
+export type Ecosystem =
+  | 'COMPOSER'
+  | 'GO'
+  | 'MAVEN'
+  | 'NPM'
+  | 'NUGET'
+  | 'PIP'
+  | 'RUBYGEMS'
+  | 'RUST';

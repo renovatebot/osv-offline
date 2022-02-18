@@ -1,18 +1,15 @@
 import fs from 'fs-extra';
-import { GithubSecurityAdvisory } from './types';
-import {
-  dbPath,
-  packageRepository,
-  vulnerabilityRepository,
-} from '@jamiemagee/ghsa-offline-db';
+import type { GithubSecurityAdvisory } from './types';
+import { GhsaOfflineDb, dbPath } from '@jamiemagee/ghsa-offline-db';
 import { GitHub } from './github';
 import {
+  VulnList,
   convertToPackage,
   convertToVulnerability,
-  VulnList,
 } from './vuln-list';
 import signale from 'signale';
 
+// eslint-disable-next-line @typescript-eslint/no-floating-promises
 (async () => {
   try {
     await fs.remove(dbPath);
@@ -21,27 +18,29 @@ import signale from 'signale';
     signale.info('No existing database found');
   }
 
-  var vulnList = new VulnList();
+  const vulnList = new VulnList();
   await vulnList.clone();
   const files = await vulnList.crawl();
   signale.info(`found ${files.length} vulnerabilities`);
 
+  const ghsaOfflineDb = await GhsaOfflineDb.create();
+
   await Promise.all(
     files.map(async (file): Promise<void> => {
-      var content = await fs.readFile(file, { encoding: 'utf-8' });
+      const content = await fs.readFile(file, { encoding: 'utf-8' });
       const ghsa: GithubSecurityAdvisory = JSON.parse(content);
 
       const p = convertToPackage(ghsa);
-      await (await packageRepository).saveIfNotExist(p);
+      await ghsaOfflineDb.packageRepository.saveIfNotExist(p);
       const v = convertToVulnerability(ghsa);
-      await (await vulnerabilityRepository).save(v);
-      signale.info(`${p.ecosystem}-${p.packageName}-${v.identifiers![0]}`);
+      await ghsaOfflineDb.vulnerabilityRepository.save(v);
+      signale.info(`${p.ecosystem}-${p.packageName}-${v.identifiers[0]}`);
     })
   );
 
   if (process.env.GITHUB_TOKEN) {
     signale.info('Uploading database');
-    var gh = new GitHub();
+    const gh = new GitHub();
     await gh.uploadDatabase(dbPath);
   } else {
     signale.warn('Skipping upload');
