@@ -2,8 +2,8 @@ import { tmpdir } from 'os';
 import path from 'path';
 import fs from 'fs-extra';
 import simpleGit, { SimpleGit } from 'simple-git';
-import { fdir, PathsOutput } from 'fdir';
-import { GithubSecurityAdvisory, Version } from './types';
+import { PathsOutput, fdir } from 'fdir';
+import type { GithubSecurityAdvisory, Version } from './types';
 import { Package, Vulnerability } from '@jamiemagee/ghsa-offline-db';
 
 export class VulnList {
@@ -60,7 +60,7 @@ export function parseVersions(version: Version): {
 
 export function convertToPackage(
   ghsa: GithubSecurityAdvisory
-): Partial<Package> {
+): Pick<Package, 'ecosystem' | 'packageName'> {
   return {
     ecosystem: ghsa.Package.Ecosystem,
     packageName: ghsa.Package.Name,
@@ -69,7 +69,18 @@ export function convertToPackage(
 
 export function convertToVulnerability(
   ghsa: GithubSecurityAdvisory
-): Partial<Vulnerability> {
+): Pick<
+  Vulnerability,
+  | 'ecosystem'
+  | 'packageName'
+  | 'title'
+  | 'description'
+  | 'patchedVersions'
+  | 'vulnerableVersions'
+  | 'references'
+  | 'identifiers'
+  | 'severity'
+> {
   const versions = ghsa.Versions.map((version) => parseVersions(version));
   return {
     ecosystem: ghsa.Package.Ecosystem,
