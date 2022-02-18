@@ -1,5 +1,5 @@
 import { EntityRepository, Repository } from 'typeorm';
-import { Package } from '../entity/Package';
+import { Package } from '../entity/package';
 
 @EntityRepository(Package)
 export class PackageRepository extends Repository<Package> {
