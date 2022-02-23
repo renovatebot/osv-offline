@@ -17,7 +17,7 @@
     "release": "multi-semantic-release --ignore-packages=packages/ghsa-offline-updater"
   },
   "devDependencies": {
-    "@qiwi/multi-semantic-release": "3.17.1",
+    "@qiwi/multi-semantic-release": "4.0.0",
     "@tsconfig/node14": "1.0.1",
     "@types/eslint": "8.4.1",
     "@types/jest": "27.4.1",
