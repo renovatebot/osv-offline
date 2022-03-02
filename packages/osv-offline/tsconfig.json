@@ -6,7 +6,7 @@
   },
   "references": [
     {
-      "path": "../ghsa-offline-db"
+      "path": "../osv-offline-db"
     }
   ]
 }

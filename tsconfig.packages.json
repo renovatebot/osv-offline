@@ -1,8 +1,10 @@
 {
   "extends": "@tsconfig/node14/tsconfig.json",
   "compilerOptions": {
+    "esModuleInterop": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "composite": true
+    "composite": true,
+    "types": ["node", "jest", "jest-extended", "expect-more-jest"]
   }
 }

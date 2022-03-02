@@ -1,5 +1,5 @@
 {
-  "name": "@jamiemagee/ghsa-offline-monorepo",
+  "name": "@jamiemagee/osv-offline-monorepo",
   "private": true,
   "workspaces": [
     "./packages/*"
@@ -7,28 +7,31 @@
   "version": "0.0.0-semantic-release",
   "repository": {
     "type": "git",
-    "url": "https://github.com/JamieMagee/ghsa-offline.git"
+    "url": "https://github.com/jamiemagee/osv-offline.git"
   },
   "scripts": {
     "build": "tsc --build",
     "clean": "tsc --build --clean",
     "eslint": "eslint .",
-    "start": "cross-env TS_NODE_PROJECT=./tsconfig.packages.json ts-node ./packages/ghsa-offline-updater/src/index.ts",
-    "release": "multi-semantic-release --ignore-packages=packages/ghsa-offline-updater"
+    "start": "cross-env TS_NODE_PROJECT=./tsconfig.packages.json ts-node ./packages/osv-offline-updater/src/index.ts",
+    "release": "multi-semantic-release --ignore-packages=packages/osv-offline-updater",
+    "test": "jest"
   },
   "devDependencies": {
-    "@qiwi/multi-semantic-release": "4.0.2",
+    "@qiwi/multi-semantic-release": "4.0.3",
     "@tsconfig/node14": "1.0.1",
     "@types/eslint": "8.4.1",
     "@types/jest": "27.4.1",
-    "@typescript-eslint/eslint-plugin": "5.12.1",
-    "@typescript-eslint/parser": "5.12.1",
+    "@typescript-eslint/eslint-plugin": "5.13.0",
+    "@typescript-eslint/parser": "5.13.0",
     "cross-env": "7.0.3",
     "eslint-config-prettier": "8.4.0",
     "eslint-plugin-import": "2.25.4",
     "eslint-plugin-jest": "26.1.1",
     "eslint-plugin-promise": "6.0.0",
+    "expect-more-jest": "5.4.0",
     "jest": "27.5.1",
+    "jest-extended": "2.0.0",
     "ts-jest": "27.1.3"
   }
 }

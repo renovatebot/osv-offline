@@ -1,13 +1,13 @@
 {
   "references": [
     {
-      "path": "./packages/ghsa-offline"
+      "path": "./packages/osv-offline"
     },
     {
-      "path": "./packages/ghsa-offline-db"
+      "path": "./packages/osv-offline-db"
     },
     {
-      "path": "./packages/ghsa-offline-updater"
+      "path": "./packages/osv-offline-updater"
     }
   ],
   "files": [],

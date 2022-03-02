@@ -1,7 +1,7 @@
-# ghsa-offline-db
+# osv-offline-db
 
-[![](https://img.shields.io/npm/v/@jamiemagee/ghsa-offline-db?style=for-the-badge)](https://www.npmjs.com/package/@jamiemagee/ghsa-offline-db)
-[![](https://img.shields.io/github/workflow/status/JamieMagee/ghsa-offline/Build?style=for-the-badge)](https://github.com/JamieMagee/ghsa-offline/actions/workflows/build.yml)
+[![](https://img.shields.io/npm/v/@jamiemagee/osv-offline-db?style=for-the-badge)](https://www.npmjs.com/package/@jamiemagee/osv-offline-db)
+[![](https://img.shields.io/github/workflow/status/jamiemagee/osv-offline/Build?style=for-the-badge)](https://github.com/jamiemagee/osv-offline/actions/workflows/build.yml)
 [![](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge)](./LICENSE)
 
 ## License

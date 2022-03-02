@@ -1,17 +1,24 @@
-# ghsa-offline
+# osv-offline
 
-A collection of packages for using [GitHub security advisories](https://github.com/advisories) in Node.js.
+A collection of packages for using [Open Source Vulnerabilities](https://osv.dev/) in Node.js.
 
 ## Packages
 
-| Name                                                                  | Version                                                                                                                                                |
-|-----------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [`@jamiemagee/ghsa-offline`](./packages/ghsa-offline)                 | [![](https://img.shields.io/npm/v/@jamiemagee/ghsa-offline?style=for-the-badge)](https://www.npmjs.com/package/@jamiemagee/ghsa-offline)               |
-| [`@jamiemagee/ghsa-offline-db`](./packages/ghsa-offline-db)           | [![](https://img.shields.io/npm/v/@jamiemagee/ghsa-offline-db?style=for-the-badge)](https://www.npmjs.com/package/@jamiemagee/ghsa-offline-db)         |
-| [`@jamiemagee/ghsa-offline-updater`](./packages/ghsa-offline-updater) | [![](https://img.shields.io/github/v/release/JamieMagee/ghsa-offline?style=for-the-badge)](https://github.com/JamieMagee/ghsa-offline/releases/latest) |
+| Name                                                                | Version                                                                                                                                              |
+| ------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`@jamiemagee/osv-offline`](./packages/osv-offline)                 | [![](https://img.shields.io/npm/v/@jamiemagee/osv-offline?style=for-the-badge)](https://www.npmjs.com/package/@jamiemagee/osv-offline)               |
+| [`@jamiemagee/osv-offline-db`](./packages/osv-offline-db)           | [![](https://img.shields.io/npm/v/@jamiemagee/osv-offline-db?style=for-the-badge)](https://www.npmjs.com/package/@jamiemagee/osv-offline-db)         |
+| [`@jamiemagee/osv-offline-updater`](./packages/osv-offline-updater) | [![](https://img.shields.io/github/v/release/jamiemagee/osv-offline?style=for-the-badge)](https://github.com/jamiemagee/osv-offline/releases/latest) |
 
 ## License
 
 All packages in this repository are licensed under [the MIT license](https://opensource.org/licenses/MIT).
 
-The GitHub Advisory Database is licensed under [the Create Commons Attribution 4.0 license](https://creativecommons.org/licenses/by/4.0/) ([source](https://docs.github.com/en/github/site-policy/github-terms-for-additional-products-and-features#advisory-database)).
+Vulnerabilities are provided from the following upstream data sources and licenses:
+
+- [GitHub Advisory Database](https://github.com/github/advisory-database) ([CC-BY 4.0](https://github.com/github/advisory-database/blob/main/LICENSE.md))
+- [PyPI Advisory Database](https://github.com/pypa/advisory-database) ([CC-BY 4.0](https://github.com/pypa/advisory-database/blob/main/LICENSE))
+- [Go Vulnerability Database](https://github.com/golang/vulndb) ([CC-BY 4.0](https://github.com/golang/vulndb#license))
+- [Rust Advisory Database](https://github.com/RustSec/advisory-db) ([CC0 1.0](https://github.com/rustsec/advisory-db/blob/main/LICENSE.txt))
+- [Global Security Database](https://github.com/cloudsecurityalliance/gsd-database) ([CC0 1.0](https://github.com/cloudsecurityalliance/gsd-database/blob/main/LICENSE))
+- [OSS-Fuzz](https://github.com/google/oss-fuzz-vulns) ([CC-BY 4.0](https://github.com/google/oss-fuzz-vulns/blob/main/LICENSE))

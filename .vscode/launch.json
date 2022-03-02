@@ -1,7 +1,4 @@
 {
-  // Use IntelliSense to learn about possible attributes.
-  // Hover to view descriptions of existing attributes.
-  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
   "version": "0.2.0",
   "configurations": [
     {
@@ -10,10 +7,58 @@
       "name": "Run updater",
       "preLaunchTask": "build",
       "runtimeArgs": ["-r", "ts-node/register"],
-      "args": ["${workspaceFolder}/packages/ghsa-offline-updater/src/index.ts"],
+      "args": ["${workspaceFolder}/packages/osv-offline-updater/src/index.ts"],
       "console": "integratedTerminal",
-      "env": { "TS_NODE_PROJECT": "${workspaceFolder}/tsconfig.packages.json" },
+      "env": {
+        "TS_NODE_PROJECT": "${workspaceFolder}/tsconfig.packages.json"
+      },
       "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Jest Current File",
+      "program": "${workspaceFolder}/node_modules/.bin/jest",
+      "args": [
+        "--runInBand",
+        "--collectCoverage=false",
+        "--testTimeout=100000000",
+        "--runTestsByPath",
+        "${relativeFile}"
+      ],
+      "env": {
+        "NODE_ENV": "test",
+        "LOG_LEVEL": "debug"
+      },
+      "console": "integratedTerminal",
+      "windows": {
+        "program": "${workspaceFolder}/node_modules/jest/bin/jest"
+      },
+      "runtimeArgs": ["--preserve-symlinks"],
+      "protocol": "inspector",
+      "skipFiles": ["<node_internals>/**/*.js"]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Jest All",
+      "program": "${workspaceFolder}/node_modules/.bin/jest",
+      "args": [
+        "--runInBand",
+        "--collectCoverage=false",
+        "--testTimeout=100000000"
+      ],
+      "env": {
+        "NODE_ENV": "test",
+        "LOG_LEVEL": "debug"
+      },
+      "console": "integratedTerminal",
+      "windows": {
+        "program": "${workspaceFolder}/node_modules/jest/bin/jest"
+      },
+      "runtimeArgs": ["--preserve-symlinks"],
+      "protocol": "inspector",
+      "skipFiles": ["<node_internals>/**/*.js"]
     }
   ]
 }

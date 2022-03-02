@@ -1,13 +1,13 @@
 import fs from 'fs-extra';
 import { Octokit } from '@octokit/rest';
-import { DateTime } from 'luxon';
 import signale from 'signale';
+import { DateTime } from 'luxon';
 
 export class GitHub {
   private readonly octokit: Octokit;
   private readonly baseParameters: { owner: string; repo: string } = {
     owner: 'JamieMagee',
-    repo: 'ghsa-offline',
+    repo: 'osv-offline',
   };
 
   constructor() {
@@ -16,7 +16,7 @@ export class GitHub {
     });
   }
 
-  async uploadDatabase(path: string) {
+  async uploadDatabases(databases: { path: string; name: string }[]) {
     await this.deleteOldReleases();
     const latestCommit = await this.getLatestCommit();
     signale.info(`Latest commit is ${latestCommit}`);
@@ -24,7 +24,13 @@ export class GitHub {
     signale.info(`Created tag ${tag.data.tag}`);
     const release = await this.createRelease(tag.data.tag);
     signale.info(`Created release ${release.data.id}`);
-    await this.createReleaseAsset(release.data.id, path);
+    for (const database of databases) {
+      await this.createReleaseAsset(
+        release.data.id,
+        database.path,
+        database.name
+      );
+    }
   }
 
   private async deleteOldReleases() {
@@ -89,7 +95,11 @@ export class GitHub {
     });
   }
 
-  private async createReleaseAsset(releaseId: number, path: string) {
+  private async createReleaseAsset(
+    releaseId: number,
+    path: string,
+    name: string
+  ) {
     await this.octokit.repos.uploadReleaseAsset({
       ...this.baseParameters,
       release_id: releaseId,
@@ -98,7 +108,7 @@ export class GitHub {
         'content-type': 'application/octet-stream',
         'content-length': (await fs.stat(path)).size,
       },
-      name: 'ghsa.sqlite',
+      name,
     });
   }
 }
