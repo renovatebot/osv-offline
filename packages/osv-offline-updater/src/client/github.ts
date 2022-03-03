@@ -1,4 +1,3 @@
-import fs from 'fs-extra';
 import { Octokit } from '@octokit/rest';
 import signale from 'signale';
 import { DateTime } from 'luxon';
@@ -16,7 +15,7 @@ export class GitHub {
     });
   }
 
-  async uploadDatabases(databases: { path: string; name: string }[]) {
+  async uploadDatabase(zipFile: Buffer) {
     await this.deleteOldReleases();
     const latestCommit = await this.getLatestCommit();
     signale.info(`Latest commit is ${latestCommit}`);
@@ -24,13 +23,7 @@ export class GitHub {
     signale.info(`Created tag ${tag.data.tag}`);
     const release = await this.createRelease(tag.data.tag);
     signale.info(`Created release ${release.data.id}`);
-    for (const database of databases) {
-      await this.createReleaseAsset(
-        release.data.id,
-        database.path,
-        database.name
-      );
-    }
+    await this.createReleaseAsset(release.data.id, zipFile);
   }
 
   private async deleteOldReleases() {
@@ -95,20 +88,16 @@ export class GitHub {
     });
   }
 
-  private async createReleaseAsset(
-    releaseId: number,
-    path: string,
-    name: string
-  ) {
+  private async createReleaseAsset(releaseId: number, zipFile: Buffer) {
     await this.octokit.repos.uploadReleaseAsset({
       ...this.baseParameters,
       release_id: releaseId,
-      data: (await fs.readFile(path)) as unknown as string,
+      data: zipFile as unknown as string,
       headers: {
         'content-type': 'application/octet-stream',
-        'content-length': (await fs.stat(path)).size,
+        'content-length': zipFile.length,
       },
-      name,
+      name: 'osv-offline.zip',
     });
   }
 }
