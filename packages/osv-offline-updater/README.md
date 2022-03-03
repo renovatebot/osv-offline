@@ -1,11 +1,19 @@
 # osv-offline-updater
 
-[![](https://img.shields.io/github/v/release/jamiemagee/osv-offline?style=for-the-badge)](https://github.com/jamiemagee/osv-offline/releases/latest)
-[![](https://img.shields.io/github/workflow/status/jamiemagee/osv-offline/Upload%20Database?style=for-the-badge)](https://github.com/jamiemagee/osv-offline/actions/workflows/update.yml)
-[![](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge)](./LICENSE)
+[![Package version](https://img.shields.io/github/v/release/jamiemagee/osv-offline?style=for-the-badge)](https://github.com/jamiemagee/osv-offline/releases/latest)
+[![Build status](https://img.shields.io/github/workflow/status/jamiemagee/osv-offline/Upload%20Database?style=for-the-badge)](https://github.com/jamiemagee/osv-offline/actions/workflows/update.yml)
+[![MIT license](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge)](./LICENSE)
+![Stability experimental](https://img.shields.io/badge/stability-experimental-orange.svg?style=for-the-badge)
 
 ## License
 
 This package is licensed under [the MIT license](https://opensource.org/licenses/MIT).
 
-The GitHub Advisory Database is licensed under [the Create Commons Attribution 4.0 license](https://creativecommons.org/licenses/by/4.0/) ([source](https://docs.github.com/en/github/site-policy/github-terms-for-additional-products-and-features#advisory-database)).
+Vulnerabilities are provided from the following upstream data sources and licenses:
+
+- [GitHub Advisory Database](https://github.com/github/advisory-database) ([CC-BY 4.0](https://github.com/github/advisory-database/blob/main/LICENSE.md))
+- [PyPI Advisory Database](https://github.com/pypa/advisory-database) ([CC-BY 4.0](https://github.com/pypa/advisory-database/blob/main/LICENSE))
+- [Go Vulnerability Database](https://github.com/golang/vulndb) ([CC-BY 4.0](https://github.com/golang/vulndb#license))
+- [Rust Advisory Database](https://github.com/RustSec/advisory-db) ([CC0 1.0](https://github.com/rustsec/advisory-db/blob/main/LICENSE.txt))
+- [Global Security Database](https://github.com/cloudsecurityalliance/gsd-database) ([CC0 1.0](https://github.com/cloudsecurityalliance/gsd-database/blob/main/LICENSE))
+- [OSS-Fuzz](https://github.com/google/oss-fuzz-vulns) ([CC-BY 4.0](https://github.com/google/oss-fuzz-vulns/blob/main/LICENSE))

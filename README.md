@@ -2,6 +2,8 @@
 
 A collection of packages for using [Open Source Vulnerabilities](https://osv.dev/) in Node.js.
 
+![stability-experimental](https://img.shields.io/badge/stability-experimental-orange.svg?style=for-the-badge)
+
 ## Packages
 
 | Name                                                                | Version                                                                                                                                              |
