@@ -3,6 +3,7 @@ import path from 'path';
 import Datastore from '@seald-io/nedb';
 import { Ecosystem, ecosystems } from './ecosystem';
 import { Vulnerability } from './osv';
+import { Osv } from '..';
 
 export class OsvOfflineDb {
   public static readonly rootDirectory = path.join(tmpdir(), 'osv-offline');
@@ -29,14 +30,17 @@ export class OsvOfflineDb {
     return osvOfflineDb;
   }
 
-  async query(name: string, ecosystem: Ecosystem) {
+  async query(
+    ecosystem: Ecosystem,
+    packageName: string
+  ): Promise<Osv.Vulnerability[]> {
     return await this.db[ecosystem].findAsync({
       affected: {
         $elemMatch: {
           package: {
-            name,
+            name: packageName,
             ecosystem,
-            purl: `pkg:${ecosystem.toLowerCase()}/${name}`,
+            purl: `pkg:${ecosystem.toLowerCase()}/${packageName}`,
           },
         },
       },
