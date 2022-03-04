@@ -17,7 +17,12 @@ module.exports = {
   ],
   parserOptions: {
     ecmaVersion: 11,
-    project: ['./packages/*/tsconfig.json'],
+    project: [
+      'tsconfig.json',
+      './packages/osv-offline/tsconfig.json',
+      './packages/osv-offline-db/tsconfig.json',
+      './packages/osv-offline-updater/tsconfig.json',
+    ],
   },
   ignorePatterns: ['**/dist/**', 'jest.config.ts', '.eslintrc.js'],
   rules: {
