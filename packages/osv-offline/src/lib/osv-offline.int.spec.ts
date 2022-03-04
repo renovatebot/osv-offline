@@ -16,11 +16,20 @@ describe('lib/osv-offline', () => {
     });
   });
 
-  describe('getNpmPackage', () => {
+  describe('getVulnerabilities', () => {
     it('works', async () => {
-      const result = await osvOffline.getNpmPackage('lodash');
+      const result = await osvOffline.getVulnerabilities('npm', 'lodash');
 
       expect(result).not.toBeEmptyArray();
+    });
+
+    it('returns empty array for invalid package', async () => {
+      const result = await osvOffline.getVulnerabilities(
+        'npm',
+        'this-package-doesnt-exist'
+      );
+
+      expect(result).toBeEmptyArray();
     });
   });
 });
