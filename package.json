@@ -15,7 +15,7 @@
     "eslint": "eslint .",
     "start": "cross-env TS_NODE_PROJECT=./tsconfig.packages.json ts-node ./packages/osv-offline-updater/src/index.ts",
     "release": "multi-semantic-release --ignore-packages=packages/osv-offline-updater",
-    "test": "run-s test:unit test:integration",
+    "test": "run-s eslint test:unit test:integration",
     "test:unit": "jest --testPathPattern=unit.spec.ts",
     "test:integration": "jest --testPathPattern=int.spec.ts --runInBand"
   },
