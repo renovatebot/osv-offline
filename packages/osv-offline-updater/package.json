@@ -8,7 +8,7 @@
     "start": "ts-node ./src/index.ts"
   },
   "dependencies": {
-    "@jamiemagee/osv-offline-db": "*",
+    "@jamiemagee/osv-offline-db": "0.0.0-semantic-release",
     "@octokit/rest": "18.12.0",
     "@seald-io/nedb": "3.0.0-6",
     "adm-zip": "0.5.9",
