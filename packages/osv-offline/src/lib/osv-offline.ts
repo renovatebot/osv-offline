@@ -5,7 +5,7 @@ export class OsvOffline {
   private osvOfflineDb!: OsvOfflineDb;
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  private constructor() {}
+  protected constructor() {}
 
   /**
    * Asynchronous code required as part of class instantiation
