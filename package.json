@@ -20,7 +20,7 @@
     "test:integration": "jest --testPathPattern=int.spec.ts --runInBand"
   },
   "devDependencies": {
-    "@qiwi/multi-semantic-release": "6.0.2",
+    "@qiwi/multi-semantic-release": "6.1.0",
     "@tsconfig/node14": "1.0.1",
     "@types/eslint": "8.4.1",
     "@types/jest": "27.4.1",
