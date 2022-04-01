@@ -16,7 +16,7 @@
     "luxon": "2.3.1"
   },
   "devDependencies": {
-    "@types/adm-zip": "0.4.34",
+    "@types/adm-zip": "0.5.0",
     "@types/fs-extra": "9.0.13",
     "@types/luxon": "2.3.1",
     "@types/node": "14.18.12",
