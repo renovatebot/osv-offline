@@ -21,7 +21,7 @@
   },
   "devDependencies": {
     "@qiwi/multi-semantic-release": "6.4.0",
-    "@tsconfig/node14": "1.0.1",
+    "@tsconfig/node14": "1.0.2",
     "@types/eslint": "8.4.3",
     "@types/jest": "27.5.2",
     "@typescript-eslint/eslint-plugin": "5.27.1",
