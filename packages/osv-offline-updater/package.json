@@ -24,7 +24,7 @@
     "@types/luxon": "2.3.2",
     "@types/node": "16.11.41",
     "@types/signale": "1.4.4",
-    "prettier": "2.7.0",
+    "prettier": "2.7.1",
     "ts-node": "10.8.1",
     "typescript": "4.7.3"
   }
