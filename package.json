@@ -23,7 +23,7 @@
     "@qiwi/multi-semantic-release": "6.5.1",
     "@tsconfig/node14": "1.0.3",
     "@types/eslint": "8.4.5",
-    "@types/jest": "28.1.4",
+    "@types/jest": "28.1.5",
     "@typescript-eslint/eslint-plugin": "5.30.6",
     "@typescript-eslint/parser": "5.30.6",
     "cross-env": "7.0.3",
