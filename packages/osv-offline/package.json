@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@jamiemagee/osv-offline-db": "0.0.0-semantic-release",
-    "@octokit/rest": "19.0.3",
+    "@octokit/rest": "19.0.4",
     "adm-zip": "^0.5.9",
     "fs-extra": "10.0.0",
     "got": "11.8.5",
