@@ -11,7 +11,7 @@ import AdmZip from 'adm-zip';
 const pipeline = promisify(Stream.pipeline);
 
 const baseParameters: { owner: string; repo: string } = {
-  owner: 'JamieMagee',
+  owner: 'renovatebot',
   repo: 'osv-offline',
 };
 
