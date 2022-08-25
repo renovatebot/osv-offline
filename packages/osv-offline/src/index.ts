@@ -1,2 +1,2 @@
-export { Osv, Ecosystem } from '@jamiemagee/osv-offline-db';
+export { Osv, Ecosystem } from '@renovatebot/osv-offline-db';
 export { OsvOffline } from './lib/osv-offline';

@@ -1,5 +1,5 @@
 {
-  "name": "@jamiemagee/osv-offline-db",
+  "name": "@renovatebot/osv-offline-db",
   "version": "0.0.0-semantic-release",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

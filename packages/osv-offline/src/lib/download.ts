@@ -3,7 +3,7 @@ import { Octokit } from '@octokit/rest';
 import got from 'got';
 import { Stream } from 'stream';
 import { promisify } from 'util';
-import { OsvOfflineDb } from '@jamiemagee/osv-offline-db';
+import { OsvOfflineDb } from '@renovatebot/osv-offline-db';
 import path from 'path';
 import { DateTime } from 'luxon';
 import AdmZip from 'adm-zip';

@@ -1,5 +1,5 @@
 {
-  "name": "@jamiemagee/osv-offline-updater",
+  "name": "@renovatebot/osv-offline-updater",
   "version": "0.0.0-semantic-release",
   "main": "src/index.ts",
   "license": "MIT",
@@ -8,7 +8,7 @@
     "start": "ts-node ./src/index.ts"
   },
   "dependencies": {
-    "@jamiemagee/osv-offline-db": "0.0.0-semantic-release",
+    "@renovatebot/osv-offline-db": "0.0.0-semantic-release",
     "@octokit/rest": "19.0.4",
     "@seald-io/nedb": "3.0.0",
     "adm-zip": "0.5.9",

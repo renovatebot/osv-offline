@@ -1,5 +1,5 @@
 {
-  "name": "@jamiemagee/osv-offline-monorepo",
+  "name": "@renovatebot/osv-offline-monorepo",
   "private": true,
   "workspaces": [
     "./packages/*"
