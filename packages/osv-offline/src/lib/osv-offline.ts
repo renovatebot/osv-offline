@@ -1,4 +1,4 @@
-import { Ecosystem, Osv, OsvOfflineDb } from '@jamiemagee/osv-offline-db';
+import { Ecosystem, Osv, OsvOfflineDb } from '@renovatebot/osv-offline-db';
 import { tryDownloadDb } from './download';
 
 export class OsvOffline {

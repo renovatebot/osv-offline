@@ -8,9 +8,9 @@ A collection of packages for using [Open Source Vulnerabilities](https://osv.dev
 
 | Name                                                                | Version                                                                                                                                              |
 | ------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [`@jamiemagee/osv-offline`](./packages/osv-offline)                 | [![](https://img.shields.io/npm/v/@jamiemagee/osv-offline?style=for-the-badge)](https://www.npmjs.com/package/@jamiemagee/osv-offline)               |
-| [`@jamiemagee/osv-offline-db`](./packages/osv-offline-db)           | [![](https://img.shields.io/npm/v/@jamiemagee/osv-offline-db?style=for-the-badge)](https://www.npmjs.com/package/@jamiemagee/osv-offline-db)         |
-| [`@jamiemagee/osv-offline-updater`](./packages/osv-offline-updater) | [![](https://img.shields.io/github/v/release/jamiemagee/osv-offline?style=for-the-badge)](https://github.com/jamiemagee/osv-offline/releases/latest) |
+| [`@renovatebot/osv-offline`](./packages/osv-offline)                 | [![](https://img.shields.io/npm/v/@renovatebot/osv-offline?style=for-the-badge)](https://www.npmjs.com/package/@renovatebot/osv-offline)               |
+| [`@renovatebot/osv-offline-db`](./packages/osv-offline-db)           | [![](https://img.shields.io/npm/v/@renovatebot/osv-offline-db?style=for-the-badge)](https://www.npmjs.com/package/@renovatebot/osv-offline-db)         |
+| [`@renovatebot/osv-offline-updater`](./packages/osv-offline-updater) | [![](https://img.shields.io/github/v/release/jamiemagee/osv-offline?style=for-the-badge)](https://github.com/jamiemagee/osv-offline/releases/latest) |
 
 ## License
 
