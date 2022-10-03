@@ -23,7 +23,7 @@
     "@qiwi/multi-semantic-release": "6.5.1",
     "@tsconfig/node14": "1.0.3",
     "@types/eslint": "8.4.6",
-    "@types/jest": "29.0.3",
+    "@types/jest": "29.1.1",
     "@typescript-eslint/eslint-plugin": "5.38.1",
     "@typescript-eslint/parser": "5.38.1",
     "cross-env": "7.0.3",
@@ -32,7 +32,7 @@
     "eslint-plugin-jest": "27.0.4",
     "eslint-plugin-promise": "6.0.1",
     "expect-more-jest": "5.4.1",
-    "jest": "29.0.3",
+    "jest": "29.1.2",
     "jest-extended": "3.1.0",
     "npm-run-all": "4.1.5",
     "ts-jest": "29.0.3"
