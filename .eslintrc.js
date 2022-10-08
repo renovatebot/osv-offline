@@ -24,7 +24,7 @@ module.exports = {
       './packages/osv-offline-updater/tsconfig.json',
     ],
   },
-  ignorePatterns: ['**/dist/**', 'jest.config.ts', '.eslintrc.js'],
+  ignorePatterns: ['**/dist/**', 'jest.config.ts', '.eslintrc.js', 'tools/prepack.mjs'],
   rules: {
     'sort-imports': [
       'error',
