@@ -14,7 +14,7 @@
     "adm-zip": "0.5.9",
     "fs-extra": "10.1.0",
     "got": "11.8.5",
-    "luxon": "3.0.4",
+    "luxon": "3.1.0",
     "signale": "1.4.0"
   },
   "devDependencies": {
