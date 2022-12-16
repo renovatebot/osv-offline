@@ -12,7 +12,7 @@
     "@octokit/rest": "19.0.5",
     "adm-zip": "0.5.9",
     "fs-extra": "10.1.0",
-    "got": "11.8.5",
+    "got": "11.8.6",
     "luxon": "3.1.1"
   },
   "devDependencies": {
