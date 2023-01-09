@@ -8,7 +8,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@seald-io/nedb": "3.1.0"
+    "@seald-io/nedb": "^3.1.0"
   },
   "devDependencies": {
     "@tsconfig/node14": "1.0.3",
