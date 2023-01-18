@@ -4,30 +4,37 @@
  * https://github.com/ossf/osv-schema/blob/main/validation/schema.json
  */
 export interface Vulnerability {
-  affected?: Affected[];
-  aliases?: string[];
-  credits?: Credit[];
-  database_specific?: { [key: string]: unknown };
-  details?: string;
+  schema_version?: string;
   id: string;
   modified: string;
   published?: string;
-  references?: Reference[];
-  related?: string[];
-  schema_version?: string;
-  severity?: Severity[];
-  summary?: string;
   withdrawn?: string;
+  aliases?: string[];
+  related?: string[];
+  summary?: string;
+  details?: string;
+  severity?: Severity[];
+  affected?: Affected[];
+  references?: Reference[];
+  credits?: Credit[];
+  database_specific?: { [key: string]: unknown };
 }
 
 export interface Affected {
-  database_specific?: { [key: string]: unknown };
-  ecosystem_specific?: { [key: string]: unknown };
   package?: Package;
   severity?: Severity[];
   ranges?: Range[];
   versions?: string[];
+  ecosystem_specific?: { [key: string]: unknown };
+  database_specific?: { [key: string]: unknown };
 }
+
+export interface Severity {
+  type: SeverityType;
+  score: string;
+}
+
+export type SeverityType = 'CVSS_V3' | 'CVSS_V2';
 
 export interface Package {
   ecosystem: string;
@@ -36,11 +43,13 @@ export interface Package {
 }
 
 export interface Range {
-  events: Event[];
-  repo?: string;
   type: RangeType;
+  repo?: string;
+  events: Event[];
   database_specific?: { [key: string]: unknown };
 }
+
+export type RangeType = 'ECOSYSTEM' | 'GIT' | 'SEMVER';
 
 export interface Event {
   introduced?: string;
@@ -49,31 +58,22 @@ export interface Event {
   limit?: string;
 }
 
-export type RangeType = 'ECOSYSTEM' | 'GIT' | 'SEMVER';
-
-export interface Credit {
-  contact?: string[];
-  name: string;
-}
-
 export interface Reference {
   type: ReferenceType;
   url: string;
 }
 
-export type ReferenceType =
-  | 'ADVISORY'
-  | 'ARTICLE'
-  | 'EVIDENCE'
-  | 'FIX'
-  | 'GIT'
-  | 'PACKAGE'
-  | 'REPORT'
-  | 'WEB';
-
-export interface Severity {
-  score: string;
-  type: SeverityType;
+export interface Credit {
+  name: string;
+  contact?: string[];
 }
 
-export type SeverityType = 'CVSS_V3';
+export type ReferenceType =
+    | 'ADVISORY'
+    | 'ARTICLE'
+    | 'REPORT'
+    | 'FIX'
+    | 'GIT'
+    | 'PACKAGE'
+    | 'EVIDENCE'
+    | 'WEB';
