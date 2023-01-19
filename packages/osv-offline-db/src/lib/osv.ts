@@ -69,11 +69,11 @@ export interface Credit {
 }
 
 export type ReferenceType =
-    | 'ADVISORY'
-    | 'ARTICLE'
-    | 'REPORT'
-    | 'FIX'
-    | 'GIT'
-    | 'PACKAGE'
-    | 'EVIDENCE'
-    | 'WEB';
+  | 'ADVISORY'
+  | 'ARTICLE'
+  | 'REPORT'
+  | 'FIX'
+  | 'GIT'
+  | 'PACKAGE'
+  | 'EVIDENCE'
+  | 'WEB';
