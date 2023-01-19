@@ -40,7 +40,7 @@ export async function tryDownloadDb(): Promise<boolean> {
     })
   ).data[0];
 
-  const asset = latestRelease.assets.find(
+  const asset = latestRelease?.assets.find(
     (asset) => asset.name === 'osv-offline.zip'
   );
 
