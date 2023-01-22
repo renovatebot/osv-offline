@@ -2,9 +2,11 @@
 export const ecosystems = [
   'crates.io',
   'Go',
+  'Hex',
   'Maven',
   'npm',
   'NuGet',
+  'Packagist',
   'PyPI',
   'RubyGems',
 ] as const;
