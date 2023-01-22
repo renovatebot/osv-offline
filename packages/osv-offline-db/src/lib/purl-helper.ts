@@ -4,9 +4,11 @@ import type { Ecosystem } from './ecosystem';
 const PURL_ECOSYSTEMS: Record<Ecosystem, string> = {
   'crates.io': 'cargo',
   Go: 'golang',
+  Hex: 'hex',
   Maven: 'maven',
   NuGet: 'nuget',
   npm: 'npm',
+  Packagist: 'composer',
   PyPI: 'pypi',
   RubyGems: 'gem',
 } as const;
