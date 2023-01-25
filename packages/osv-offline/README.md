@@ -1,7 +1,7 @@
 # osv-offline
 
 [![Package version](https://img.shields.io/npm/v/@renovatebot/osv-offline?style=for-the-badge)](https://www.npmjs.com/package/@renovatebot/osv-offline)
-[![Build status](https://img.shields.io/github/workflow/status/jamiemagee/osv-offline/Build?style=for-the-badge)](https://github.com/jamiemagee/osv-offline/actions/workflows/build.yml)
+[![Build status](https://img.shields.io/github/actions/workflow/status/renovatebot/osv-offline/build.yml?branch=main&style=for-the-badge)](https://github.com/renovatebot/osv-offline/actions/workflows/build.yml)
 [![MIT license](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge)](./LICENSE)
 ![Stability experimental](https://img.shields.io/badge/stability-experimental-orange.svg?style=for-the-badge)
 
