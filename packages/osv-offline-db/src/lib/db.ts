@@ -4,6 +4,7 @@ import Datastore from '@seald-io/nedb';
 import { Ecosystem, ecosystems } from './ecosystem';
 import { Vulnerability } from './osv';
 import { Osv } from '..';
+import { packageToPurl } from './purl-helper';
 
 export class OsvOfflineDb {
   public static readonly rootDirectory = path.join(tmpdir(), 'osv-offline');
@@ -40,7 +41,7 @@ export class OsvOfflineDb {
           package: {
             name: packageName,
             ecosystem,
-            purl: `pkg:${ecosystem.toLowerCase()}/${packageName}`,
+            purl: packageToPurl(ecosystem, packageName),
           },
         },
       },
