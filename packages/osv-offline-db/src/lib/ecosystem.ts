@@ -1,12 +1,12 @@
-/**
- * https://github.com/google/osv/blob/b9f0d1c1b377b0ab5804808f24032be965a571b8/lib/osv/ecosystems.py#L313-L321
- */
+// https://github.com/google/osv.dev/blob/edacbd3c32b1d632bad8c5b506a14d0850b2e537/osv/ecosystems.py#L659-L679
 export const ecosystems = [
   'crates.io',
   'Go',
+  'Hex',
   'Maven',
   'npm',
   'NuGet',
+  'Packagist',
   'PyPI',
   'RubyGems',
 ] as const;
