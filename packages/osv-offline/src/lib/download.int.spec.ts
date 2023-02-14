@@ -28,5 +28,11 @@ describe('lib/download', () => {
       const stat = await fs.stat(zipFilePath);
       expect(stat.size).toBe(0);
     });
+
+    it('skips download in case of invalid GitHub token', async () => {
+      process.env.GITHUB_COM_TOKEN = 'some-token';
+
+      await expect(tryDownloadDb()).resolves.toBeFalse();
+    });
   });
 });
