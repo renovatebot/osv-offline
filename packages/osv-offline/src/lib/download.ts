@@ -34,11 +34,20 @@ export async function tryDownloadDb(): Promise<boolean> {
     return true;
   }
 
-  const latestRelease = (
-    await new Octokit().repos.listReleases({
-      ...baseParameters,
-    })
-  ).data[0];
+  const octokitOptions = process.env.GITHUB_COM_TOKEN
+    ? { auth: process.env.GITHUB_COM_TOKEN }
+    : undefined;
+
+  let latestRelease = null;
+  try {
+    latestRelease = (
+      await new Octokit(octokitOptions).repos.listReleases({
+        ...baseParameters,
+      })
+    ).data[0];
+  } catch (err) {
+    return false;
+  }
 
   const asset = latestRelease?.assets.find(
     (asset) => asset.name === 'osv-offline.zip'
