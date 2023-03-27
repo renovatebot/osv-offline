@@ -1,5 +1,5 @@
 import { packageToPurl } from './purl-helper';
-import { Ecosystem } from './ecosystem';
+import type { Ecosystem } from './ecosystem';
 
 describe('lib/purl-helper', () => {
   describe('test ecosystems', () => {
