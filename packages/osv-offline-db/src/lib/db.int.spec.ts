@@ -1,7 +1,7 @@
 import { OsvOfflineDb } from './db';
 import fs from 'fs-extra';
 import path from 'path';
-import { Vulnerability } from './osv';
+import type { Vulnerability } from './osv';
 
 describe('lib/db', () => {
   let osvOfflineDb: OsvOfflineDb;

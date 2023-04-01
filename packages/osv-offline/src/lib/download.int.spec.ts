@@ -30,7 +30,7 @@ describe('lib/download', () => {
     });
 
     it('skips download in case of invalid GitHub token', async () => {
-      process.env.GITHUB_COM_TOKEN = 'some-token';
+      process.env['GITHUB_COM_TOKEN'] = 'some-token';
 
       await expect(tryDownloadDb()).resolves.toBeFalse();
     });

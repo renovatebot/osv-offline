@@ -18,7 +18,8 @@
     "signale": "1.4.0"
   },
   "devDependencies": {
-    "@tsconfig/node14": "1.0.3",
+    "@tsconfig/node18": "1.0.1",
+    "@tsconfig/strictest": "1.0.2",
     "@types/adm-zip": "0.5.0",
     "@types/fs-extra": "11.0.1",
     "@types/luxon": "3.2.0",

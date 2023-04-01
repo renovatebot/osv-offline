@@ -11,7 +11,7 @@ export class GitHub {
 
   constructor() {
     this.octokit = new Octokit({
-      auth: process.env.GITHUB_TOKEN,
+      auth: process.env['GITHUB_TOKEN'],
     });
   }
 

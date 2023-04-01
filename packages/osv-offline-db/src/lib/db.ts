@@ -2,8 +2,8 @@ import { tmpdir } from 'os';
 import path from 'path';
 import Datastore from '@seald-io/nedb';
 import { Ecosystem, ecosystems } from './ecosystem';
-import { Vulnerability } from './osv';
-import { Osv } from '..';
+import type { Vulnerability } from './osv';
+import type { Osv } from '..';
 import { packageToPurl } from './purl-helper';
 
 export class OsvOfflineDb {

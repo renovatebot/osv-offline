@@ -35,7 +35,7 @@ export async function tryDownloadDb(): Promise<boolean> {
     return true;
   }
 
-  const octokitOptions = { auth: process.env.GITHUB_COM_TOKEN, request: { fetch } };
+  const octokitOptions = { auth: process.env['GITHUB_COM_TOKEN'], request: { fetch } };
 
   let latestRelease = null;
   try {
