@@ -1,4 +1,5 @@
 import fs from 'fs-extra';
+import fetch from 'node-fetch';
 import { Octokit } from '@octokit/rest';
 import got from 'got';
 import { Stream } from 'stream';
@@ -34,9 +35,7 @@ export async function tryDownloadDb(): Promise<boolean> {
     return true;
   }
 
-  const octokitOptions = process.env.GITHUB_COM_TOKEN
-    ? { auth: process.env.GITHUB_COM_TOKEN }
-    : undefined;
+  const octokitOptions = { auth: process.env.GITHUB_COM_TOKEN, request: { fetch } };
 
   let latestRelease = null;
   try {
