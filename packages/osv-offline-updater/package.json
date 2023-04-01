@@ -19,7 +19,7 @@
   },
   "devDependencies": {
     "@tsconfig/node18": "1.0.1",
-    "@tsconfig/strictest": "1.0.2",
+    "@tsconfig/strictest": "2.0.0",
     "@types/adm-zip": "0.5.0",
     "@types/fs-extra": "11.0.1",
     "@types/luxon": "3.2.0",

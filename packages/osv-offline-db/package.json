@@ -12,7 +12,7 @@
   },
   "devDependencies": {
     "@tsconfig/node18": "1.0.1",
-    "@tsconfig/strictest": "1.0.2",
+    "@tsconfig/strictest": "2.0.0",
     "@types/node": "18.15.9",
     "prettier": "2.8.7",
     "ts-node": "10.9.1",
