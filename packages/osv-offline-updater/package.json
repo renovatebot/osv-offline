@@ -22,7 +22,7 @@
     "@tsconfig/strictest": "1.0.2",
     "@types/adm-zip": "0.5.0",
     "@types/fs-extra": "11.0.1",
-    "@types/luxon": "3.2.2",
+    "@types/luxon": "3.3.0",
     "@types/node": "18.15.11",
     "@types/signale": "1.4.4",
     "prettier": "2.8.7",
