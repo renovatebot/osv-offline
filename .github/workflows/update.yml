@@ -8,6 +8,9 @@ on:
     - cron: '0 5,17 * * *'
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   update:
     runs-on: ubuntu-latest
@@ -26,4 +29,4 @@ jobs:
 
       - run: npm run start
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
