@@ -66,14 +66,30 @@ export interface Reference {
 export interface Credit {
   name: string;
   contact?: string[];
+  type: CreditType;
 }
 
 export type ReferenceType =
   | 'ADVISORY'
   | 'ARTICLE'
+  | 'DETECTION'
+  | 'DISCUSSION'
   | 'REPORT'
   | 'FIX'
   | 'GIT'
+  | 'INTRODUCED'
   | 'PACKAGE'
   | 'EVIDENCE'
   | 'WEB';
+
+export type CreditType =
+  | 'FINDER'
+  | 'REPORTER'
+  | 'ANALYST'
+  | 'COORDINATOR'
+  | 'REMEDIATION_DEVELOPER'
+  | 'REMEDIATION_REVIEWER'
+  | 'REMEDIATION_VERIFIER'
+  | 'TOOL'
+  | 'SPONSOR'
+  | 'OTHER'

@@ -7,6 +7,7 @@ export const ecosystems = [
   'npm',
   'NuGet',
   'Packagist',
+  'Pub',
   'PyPI',
   'RubyGems',
 ] as const;
