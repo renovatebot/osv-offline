@@ -10,6 +10,7 @@ const PURL_ECOSYSTEMS: Record<Ecosystem, string> = {
   npm: 'npm',
   Packagist: 'composer',
   PyPI: 'pypi',
+  Pub: 'pub',
   RubyGems: 'gem',
 } as const;
 
