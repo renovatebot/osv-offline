@@ -12,6 +12,7 @@ describe('lib/purl-helper', () => {
       ${'npm'}       | ${'@hapi/hoek'}                     | ${'pkg:npm/%40hapi/hoek'}
       ${'NuGet'}     | ${'Microsoft.ChakraCore'}           | ${'pkg:nuget/Microsoft.ChakraCore'}
       ${'Packagist'} | ${'typo3/cms-core'}                 | ${'pkg:composer/typo3/cms-core'}
+      ${'Pub'}       | ${'dio'}                            | ${'pkg:pub/dio'}
       ${'PyPI'}      | ${'django'}                         | ${'pkg:pypi/django'}
       ${'RubyGems'}  | ${'rails-html-sanitizer'}           | ${'pkg:gem/rails-html-sanitizer'}
     `('$ecosystem | $packageName', ({ ecosystem, packageName, purl }) => {
