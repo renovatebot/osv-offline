@@ -7,6 +7,10 @@
   "publishConfig": {
     "access": "public"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/renovatebot/osv-offline.git"
+  },
   "dependencies": {
     "@seald-io/nedb": "^4.0.2"
   },
