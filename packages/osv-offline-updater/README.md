@@ -3,7 +3,6 @@
 [![Package version](https://img.shields.io/github/v/release/renovatebot/osv-offline?style=for-the-badge)](https://github.com/renovatebot/osv-offline/releases/latest)
 [![Build status](https://img.shields.io/github/actions/workflow/status/renovatebot/osv-offline/update.yml?branch=main&style=for-the-badge)](https://github.com/renovatebot/osv-offline/actions/workflows/update.yml)
 [![MIT license](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge)](./LICENSE)
-![Stability experimental](https://img.shields.io/badge/stability-experimental-orange.svg?style=for-the-badge)
 
 ## License
 
