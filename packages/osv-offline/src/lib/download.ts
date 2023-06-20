@@ -8,6 +8,7 @@ import { OsvOfflineDb } from '@renovatebot/osv-offline-db';
 import path from 'path';
 import { DateTime } from 'luxon';
 import AdmZip from 'adm-zip';
+import { Result, failure, success } from './types';
 
 const pipeline = promisify(Stream.pipeline);
 
@@ -16,7 +17,7 @@ const baseParameters: { owner: string; repo: string } = {
   repo: 'osv-offline',
 };
 
-export async function tryDownloadDb(): Promise<boolean> {
+export async function tryDownloadDb(): Promise<Result> {
   await fs.ensureDir(OsvOfflineDb.rootDirectory);
 
   // if local database exists and is less than a day old, don't do any network requests
@@ -32,10 +33,13 @@ export async function tryDownloadDb(): Promise<boolean> {
     stats !== undefined &&
     DateTime.utc().diff(DateTime.fromJSDate(stats.mtime)).as('days') < 1
   ) {
-    return true;
+    return success();
   }
 
-  const octokitOptions = { auth: process.env['GITHUB_COM_TOKEN'], request: { fetch } };
+  const octokitOptions = {
+    auth: process.env['GITHUB_COM_TOKEN'],
+    request: { fetch },
+  };
 
   let latestRelease = null;
   try {
@@ -45,7 +49,7 @@ export async function tryDownloadDb(): Promise<boolean> {
       })
     ).data[0];
   } catch (err) {
-    return false;
+    return failure(err as Error);
   }
 
   const asset = latestRelease?.assets.find(
@@ -54,7 +58,7 @@ export async function tryDownloadDb(): Promise<boolean> {
 
   // if local database is the same size as remote database, don't download again
   if (asset?.size === stats?.size) {
-    return true;
+    return success();
   }
 
   if (asset !== undefined) {
@@ -67,9 +71,9 @@ export async function tryDownloadDb(): Promise<boolean> {
       const zip = new AdmZip(zipPath);
       zip.extractAllTo(OsvOfflineDb.rootDirectory);
     } catch (err) {
-      return false;
+      return failure(err as Error);
     }
   }
 
-  return true;
+  return success();
 }

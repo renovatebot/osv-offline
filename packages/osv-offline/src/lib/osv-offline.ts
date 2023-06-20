@@ -11,9 +11,9 @@ export class OsvOffline {
    * Asynchronous code required as part of class instantiation
    */
   private async initialize(): Promise<void> {
-    const success = await tryDownloadDb();
-    if (!success) {
-      throw new Error();
+    const result = await tryDownloadDb();
+    if (!result.success) {
+      throw result.error;
     }
     this.osvOfflineDb = await OsvOfflineDb.create();
   }
