@@ -10,7 +10,9 @@ describe('lib/download', () => {
     });
 
     it('works', async () => {
-      await expect(tryDownloadDb()).resolves.not.toThrow();
+      const result = await tryDownloadDb();
+
+      expect(result.success).toBeTrue();
       expect(fs.stat(OsvOfflineDb.rootDirectory)).toBeDefined();
       expect(fs.readdir(OsvOfflineDb.rootDirectory)).not.toBeEmptyArray();
     });
@@ -23,8 +25,9 @@ describe('lib/download', () => {
       );
       await fs.ensureFile(zipFilePath);
 
-      await tryDownloadDb();
+      const result = await tryDownloadDb();
 
+      expect(result.success).toBeTrue();
       const stat = await fs.stat(zipFilePath);
       expect(stat.size).toBe(0);
     });
@@ -32,7 +35,9 @@ describe('lib/download', () => {
     it('skips download in case of invalid GitHub token', async () => {
       process.env['GITHUB_COM_TOKEN'] = 'some-token';
 
-      await expect(tryDownloadDb()).resolves.toBeFalse();
+      const result = await tryDownloadDb();
+
+      expect(result.success).toBeFalse();
     });
   });
 });
