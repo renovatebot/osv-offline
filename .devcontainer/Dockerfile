@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/vscode/devcontainers/typescript-node:18@sha256:731f11852ce9c3b5913b2f747d9cd2d5befc5ea1bab6d8ee997903061792cd6b
+FROM mcr.microsoft.com/vscode/devcontainers/typescript-node:18@sha256:7271883c9dfe41bb8794182df6e414287260ec273b9d4c59450c29718e9121e2
 
 RUN echo "deb https://deb.debian.org/debian unstable main" > /etc/apt/sources.list \
   && apt-get update \
