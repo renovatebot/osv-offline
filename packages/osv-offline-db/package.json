@@ -15,7 +15,7 @@
     "@seald-io/nedb": "^4.0.2"
   },
   "devDependencies": {
-    "@tsconfig/node18": "18.2.0",
+    "@tsconfig/node18": "18.2.1",
     "@tsconfig/strictest": "1.0.2",
     "@types/node": "18.17.6",
     "prettier": "2.8.8",
