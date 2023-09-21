@@ -21,7 +21,7 @@
   },
   "devDependencies": {
     "@qiwi/multi-semantic-release": "7.0.0",
-    "@tsconfig/node18": "18.2.1",
+    "@tsconfig/node18": "18.2.2",
     "@tsconfig/strictest": "1.0.2",
     "@types/eslint": "8.44.2",
     "@types/jest": "29.5.4",

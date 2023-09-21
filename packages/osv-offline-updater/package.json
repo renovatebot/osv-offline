@@ -22,7 +22,7 @@
     "signale": "1.4.0"
   },
   "devDependencies": {
-    "@tsconfig/node18": "18.2.1",
+    "@tsconfig/node18": "18.2.2",
     "@tsconfig/strictest": "1.0.2",
     "@types/adm-zip": "0.5.1",
     "@types/fs-extra": "11.0.1",
