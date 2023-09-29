@@ -21,7 +21,7 @@
     "node-fetch": "^2.7.0"
   },
   "devDependencies": {
-    "@types/adm-zip": "0.5.1",
+    "@types/adm-zip": "0.5.2",
     "@types/fs-extra": "11.0.2",
     "@types/luxon": "3.3.2",
     "@types/node": "20.6.2",
