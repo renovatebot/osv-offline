@@ -22,7 +22,7 @@
   },
   "devDependencies": {
     "@types/adm-zip": "0.5.3",
-    "@types/fs-extra": "11.0.2",
+    "@types/fs-extra": "11.0.3",
     "@types/luxon": "3.3.3",
     "@types/node": "20.8.5",
     "@types/node-fetch": "2.6.7",
