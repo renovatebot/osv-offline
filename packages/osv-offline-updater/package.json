@@ -27,7 +27,7 @@
     "@types/adm-zip": "0.5.3",
     "@types/fs-extra": "11.0.3",
     "@types/luxon": "3.3.3",
-    "@types/node": "20.8.8",
+    "@types/node": "20.8.10",
     "@types/signale": "1.4.6",
     "prettier": "2.8.8",
     "ts-node": "10.9.1",
