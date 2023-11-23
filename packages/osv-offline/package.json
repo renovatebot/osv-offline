@@ -24,7 +24,7 @@
     "@types/adm-zip": "0.5.4",
     "@types/fs-extra": "11.0.4",
     "@types/luxon": "3.3.4",
-    "@types/node": "20.9.0",
+    "@types/node": "20.9.1",
     "@types/node-fetch": "2.6.9",
     "prettier": "2.8.8",
     "ts-node": "10.9.1",
