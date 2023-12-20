@@ -12,7 +12,7 @@
     "url": "https://github.com/renovatebot/osv-offline.git"
   },
   "dependencies": {
-    "@seald-io/nedb": "^4.0.2"
+    "@seald-io/nedb": "^4.0.3"
   },
   "devDependencies": {
     "@tsconfig/node18": "18.2.2",
