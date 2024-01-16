@@ -18,11 +18,11 @@ const baseParameters: { owner: string; repo: string } = {
 };
 
 export async function tryDownloadDb(): Promise<Result> {
+  await fs.ensureDir(OsvOfflineDb.rootDirectory);
+
   if (process.env['OSV_OFFLINE_DISABLE_DOWNLOAD']?.toLowerCase() === 'true') {
     return success()
   }
-
-  await fs.ensureDir(OsvOfflineDb.rootDirectory);
 
   // if local database exists and is less than a day old, don't do any network requests
   let stats: fs.Stats | undefined;
