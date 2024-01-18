@@ -34,7 +34,7 @@ export interface Severity {
   score: string;
 }
 
-export type SeverityType = 'CVSS_V3' | 'CVSS_V2';
+export type SeverityType = 'CVSS_V4' | 'CVSS_V3' | 'CVSS_V2';
 
 export interface Package {
   ecosystem: string;
