@@ -25,8 +25,8 @@ export class OsvOffline {
    * Asynchronously creates a new instance of {@link OsvOffline}
    * @returns A new instance of {@link OsvOffline}
    */
-  static async create(): Promise<OsvOffline> {
-    const instance = new OsvOffline();
+  static async create(githubToken?: string): Promise<OsvOffline> {
+    const instance = new OsvOffline(githubToken);
     await instance.initialize();
     return instance;
   }
