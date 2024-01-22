@@ -3,15 +3,18 @@ import { tryDownloadDb } from './download';
 
 export class OsvOffline {
   private osvOfflineDb!: OsvOfflineDb;
+  private githubToken?: string;
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  protected constructor() {}
+  protected constructor(githubToken?: string) {
+    this.githubToken = githubToken;
+  }
 
   /**
    * Asynchronous code required as part of class instantiation
    */
   private async initialize(): Promise<void> {
-    const result = await tryDownloadDb();
+    const result = await tryDownloadDb(this.githubToken);
     if (!result.success) {
       throw result.error;
     }
