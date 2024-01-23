@@ -39,5 +39,11 @@ describe('lib/download', () => {
 
       expect(result.success).toBeFalse();
     });
+
+    it('skips download in case of invalid GitHub token provided as parameter', async () => {
+      const result = await tryDownloadDb('some-token');
+
+      expect(result.success).toBeFalse();
+    });
   });
 });

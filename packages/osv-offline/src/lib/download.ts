@@ -17,11 +17,11 @@ const baseParameters: { owner: string; repo: string } = {
   repo: 'osv-offline',
 };
 
-export async function tryDownloadDb(): Promise<Result> {
+export async function tryDownloadDb(githubToken?: string): Promise<Result> {
   await fs.ensureDir(OsvOfflineDb.rootDirectory);
 
   if (process.env['OSV_OFFLINE_DISABLE_DOWNLOAD']?.toLowerCase() === 'true') {
-    return success()
+    return success();
   }
 
   // if local database exists and is less than a day old, don't do any network requests
@@ -41,7 +41,7 @@ export async function tryDownloadDb(): Promise<Result> {
   }
 
   const octokitOptions = {
-    auth: process.env['GITHUB_COM_TOKEN'],
+    auth: githubToken ?? process.env['GITHUB_COM_TOKEN'],
     request: { fetch },
   };
 
