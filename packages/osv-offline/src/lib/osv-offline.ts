@@ -3,18 +3,15 @@ import { tryDownloadDb } from './download';
 
 export class OsvOffline {
   private osvOfflineDb!: OsvOfflineDb;
-  private githubToken?: string;
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  protected constructor(githubToken?: string) {
-    this.githubToken = githubToken;
-  }
+  protected constructor() {}
 
   /**
    * Asynchronous code required as part of class instantiation
    */
-  private async initialize(): Promise<void> {
-    const result = await tryDownloadDb(this.githubToken);
+  private async initialize(githubToken?: string): Promise<void> {
+    const result = await tryDownloadDb(githubToken);
     if (!result.success) {
       throw result.error;
     }
@@ -26,8 +23,8 @@ export class OsvOffline {
    * @returns A new instance of {@link OsvOffline}
    */
   static async create(githubToken?: string): Promise<OsvOffline> {
-    const instance = new OsvOffline(githubToken);
-    await instance.initialize();
+    const instance = new OsvOffline();
+    await instance.initialize(githubToken);
     return instance;
   }
 
