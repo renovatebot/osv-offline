@@ -23,7 +23,7 @@
     "@qiwi/multi-semantic-release": "7.1.1",
     "@tsconfig/node18": "18.2.4",
     "@tsconfig/strictest": "1.0.2",
-    "@types/eslint": "8.56.10",
+    "@types/eslint": "8.56.11",
     "@types/jest": "29.5.12",
     "@typescript-eslint/eslint-plugin": "7.16.1",
     "@typescript-eslint/parser": "7.16.1",
