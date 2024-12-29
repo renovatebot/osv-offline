@@ -2,6 +2,7 @@
 export const ecosystems = [
   'crates.io',
   'Go',
+  'Hackage',
   'Hex',
   'Maven',
   'npm',
