@@ -7,6 +7,7 @@ describe('lib/purl-helper', () => {
       ecosystem      | packageName                         | purl
       ${'crates.io'} | ${'libpulse-binding'}               | ${'pkg:cargo/libpulse-binding'}
       ${'Go'}        | ${'github.com/hashicorp/consul'}    | ${'pkg:golang/github.com/hashicorp/consul'}
+      ${'Hackage'}   | ${'aeson'}                          | ${'pkg:hackage/aeson'}
       ${'Hex'}       | ${'sweet_xml'}                      | ${'pkg:hex/sweet_xml'}
       ${'Maven'}     | ${'org.apache.struts:struts2-core'} | ${'pkg:maven/org.apache.struts/struts2-core'}
       ${'npm'}       | ${'@hapi/hoek'}                     | ${'pkg:npm/%40hapi/hoek'}
