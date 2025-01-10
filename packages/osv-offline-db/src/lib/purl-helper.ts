@@ -13,6 +13,7 @@ const PURL_ECOSYSTEMS: Record<Ecosystem, string> = {
   PyPI: 'pypi',
   Pub: 'pub',
   RubyGems: 'gem',
+  Docker: 'docker',
 } as const;
 
 function urlEncode(packageName: string): string {

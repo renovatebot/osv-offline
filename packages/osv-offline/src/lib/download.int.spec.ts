@@ -1,4 +1,4 @@
-import { OsvOfflineDb } from '@renovatebot/osv-offline-db';
+import { OsvOfflineDb } from '@redhat-exd-rebuilds/osv-offline-db';
 import fs from 'fs-extra';
 import path from 'path';
 import { tryDownloadDb } from './download';

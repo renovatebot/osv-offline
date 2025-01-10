@@ -1,5 +1,5 @@
 {
-  "name": "@renovatebot/osv-offline",
+  "name": "@redhat-exd-rebuilds/osv-offline",
   "version": "0.0.0-semantic-release",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -9,10 +9,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/renovatebot/osv-offline.git"
+    "url": "https://github.com/redhat-exd-rebuilds/osv-offline.git"
   },
   "dependencies": {
-    "@renovatebot/osv-offline-db": "0.0.0-semantic-release",
+    "@redhat-exd-rebuilds/osv-offline-db": "0.0.0-semantic-release",
     "@octokit/rest": "^20.1.1",
     "adm-zip": "~0.5.16",
     "fs-extra": "^11.2.0",

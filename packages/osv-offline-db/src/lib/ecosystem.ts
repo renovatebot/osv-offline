@@ -11,5 +11,6 @@ export const ecosystems = [
   'Pub',
   'PyPI',
   'RubyGems',
+  'Docker',
 ] as const;
 export type Ecosystem = typeof ecosystems[number];

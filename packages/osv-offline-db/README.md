@@ -1,7 +1,7 @@
 # osv-offline-db
 
-[![Package version](https://img.shields.io/npm/v/@renovatebot/osv-offline-db?style=for-the-badge)](https://www.npmjs.com/package/@renovatebot/osv-offline-db)
-[![Build status](https://img.shields.io/github/actions/workflow/status/renovatebot/osv-offline/build.yml?branch=main&style=for-the-badge)](https://github.com/renovatebot/osv-offline/actions/workflows/build.yml)
+[![Package version](https://img.shields.io/npm/v/@redhat-exd-rebuilds/osv-offline-db?style=for-the-badge)](https://www.npmjs.com/package/@redhat-exd-rebuilds/osv-offline-db)
+[![Build status](https://img.shields.io/github/actions/workflow/status/redhat-exd-rebuilds/osv-offline/build.yml?branch=main&style=for-the-badge)](https://github.com/redhat-exd-rebuilds/osv-offline/actions/workflows/build.yml)
 [![MIT license](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge)](./LICENSE)
 
 ## License

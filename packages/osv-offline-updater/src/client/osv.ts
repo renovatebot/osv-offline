@@ -2,7 +2,7 @@ import { format } from 'util';
 
 import AdmZip from 'adm-zip';
 import got from 'got';
-import type { Ecosystem, Osv } from '@renovatebot/osv-offline-db';
+import type { Ecosystem, Osv } from '@redhat-exd-rebuilds/osv-offline-db';
 
 export class OsvDownloader {
   private static readonly downloadUrlFormat =

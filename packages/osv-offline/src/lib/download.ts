@@ -4,7 +4,7 @@ import { Octokit } from '@octokit/rest';
 import got from 'got';
 import { Stream } from 'stream';
 import { promisify } from 'util';
-import { OsvOfflineDb } from '@renovatebot/osv-offline-db';
+import { OsvOfflineDb } from '@redhat-exd-rebuilds/osv-offline-db';
 import path from 'path';
 import { DateTime } from 'luxon';
 import AdmZip from 'adm-zip';
@@ -13,7 +13,7 @@ import { Result, failure, success } from './types';
 const pipeline = promisify(Stream.pipeline);
 
 const baseParameters: { owner: string; repo: string } = {
-  owner: 'renovatebot',
+  owner: 'redhat-exd-rebuilds',
   repo: 'osv-offline',
 };
 

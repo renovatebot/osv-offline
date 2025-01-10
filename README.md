@@ -6,9 +6,9 @@ A collection of packages for using [Open Source Vulnerabilities](https://osv.dev
 
 | Name                                                                | Version                                                                                                                                               |
 | ------------------------------------------------------------------- |-------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [`@renovatebot/osv-offline`](./packages/osv-offline)                 | [![](https://img.shields.io/npm/v/@renovatebot/osv-offline?style=for-the-badge)](https://www.npmjs.com/package/@renovatebot/osv-offline)              |
-| [`@renovatebot/osv-offline-db`](./packages/osv-offline-db)           | [![](https://img.shields.io/npm/v/@renovatebot/osv-offline-db?style=for-the-badge)](https://www.npmjs.com/package/@renovatebot/osv-offline-db)        |
-| [`@renovatebot/osv-offline-updater`](./packages/osv-offline-updater) | [![](https://img.shields.io/github/v/release/renovatebot/osv-offline?style=for-the-badge)](https://github.com/renovatebot/osv-offline/releases/latest) |
+| [`@redhat-exd-rebuilds/osv-offline`](./packages/osv-offline)                 | [![](https://img.shields.io/npm/v/@redhat-exd-rebuilds/osv-offline?style=for-the-badge)](https://www.npmjs.com/package/@redhat-exd-rebuilds/osv-offline)              |
+| [`@redhat-exd-rebuilds/osv-offline-db`](./packages/osv-offline-db)           | [![](https://img.shields.io/npm/v/@redhat-exd-rebuilds/osv-offline-db?style=for-the-badge)](https://www.npmjs.com/package/@redhat-exd-rebuilds/osv-offline-db)        |
+| [`@redhat-exd-rebuilds/osv-offline-updater`](./packages/osv-offline-updater) | [![](https://img.shields.io/github/v/release/redhat-exd-rebuilds/osv-offline?style=for-the-badge)](https://github.com/redhat-exd-rebuilds/osv-offline/releases/latest) |
 
 ## License
 
