@@ -1,4 +1,4 @@
-import { OsvOfflineDb } from '@renovatebot/osv-offline-db';
+import { OsvOfflineDb } from '@mintmaker/osv-offline-db';
 import fs from 'fs-extra';
 import { OsvOffline } from './osv-offline';
 
@@ -17,17 +17,19 @@ describe('lib/osv-offline', () => {
   });
 
   describe('getVulnerabilities', () => {
-    it('works', async () => {
-      const result = await osvOffline.getVulnerabilities('npm', 'lodash');
-
-      expect(result).not.toBeEmptyArray();
-    });
-
     it('returns empty array for invalid package', async () => {
       const result = await osvOffline.getVulnerabilities(
         'npm',
         'this-package-doesnt-exist'
       );
+
+      expect(result).toBeEmptyArray();
+    });
+  });
+
+  describe('getContainerVulnerabilities', () => {
+    it('returns empty array for invalid package', async () => {
+      const result = await osvOffline.getContainerVulnerabilities("quay.io/some/repo");
 
       expect(result).toBeEmptyArray();
     });

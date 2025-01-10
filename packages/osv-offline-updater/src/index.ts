@@ -1,5 +1,5 @@
 import fs from 'fs-extra';
-import { Osv, OsvOfflineDb, ecosystems } from '@renovatebot/osv-offline-db';
+import { Osv, OsvOfflineDb, ecosystems } from '@mintmaker/osv-offline-db';
 import { GitHub } from './client/github';
 import signale from 'signale';
 import Datastore from '@seald-io/nedb';

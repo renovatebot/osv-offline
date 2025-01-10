@@ -1,18 +1,18 @@
 {
-  "name": "@renovatebot/osv-offline-updater",
+  "name": "@mintmaker/osv-offline-updater",
   "version": "0.0.0-semantic-release",
   "main": "src/index.ts",
   "license": "MIT",
   "private": true,
   "repository": {
     "type": "git",
-    "url": "https://github.com/renovatebot/osv-offline.git"
+    "url": "https://github.com/redhat-exd-rebuilds/osv-offline.git"
   },
   "scripts": {
     "start": "ts-node ./src/index.ts"
   },
   "dependencies": {
-    "@renovatebot/osv-offline-db": "0.0.0-semantic-release",
+    "@mintmaker/osv-offline-db": "0.0.0-semantic-release",
     "@octokit/rest": "20.1.1",
     "@seald-io/nedb": "4.0.4",
     "adm-zip": "0.5.16",
