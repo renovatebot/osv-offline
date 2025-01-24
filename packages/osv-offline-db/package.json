@@ -1,5 +1,5 @@
 {
-  "name": "@renovatebot/osv-offline-db",
+  "name": "@mintmaker/osv-offline-db",
   "version": "0.0.0-semantic-release",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/renovatebot/osv-offline.git"
+    "url": "https://github.com/redhat-exd-rebuilds/osv-offline.git"
   },
   "dependencies": {
     "@seald-io/nedb": "^4.0.4"

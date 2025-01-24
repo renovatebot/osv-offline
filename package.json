@@ -1,5 +1,5 @@
 {
-  "name": "@renovatebot/osv-offline-monorepo",
+  "name": "@mintmaker/osv-offline-monorepo",
   "private": true,
   "workspaces": [
     "./packages/*"
@@ -7,7 +7,7 @@
   "version": "0.0.0-semantic-release",
   "repository": {
     "type": "git",
-    "url": "https://github.com/renovatebot/osv-offline.git"
+    "url": "https://github.com/redhat-exd-rebuilds/osv-offline.git"
   },
   "scripts": {
     "build": "tsc --build",

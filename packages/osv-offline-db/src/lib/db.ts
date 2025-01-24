@@ -48,4 +48,13 @@ export class OsvOfflineDb {
       },
     });
   }
+
+  async query_containers(
+    repository: string
+  ): Promise<Osv.Vulnerability[]> {
+    return await this.db["Docker" as Ecosystem].findAsync({
+      'affected.package.name': repository,
+      'affected.package.ecosystem': 'Docker'
+    });
+  }
 }
