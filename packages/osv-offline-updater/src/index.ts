@@ -11,7 +11,7 @@ async function deleteIfExists(path: string): Promise<void> {
   try {
     await fs.remove(path);
     signale.info(`Deleted existing database at ${path}`);
-  } catch (e) {
+  } catch {
     signale.info(`No existing database found at ${path}`);
   }
 }

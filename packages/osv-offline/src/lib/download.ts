@@ -30,7 +30,7 @@ export async function tryDownloadDb(githubToken?: string): Promise<Result> {
     stats = await fs.stat(
       path.join(OsvOfflineDb.rootDirectory, `osv-offline.zip`)
     );
-  } catch (err) {
+  } catch {
     // ignored
   }
   if (
