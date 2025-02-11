@@ -23,6 +23,9 @@ importers:
       '@types/jest':
         specifier: 29.5.14
         version: 29.5.14
+      '@types/node':
+        specifier: 22.13.1
+        version: 22.13.1
       '@typescript-eslint/eslint-plugin':
         specifier: 8.23.0
         version: 8.23.0(@typescript-eslint/parser@8.23.0(eslint@8.57.1)(typescript@5.7.3))(eslint@8.57.1)(typescript@5.7.3)
@@ -105,9 +108,6 @@ importers:
       '@types/luxon':
         specifier: 3.4.2
         version: 3.4.2
-      '@types/node':
-        specifier: 22.13.1
-        version: 22.13.1
       '@types/node-fetch':
         specifier: 2.6.12
         version: 2.6.12
@@ -127,9 +127,6 @@ importers:
       '@types/fs-extra':
         specifier: 11.0.4
         version: 11.0.4
-      '@types/node':
-        specifier: 22.13.1
-        version: 22.13.1
       fs-extra:
         specifier: 11.3.0
         version: 11.3.0
@@ -176,9 +173,6 @@ importers:
       '@types/luxon':
         specifier: 3.4.2
         version: 3.4.2
-      '@types/node':
-        specifier: 22.13.1
-        version: 22.13.1
       '@types/signale':
         specifier: 1.4.7
         version: 1.4.7
