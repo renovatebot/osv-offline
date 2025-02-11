@@ -124,9 +124,15 @@ importers:
       '@tsconfig/strictest':
         specifier: 1.0.2
         version: 1.0.2
+      '@types/fs-extra':
+        specifier: 11.0.4
+        version: 11.0.4
       '@types/node':
         specifier: 22.13.1
         version: 22.13.1
+      fs-extra:
+        specifier: 11.3.0
+        version: 11.3.0
       prettier:
         specifier: 3.4.2
         version: 3.4.2
