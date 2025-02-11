@@ -14,16 +14,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-
-      - name: Set up Node.js
-        uses: actions/setup-node@1d0ff469b7ec7b3cb9d8673fde0c81c44821de2a # v4.2.0
+      - uses: containerbase/internal-tools/setup@d282592d8c11a17ca0bafe45e49c099ddfb9e15a # v3.8.5
         with:
-          node-version-file: .node-version
-          cache: 'npm'
+          save-cache: true
 
-      - run: npm ci
+      - run: pnpm build
 
-      - run: npm run build
-
-      - run: npm run test
+      - run: pnpm test
