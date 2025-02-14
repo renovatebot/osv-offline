@@ -14,7 +14,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: containerbase/internal-tools/setup@d282592d8c11a17ca0bafe45e49c099ddfb9e15a # v3.8.5
+      - uses: containerbase/internal-tools/setup@d005037f4b778e5c456510a397b91f8ac19078e6 # v3.9.0
         with:
           save-cache: true
           pnpm-cache: |
