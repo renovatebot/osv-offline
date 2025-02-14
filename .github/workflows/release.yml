@@ -25,7 +25,7 @@ jobs:
           checkout: false
           pnpm-cache: |
             node_modules
-            package/*/node_modules
+            packages/*/node_modules
 
       - run: pnpm build
 
