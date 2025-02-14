@@ -17,6 +17,9 @@ jobs:
       - uses: containerbase/internal-tools/setup@d282592d8c11a17ca0bafe45e49c099ddfb9e15a # v3.8.5
         with:
           save-cache: true
+          pnpm-cache: |
+            node_modules
+            package/*/node_modules
 
       - run: pnpm build
 

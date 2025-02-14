@@ -23,6 +23,9 @@ jobs:
         with:
           save-cache: true
           checkout: false
+          pnpm-cache: |
+            node_modules
+            package/*/node_modules
 
       - run: pnpm build
 
