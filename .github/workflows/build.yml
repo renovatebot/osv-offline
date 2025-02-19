@@ -49,7 +49,9 @@ jobs:
 
       - run: pnpm build
 
-      - run: pnpm test
+      - run: pnpm test:unit
+      
+      - run: pnpm test:integration
 
   # Catch-all required check for test matrix
   success:
