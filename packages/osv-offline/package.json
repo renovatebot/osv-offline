@@ -13,17 +13,14 @@
   },
   "dependencies": {
     "@renovatebot/osv-offline-db": "workspace:*",
-    "@octokit/rest": "^20.1.1",
     "adm-zip": "~0.5.16",
     "fs-extra": "^11.3.0",
     "got": "^11.8.6",
-    "luxon": "^3.5.0",
-    "node-fetch": "^2.7.0"
+    "luxon": "^3.5.0"
   },
   "devDependencies": {
     "@types/adm-zip": "0.5.7",
     "@types/fs-extra": "11.0.4",
-    "@types/luxon": "3.4.2",
-    "@types/node-fetch": "2.6.12"
+    "@types/luxon": "3.4.2"
   }
 }
