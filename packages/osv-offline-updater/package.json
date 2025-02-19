@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@renovatebot/osv-offline-db": "workspace:*",
-    "@octokit/rest": "21.1.0",
+    "@octokit/rest": "21.1.1",
     "@seald-io/nedb": "4.0.4",
     "adm-zip": "0.5.16",
     "fs-extra": "11.3.0",
