@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   update:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: containerbase/internal-tools/setup@9d974fd61a2b37c198fac584cc8b32e8585213b7 # v3.10.1
         with:

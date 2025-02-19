@@ -11,8 +11,9 @@ permissions:
   contents: read
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  lint:
+    runs-on: ubuntu-24.04
+
     steps:
       - uses: containerbase/internal-tools/setup@9d974fd61a2b37c198fac584cc8b32e8585213b7 # v3.10.1
         with:
@@ -23,4 +24,52 @@ jobs:
 
       - run: pnpm build
 
-      - run: pnpm test
+      - run: pnpm eslint
+
+      - run: pnpm prettier
+
+  test:
+    runs-on: ubuntu-24.04
+
+    strategy:
+      matrix:
+        node-version:
+          - 18
+          - 20
+          - 22
+
+    steps:
+      - uses: containerbase/internal-tools/setup@9d974fd61a2b37c198fac584cc8b32e8585213b7 # v3.10.1
+        with:
+          save-cache: true
+          node-version: ${{ matrix.node-version }}
+          pnpm-cache: |
+            node_modules
+            packages/*/node_modules
+
+      - run: pnpm build
+
+      - run: pnpm test:unit
+
+      - run: pnpm test:integration
+
+  # Catch-all required check for test matrix
+  success:
+    needs:
+      - lint
+      - test
+    runs-on: ubuntu-24.04
+    timeout-minutes: 1
+    if: always()
+    steps:
+      - name: Fail for failed or cancelled lint tests
+        if: |
+          needs.lint.result == 'failure' ||
+          needs.lint.result == 'cancelled'
+        run: exit 1
+
+      - name: Fail for failed or cancelled test tests
+        if: |
+          needs.test.result == 'failure' ||
+          needs.test.result == 'skipped'
+        run: exit 1
