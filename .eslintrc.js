@@ -35,6 +35,7 @@ module.exports = {
         memberSyntaxSortOrder: ['none', 'all', 'multiple', 'single'],
       },
     ],
+    'import/no-unresolved': 0, // TODO: needs lint upgrades, typescript is also handling it
   },
   overrides: [
     {
