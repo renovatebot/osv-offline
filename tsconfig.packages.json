@@ -2,6 +2,6 @@
   "extends": "@tsconfig/node18/tsconfig",
   "compilerOptions": {
     "composite": true,
-    "types": ["node", "jest", "jest-extended", "expect-more-jest"],
+    "types": ["node", "jest", "jest-extended", "expect-more-jest"]
   }
 }
