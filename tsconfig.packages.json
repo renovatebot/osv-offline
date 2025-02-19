@@ -1,11 +1,7 @@
 {
   "extends": "@tsconfig/node18/tsconfig",
   "compilerOptions": {
-    "esModuleInterop": true,
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
     "composite": true,
     "types": ["node", "jest", "jest-extended", "expect-more-jest"],
-    "ignoreDeprecations": "5.0"
   }
 }
