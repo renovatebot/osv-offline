@@ -4,6 +4,7 @@
   "main": "src/index.ts",
   "license": "MIT",
   "private": true,
+  "type": "commonjs",
   "repository": {
     "type": "git",
     "url": "https://github.com/renovatebot/osv-offline.git"
