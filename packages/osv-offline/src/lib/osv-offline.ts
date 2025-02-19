@@ -10,8 +10,8 @@ export class OsvOffline {
   /**
    * Asynchronous code required as part of class instantiation
    */
-  private async initialize(githubToken?: string): Promise<void> {
-    const result = await tryDownloadDb(githubToken);
+  private async initialize(): Promise<void> {
+    const result = await tryDownloadDb();
     if (!result.success) {
       throw result.error;
     }
@@ -22,9 +22,9 @@ export class OsvOffline {
    * Asynchronously creates a new instance of {@link OsvOffline}
    * @returns A new instance of {@link OsvOffline}
    */
-  static async create(githubToken?: string): Promise<OsvOffline> {
+  static async create(): Promise<OsvOffline> {
     const instance = new OsvOffline();
-    await instance.initialize(githubToken);
+    await instance.initialize();
     return instance;
   }
 
