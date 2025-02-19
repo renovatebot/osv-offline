@@ -31,6 +31,7 @@
     "cross-env": "7.0.3",
     "eslint": "8.57.1",
     "eslint-config-prettier": "10.0.1",
+    "eslint-formatter-gha": "1.5.2",
     "eslint-plugin-import": "2.31.0",
     "eslint-plugin-jest": "28.11.0",
     "eslint-plugin-promise": "7.2.1",
