@@ -16,8 +16,7 @@ export class OsvDownloader {
     return new AdmZip(response.body)
       .getEntries()
       .map(
-        (entry) =>
-          JSON.parse(entry.getData().toString()) as Osv.Vulnerability
+        (entry) => JSON.parse(entry.getData().toString()) as Osv.Vulnerability
       );
   }
 }

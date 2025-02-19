@@ -12,4 +12,4 @@ export const ecosystems = [
   'PyPI',
   'RubyGems',
 ] as const;
-export type Ecosystem = typeof ecosystems[number];
+export type Ecosystem = (typeof ecosystems)[number];

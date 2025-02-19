@@ -30,17 +30,19 @@ export async function tryDownloadDb(): Promise<Result> {
     return success();
   }
 
-    // only download databases if local databases are missing or remote is newer
-    try {
-      const stream = got.stream("https://github.com/renovatebot/osv-offline/releases/latest/download/osv-offline.zip");
-      const zipPath = path.join(OsvOfflineDb.rootDirectory, 'osv-offline.zip');
-      const writeStream = fs.createWriteStream(zipPath);
-      await pipeline(stream, writeStream);
-      const zip = new AdmZip(zipPath);
-      zip.extractAllTo(OsvOfflineDb.rootDirectory);
-    } catch (err) {
-      return failure(err as Error);
-    }
+  // only download databases if local databases are missing or remote is newer
+  try {
+    const stream = got.stream(
+      'https://github.com/renovatebot/osv-offline/releases/latest/download/osv-offline.zip'
+    );
+    const zipPath = path.join(OsvOfflineDb.rootDirectory, 'osv-offline.zip');
+    const writeStream = fs.createWriteStream(zipPath);
+    await pipeline(stream, writeStream);
+    const zip = new AdmZip(zipPath);
+    zip.extractAllTo(OsvOfflineDb.rootDirectory);
+  } catch (err) {
+    return failure(err as Error);
+  }
 
   return success();
 }

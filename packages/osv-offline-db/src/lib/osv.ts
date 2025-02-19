@@ -92,4 +92,4 @@ export type CreditType =
   | 'REMEDIATION_VERIFIER'
   | 'TOOL'
   | 'SPONSOR'
-  | 'OTHER'
+  | 'OTHER';
