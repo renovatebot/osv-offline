@@ -1,5 +1,10 @@
-interface Success { success: true }
-interface Failure { success: false; error: Error }
+interface Success {
+  success: true;
+}
+interface Failure {
+  success: false;
+  error: Error;
+}
 export type Result = Success | Failure;
 
 export function success(): Success {
