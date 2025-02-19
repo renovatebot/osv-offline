@@ -143,8 +143,8 @@ importers:
   packages/osv-offline-updater:
     dependencies:
       '@octokit/rest':
-        specifier: 21.1.0
-        version: 21.1.0
+        specifier: 21.1.1
+        version: 21.1.1
       '@renovatebot/osv-offline-db':
         specifier: workspace:*
         version: link:../osv-offline-db
@@ -631,8 +631,8 @@ packages:
     resolution: {integrity: sha512-dZl0ZHx6gOQGcffgm1/Sf6JfEpmh34v3Af2Uci02vzUYz6qEN6zepoRtmybWXIGXFIK8K9ylE3b+duCWqhArtg==}
     engines: {node: '>= 18'}
 
-  '@octokit/rest@21.1.0':
-    resolution: {integrity: sha512-93iLxcKDJboUpmnUyeJ6cRIi7z7cqTZT1K7kRK4LobGxwTwpsa+2tQQbRQNGy7IFDEAmrtkf4F4wBj3D5rVlJQ==}
+  '@octokit/rest@21.1.1':
+    resolution: {integrity: sha512-sTQV7va0IUVZcntzy1q3QqPm/r8rWtDCqpRAmb8eXXnKkjoQEtFe3Nt5GTVsHft+R6jJoHeSiVLcgcvhtue/rg==}
     engines: {node: '>= 18'}
 
   '@octokit/types@12.6.0':
@@ -4192,7 +4192,7 @@ snapshots:
       fast-content-type-parse: 2.0.1
       universal-user-agent: 7.0.2
 
-  '@octokit/rest@21.1.0':
+  '@octokit/rest@21.1.1':
     dependencies:
       '@octokit/core': 6.1.4
       '@octokit/plugin-paginate-rest': 11.4.2(@octokit/core@6.1.4)
