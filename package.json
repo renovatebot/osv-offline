@@ -10,6 +10,8 @@
     "build": "tsc --build",
     "clean": "tsc --build --clean",
     "eslint": "eslint .",
+    "prettier": "prettier --cache -c -u \"**/*.*\"",
+    "prettier-fix": "prettier --cache -w -u \"**/*.*\"",
     "start": "cross-env TS_NODE_PROJECT=./tsconfig.packages.json ts-node ./packages/osv-offline-updater/src/index.ts",
     "release": "multi-semantic-release --ignore-packages=packages/osv-offline-updater",
     "test": "run-s eslint test:unit test:integration",

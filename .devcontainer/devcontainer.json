@@ -1,5 +1,9 @@
 {
   "dockerFile": "Dockerfile",
   "postStartCommand": "pnpm install",
-  "extensions": ["orta.vscode-jest", "dbaeumer.vscode-eslint", "esbenp.prettier-vscode"]
+  "extensions": [
+    "orta.vscode-jest",
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode"
+  ]
 }

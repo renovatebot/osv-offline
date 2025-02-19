@@ -14,6 +14,7 @@ package.json
 bin/yarn*
 .clinic/
 .eslintcache
+pnpm-lock.yaml
 
 # generated code
 **/*.generated.ts
