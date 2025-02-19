@@ -52,7 +52,7 @@ jobs:
       - run: pnpm test
 
   # Catch-all required check for test matrix
-  test-success:
+  success:
     needs:
       - lint
       - test
