@@ -3,7 +3,7 @@ import fs from 'fs-extra';
 import path from 'path';
 import type { Vulnerability } from './osv';
 
-describe('lib/db', () => {
+describe('packages/osv-offline-db/src/lib/db.int', () => {
   let osvOfflineDb: OsvOfflineDb;
 
   const sampleVuln: Vulnerability & { _id: string } = {

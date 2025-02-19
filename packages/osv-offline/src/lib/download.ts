@@ -10,7 +10,7 @@ import { Result, failure, success } from './types';
 export async function tryDownloadDb(): Promise<Result> {
   await fs.ensureDir(OsvOfflineDb.rootDirectory);
 
-  if (process.env['OSV_OFFLINE_DISABLE_DOWNLOAD']?.toLowerCase() === 'true') {
+  if (process.env.OSV_OFFLINE_DISABLE_DOWNLOAD?.toLowerCase() === 'true') {
     return success();
   }
 

@@ -8,7 +8,7 @@ import { packageToPurl } from './purl-helper';
 
 export class OsvOfflineDb {
   public static readonly rootDirectory =
-    process.env['OSV_OFFLINE_ROOT_DIR'] ?? path.join(tmpdir(), 'osv-offline');
+    process.env.OSV_OFFLINE_ROOT_DIR ?? path.join(tmpdir(), 'osv-offline');
   private db = {} as Record<Ecosystem, Datastore<Vulnerability>>;
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function

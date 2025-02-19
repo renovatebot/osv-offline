@@ -17,7 +17,7 @@ export interface Vulnerability {
   affected?: Affected[];
   references?: Reference[];
   credits?: Credit[];
-  database_specific?: { [key: string]: unknown };
+  database_specific?: Record<string, unknown>;
 }
 
 export interface Affected {
@@ -25,8 +25,8 @@ export interface Affected {
   severity?: Severity[];
   ranges?: Range[];
   versions?: string[];
-  ecosystem_specific?: { [key: string]: unknown };
-  database_specific?: { [key: string]: unknown };
+  ecosystem_specific?: Record<string, unknown>;
+  database_specific?: Record<string, unknown>;
 }
 
 export interface Severity {
@@ -46,7 +46,7 @@ export interface Range {
   type: RangeType;
   repo?: string;
   events: Event[];
-  database_specific?: { [key: string]: unknown };
+  database_specific?: Record<string, unknown>;
 }
 
 export type RangeType = 'ECOSYSTEM' | 'GIT' | 'SEMVER';

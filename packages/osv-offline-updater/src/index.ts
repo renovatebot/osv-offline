@@ -46,7 +46,7 @@ async function deleteIfExists(path: string): Promise<void> {
 
   const zipFile = zip.toBuffer();
 
-  if (process.env['GITHUB_TOKEN']) {
+  if (process.env.GITHUB_TOKEN) {
     signale.info('Uploading databases');
     const gh = new GitHub();
     await gh.uploadDatabase(zipFile);

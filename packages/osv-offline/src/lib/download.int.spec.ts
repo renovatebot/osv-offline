@@ -3,7 +3,7 @@ import fs from 'fs-extra';
 import path from 'path';
 import { tryDownloadDb } from './download';
 
-describe('lib/download', () => {
+describe('packages/osv-offline/src/lib/download.int', () => {
   describe('tryDownloadDb', () => {
     beforeEach(async () => {
       await fs.remove(OsvOfflineDb.rootDirectory);

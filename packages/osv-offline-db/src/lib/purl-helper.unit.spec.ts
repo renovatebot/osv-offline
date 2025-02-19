@@ -1,7 +1,7 @@
 import { packageToPurl } from './purl-helper';
 import type { Ecosystem } from './ecosystem';
 
-describe('lib/purl-helper', () => {
+describe('packages/osv-offline-db/src/lib/purl-helper.unit', () => {
   describe('test ecosystems', () => {
     test.each`
       ecosystem      | packageName                         | purl

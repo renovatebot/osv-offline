@@ -2,7 +2,7 @@ import { OsvOfflineDb } from '@renovatebot/osv-offline-db';
 import fs from 'fs-extra';
 import { OsvOffline } from './osv-offline';
 
-describe('lib/osv-offline', () => {
+describe('packages/osv-offline/src/lib/osv-offline.int', () => {
   let osvOffline: OsvOffline;
 
   beforeAll(async () => {
