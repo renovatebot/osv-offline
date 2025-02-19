@@ -21,8 +21,8 @@ importers:
         specifier: 18.2.4
         version: 18.2.4
       '@tsconfig/strictest':
-        specifier: 1.0.2
-        version: 1.0.2
+        specifier: 2.0.5
+        version: 2.0.5
       '@types/jest':
         specifier: 29.5.14
         version: 29.5.14
@@ -128,8 +128,8 @@ importers:
         specifier: 18.2.4
         version: 18.2.4
       '@tsconfig/strictest':
-        specifier: 1.0.2
-        version: 1.0.2
+        specifier: 2.0.5
+        version: 2.0.5
       '@types/fs-extra':
         specifier: 11.0.4
         version: 11.0.4
@@ -171,8 +171,8 @@ importers:
         specifier: 18.2.4
         version: 18.2.4
       '@tsconfig/strictest':
-        specifier: 1.0.2
-        version: 1.0.2
+        specifier: 2.0.5
+        version: 2.0.5
       '@types/adm-zip':
         specifier: 0.5.7
         version: 0.5.7
@@ -734,8 +734,8 @@ packages:
   '@tsconfig/node18@18.2.4':
     resolution: {integrity: sha512-5xxU8vVs9/FNcvm3gE07fPbn9tl6tqGGWA9tSlwsUEkBxtRnTsNmwrV8gasZ9F/EobaSv9+nu8AxUKccw77JpQ==}
 
-  '@tsconfig/strictest@1.0.2':
-    resolution: {integrity: sha512-IRKlC8cnP7zMz1SDBjyIVyPapkEGWLZ6wkF6Z8T+xU80P9sO5uGXlIUvtzjx+7ehPJRWxkB6CeIDwUfyqNtYkQ==}
+  '@tsconfig/strictest@2.0.5':
+    resolution: {integrity: sha512-ec4tjL2Rr0pkZ5hww65c+EEPYwxOi4Ryv+0MtjeaSQRJyq322Q27eOQiFbuNgw2hpL4hB1/W/HBGk3VKS43osg==}
 
   '@types/adm-zip@0.5.7':
     resolution: {integrity: sha512-DNEs/QvmyRLurdQPChqq0Md4zGvPwHerAJYWk9l2jCbD1VPpnzRJorOdiq4zsw09NFbYnhfsoEhWtxIzXpn2yw==}
@@ -4356,7 +4356,7 @@ snapshots:
 
   '@tsconfig/node18@18.2.4': {}
 
-  '@tsconfig/strictest@1.0.2': {}
+  '@tsconfig/strictest@2.0.5': {}
 
   '@types/adm-zip@0.5.7':
     dependencies:
