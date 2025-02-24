@@ -36,6 +36,13 @@ export class OsvOfflineDb {
     ecosystem: Ecosystem,
     packageName: string
   ): Promise<Osv.Vulnerability[]> {
+    if (ecosystem === 'RPM') {
+      return await this.db['RPM' as Ecosystem].findAsync({
+        'affected.package.name': packageName,
+        'affected.package.ecosystem': 'Red Hat'
+      });
+    }
+
     return await this.db[ecosystem].findAsync({
       affected: {
         $elemMatch: {
