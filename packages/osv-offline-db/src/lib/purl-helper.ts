@@ -14,7 +14,7 @@ const PURL_ECOSYSTEMS: Record<Ecosystem, string> = {
   Pub: 'pub',
   RubyGems: 'gem',
   Docker: 'docker',
-  RPM: 'rpm/redhat',
+  RPM: 'rpm/redhat',  // This prefix is used in rpm.nedb
 } as const;
 
 function urlEncode(packageName: string): string {
