@@ -6,12 +6,9 @@
       "request": "launch",
       "name": "Run updater",
       "preLaunchTask": "build",
-      "runtimeArgs": ["-r", "ts-node/register"],
+      "runtimeExecutable": "tsx",
       "args": ["${workspaceFolder}/packages/osv-offline-updater/src/index.ts"],
       "console": "integratedTerminal",
-      "env": {
-        "TS_NODE_PROJECT": "${workspaceFolder}/tsconfig.packages.json"
-      },
       "envFile": "${workspaceFolder}/.env"
     },
     {
@@ -35,7 +32,6 @@
         "program": "${workspaceFolder}/node_modules/jest/bin/jest"
       },
       "runtimeArgs": ["--preserve-symlinks"],
-      "protocol": "inspector",
       "skipFiles": ["<node_internals>/**/*.js"]
     },
     {
@@ -57,7 +53,6 @@
         "program": "${workspaceFolder}/node_modules/jest/bin/jest"
       },
       "runtimeArgs": ["--preserve-symlinks"],
-      "protocol": "inspector",
       "skipFiles": ["<node_internals>/**/*.js"]
     }
   ]

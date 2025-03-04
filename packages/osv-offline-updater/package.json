@@ -10,7 +10,7 @@
     "url": "https://github.com/renovatebot/osv-offline.git"
   },
   "scripts": {
-    "start": "ts-node ./src/index.ts"
+    "start": "tsx ./src/index.ts"
   },
   "dependencies": {
     "@renovatebot/osv-offline-db": "workspace:*",
