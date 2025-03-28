@@ -121,8 +121,8 @@ importers:
   packages/osv-offline-db:
     dependencies:
       '@seald-io/nedb':
-        specifier: ^4.0.4
-        version: 4.0.4
+        specifier: ^4.1.1
+        version: 4.1.1
     devDependencies:
       '@tsconfig/node18':
         specifier: 18.2.4
@@ -149,8 +149,8 @@ importers:
         specifier: workspace:*
         version: link:../osv-offline-db
       '@seald-io/nedb':
-        specifier: 4.0.4
-        version: 4.0.4
+        specifier: 4.1.1
+        version: 4.1.1
       adm-zip:
         specifier: 0.5.16
         version: 0.5.16
@@ -830,8 +830,8 @@ packages:
   '@seald-io/binary-search-tree@1.0.3':
     resolution: {integrity: sha512-qv3jnwoakeax2razYaMsGI/luWdliBLHTdC6jU55hQt1hcFqzauH/HsBollQ7IR4ySTtYhT+xyHoijpA16C+tA==}
 
-  '@seald-io/nedb@4.0.4':
-    resolution: {integrity: sha512-CUNcMio7QUHTA+sIJ/DC5JzVNNsHe743TPmC4H5Gij9zDLMbmrCT2li3eVB72/gF63BPS8pWEZrjlAMRKA8FDw==}
+  '@seald-io/nedb@4.1.1':
+    resolution: {integrity: sha512-u7fVfzKQ/3ZaIOnYQONf2lPZtGUeQtMPjfcaQkCw/GZv5dzn20qKW6sfN0NkVbr0ksJMlWcFXNGcXYsQSb1a1g==}
 
   '@semantic-release/commit-analyzer@10.0.4':
     resolution: {integrity: sha512-pFGn99fn8w4/MHE0otb2A/l5kxgOuxaaauIh4u30ncoTJuqWj4hXTgEJ03REqjS+w1R2vPftSsO26WC61yOcpw==}
@@ -4586,7 +4586,7 @@ snapshots:
 
   '@seald-io/binary-search-tree@1.0.3': {}
 
-  '@seald-io/nedb@4.0.4':
+  '@seald-io/nedb@4.1.1':
     dependencies:
       '@seald-io/binary-search-tree': 1.0.3
       localforage: 1.10.0
