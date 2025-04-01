@@ -17,8 +17,8 @@
     "start": "tsx ./packages/osv-offline-updater/src/index.ts",
     "release": "multi-semantic-release --ignore-packages=packages/osv-offline-updater",
     "test": "run-s eslint test:unit test:integration",
-    "test:unit": "jest --testPathPattern=unit.spec.ts",
-    "test:integration": "jest --testPathPattern=int.spec.ts --runInBand"
+    "test:unit": "vitest run unit.spec.ts",
+    "test:integration": "vitest run int.spec.ts --poolOptions.threads.singleThread"
   },
   "devDependencies": {
     "@containerbase/eslint-plugin": "1.1.4",
@@ -46,7 +46,8 @@
     "ts-node": "10.9.2",
     "tsx": "4.19.4",
     "typescript": "5.8.3",
-    "typescript-eslint": "8.32.1"
+    "typescript-eslint": "8.32.1",
+    "vitest": "3.1.1"
   },
   "engines": {
     "node": ">=22.12.0",
