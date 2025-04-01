@@ -14,46 +14,24 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Jest Current File",
-      "program": "${workspaceFolder}/node_modules/.bin/jest",
-      "args": [
-        "--runInBand",
-        "--collectCoverage=false",
-        "--testTimeout=100000000",
-        "--runTestsByPath",
-        "${relativeFile}"
-      ],
-      "env": {
-        "NODE_ENV": "test",
-        "LOG_LEVEL": "debug"
-      },
-      "console": "integratedTerminal",
-      "windows": {
-        "program": "${workspaceFolder}/node_modules/jest/bin/jest"
-      },
-      "runtimeArgs": ["--preserve-symlinks"],
-      "skipFiles": ["<node_internals>/**/*.js"]
+      "name": "Debug Vitest Current File",
+      "autoAttachChildProcesses": true,
+      "skipFiles": ["<node_internals>/**", "**/node_modules/**"],
+      "program": "${workspaceRoot}/node_modules/vitest/vitest.mjs",
+      "args": ["run", "${relativeFile}"],
+      "smartStep": true,
+      "console": "integratedTerminal"
     },
     {
       "type": "node",
       "request": "launch",
-      "name": "Jest All",
-      "program": "${workspaceFolder}/node_modules/.bin/jest",
-      "args": [
-        "--runInBand",
-        "--collectCoverage=false",
-        "--testTimeout=100000000"
-      ],
-      "env": {
-        "NODE_ENV": "test",
-        "LOG_LEVEL": "debug"
-      },
-      "console": "integratedTerminal",
-      "windows": {
-        "program": "${workspaceFolder}/node_modules/jest/bin/jest"
-      },
-      "runtimeArgs": ["--preserve-symlinks"],
-      "skipFiles": ["<node_internals>/**/*.js"]
+      "name": "Vitest All",
+      "autoAttachChildProcesses": true,
+      "skipFiles": ["<node_internals>/**", "**/node_modules/**"],
+      "program": "${workspaceRoot}/node_modules/vitest/vitest.mjs",
+      "args": ["run"],
+      "smartStep": true,
+      "console": "integratedTerminal"
     }
   ]
 }
