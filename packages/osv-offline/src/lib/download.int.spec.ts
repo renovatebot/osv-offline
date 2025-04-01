@@ -2,6 +2,7 @@ import { OsvOfflineDb } from '@renovatebot/osv-offline-db';
 import fs from 'fs-extra';
 import path from 'path';
 import { tryDownloadDb } from './download';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 describe('packages/osv-offline/src/lib/download.int', () => {
   describe('tryDownloadDb', () => {
@@ -12,9 +13,9 @@ describe('packages/osv-offline/src/lib/download.int', () => {
     it('works', async () => {
       const result = await tryDownloadDb();
 
-      expect(result.success).toBeTrue();
+      expect(result.success).toBe(true);
       expect(fs.stat(OsvOfflineDb.rootDirectory)).toBeDefined();
-      expect(fs.readdir(OsvOfflineDb.rootDirectory)).not.toBeEmptyArray();
+      expect(fs.readdir(OsvOfflineDb.rootDirectory)).not.toEqual([]);
     });
 
     it('skips download if less than 1 day old', async () => {
@@ -27,7 +28,7 @@ describe('packages/osv-offline/src/lib/download.int', () => {
 
       const result = await tryDownloadDb();
 
-      expect(result.success).toBeTrue();
+      expect(result.success).toEqual(true);
       const stat = await fs.stat(zipFilePath);
       expect(stat.size).toBe(0);
     });

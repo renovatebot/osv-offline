@@ -2,6 +2,7 @@ import { OsvOfflineDb } from './db';
 import fs from 'fs-extra';
 import path from 'path';
 import type { Vulnerability } from './osv';
+import { beforeAll, describe, expect, it } from 'vitest';
 
 describe('packages/osv-offline-db/src/lib/db.int', () => {
   let osvOfflineDb: OsvOfflineDb;
@@ -73,7 +74,7 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
         'this-package-doesnt-exist'
       );
 
-      expect(result).toBeEmptyArray();
+      expect(result).toEqual([]);
     });
   });
 });
