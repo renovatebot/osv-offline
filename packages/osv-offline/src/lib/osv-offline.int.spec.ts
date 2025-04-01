@@ -1,6 +1,7 @@
 import { OsvOfflineDb } from '@renovatebot/osv-offline-db';
 import fs from 'fs-extra';
 import { OsvOffline } from './osv-offline';
+import { beforeAll, describe, expect, it } from 'vitest';
 
 describe('packages/osv-offline/src/lib/osv-offline.int', () => {
   let osvOffline: OsvOffline;
@@ -20,7 +21,7 @@ describe('packages/osv-offline/src/lib/osv-offline.int', () => {
     it('works', async () => {
       const result = await osvOffline.getVulnerabilities('npm', 'lodash');
 
-      expect(result).not.toBeEmptyArray();
+      expect(result).not.toBe([]);
     });
 
     it('returns empty array for invalid package', async () => {
@@ -29,7 +30,7 @@ describe('packages/osv-offline/src/lib/osv-offline.int', () => {
         'this-package-doesnt-exist'
       );
 
-      expect(result).toBeEmptyArray();
+      expect(result).toEqual([]);
     });
   });
 });
