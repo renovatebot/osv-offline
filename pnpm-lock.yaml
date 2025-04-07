@@ -112,8 +112,8 @@ importers:
         specifier: 11.0.4
         version: 11.0.4
       '@types/luxon':
-        specifier: 3.4.2
-        version: 3.4.2
+        specifier: 3.6.0
+        version: 3.6.0
       '@types/node':
         specifier: 18.19.84
         version: 18.19.84
@@ -180,8 +180,8 @@ importers:
         specifier: 11.0.4
         version: 11.0.4
       '@types/luxon':
-        specifier: 3.4.2
-        version: 3.4.2
+        specifier: 3.6.0
+        version: 3.6.0
       '@types/node':
         specifier: 22.13.4
         version: 22.13.4
@@ -964,8 +964,8 @@ packages:
   '@types/keyv@3.1.4':
     resolution: {integrity: sha512-BQ5aZNSCpj7D6K2ksrRCTmKRLEpnPvWDiLPfoGyhZ++8YtiK9d/3DBKPJgry359X/P1PfruyYwvnvwFjuEiEIg==}
 
-  '@types/luxon@3.4.2':
-    resolution: {integrity: sha512-TifLZlFudklWlMBfhubvgqTXRzLDI5pCbGa4P8a3wPyUQSW+1xQ5eDsreP9DWHX3tjq1ke96uYG/nwundroWcA==}
+  '@types/luxon@3.6.0':
+    resolution: {integrity: sha512-RtEj20xRyG7cRp142MkQpV3GRF8Wo2MtDkKLz65MQs7rM1Lh8bz+HtfPXCCJEYpnDFu6VwAq/Iv2Ikyp9Jw/hw==}
 
   '@types/minimist@1.2.5':
     resolution: {integrity: sha512-hov8bUuiLiyFPGyFPE1lwWhmzYbirOXQNNo40+y3zow8aFVTeyn3VWL0VFFfdNddA8S4Vf0Tc062rzyNr7Paag==}
@@ -4803,7 +4803,7 @@ snapshots:
     dependencies:
       '@types/node': 22.13.4
 
-  '@types/luxon@3.4.2': {}
+  '@types/luxon@3.6.0': {}
 
   '@types/minimist@1.2.5': {}
 
