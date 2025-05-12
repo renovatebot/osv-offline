@@ -19,7 +19,7 @@
     "@tsconfig/node18": "18.2.4",
     "@tsconfig/strictest": "2.0.5",
     "@types/fs-extra": "11.0.4",
-    "@types/node": "18.19.89",
+    "@types/node": "18.19.91",
     "fs-extra": "11.3.0"
   },
   "engines": {
