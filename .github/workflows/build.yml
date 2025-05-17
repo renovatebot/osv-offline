@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-24.04
 
     steps:
-      - uses: containerbase/internal-tools/setup@a2739c77de4cbf44c896d30ed351800214ba57c1 # v3.10.35
+      - uses: containerbase/internal-tools/setup@98ccec34cede40632e72d7f80c2eaf0ea69de399 # v3.10.36
         with:
           save-cache: true
           pnpm-cache: |
@@ -39,7 +39,7 @@ jobs:
           - 22
 
     steps:
-      - uses: containerbase/internal-tools/setup@a2739c77de4cbf44c896d30ed351800214ba57c1 # v3.10.35
+      - uses: containerbase/internal-tools/setup@98ccec34cede40632e72d7f80c2eaf0ea69de399 # v3.10.36
         with:
           save-cache: true
           node-version: ${{ matrix.node-version }}
