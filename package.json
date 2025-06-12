@@ -21,7 +21,7 @@
     "test:integration": "jest --testPathPattern=int.spec.ts --runInBand"
   },
   "devDependencies": {
-    "@containerbase/eslint-plugin": "1.1.4",
+    "@containerbase/eslint-plugin": "1.1.6",
     "@eslint/js": "9.28.0",
     "@qiwi/multi-semantic-release": "7.1.2",
     "@tsconfig/node18": "18.2.4",
