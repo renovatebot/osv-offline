@@ -32,7 +32,7 @@
     "eslint-formatter-gha": "1.5.2",
     "eslint-import-resolver-typescript": "3.10.1",
     "eslint-plugin-import": "2.31.0",
-    "eslint-plugin-jest": "28.13.3",
+    "eslint-plugin-jest": "28.13.5",
     "eslint-plugin-promise": "7.2.1",
     "expect-more-jest": "5.5.0",
     "globals": "15.15.0",
