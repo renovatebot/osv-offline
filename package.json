@@ -27,7 +27,7 @@
     "@tsconfig/node18": "18.2.4",
     "@tsconfig/strictest": "2.0.5",
     "@types/jest": "29.5.14",
-    "eslint": "9.28.0",
+    "eslint": "9.29.0",
     "eslint-config-prettier": "10.1.5",
     "eslint-formatter-gha": "1.5.2",
     "eslint-import-resolver-typescript": "3.10.1",
