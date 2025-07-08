@@ -23,7 +23,7 @@
     "@types/adm-zip": "0.5.7",
     "@types/fs-extra": "11.0.4",
     "@types/luxon": "3.6.2",
-    "@types/node": "18.19.114"
+    "@types/node": "18.19.115"
   },
   "engines": {
     "node": ">=18.12.0"
