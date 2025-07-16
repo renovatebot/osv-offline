@@ -102,8 +102,8 @@ importers:
         specifier: ^11.8.6
         version: 11.8.6
       luxon:
-        specifier: ^3.7.0
-        version: 3.7.0
+        specifier: ^3.7.1
+        version: 3.7.1
     devDependencies:
       '@types/adm-zip':
         specifier: 0.5.7
@@ -161,8 +161,8 @@ importers:
         specifier: 11.8.6
         version: 11.8.6
       luxon:
-        specifier: 3.7.0
-        version: 3.7.0
+        specifier: 3.7.1
+        version: 3.7.1
       signale:
         specifier: 1.4.0
         version: 1.4.0
@@ -2751,8 +2751,8 @@ packages:
     resolution: {integrity: sha512-Jo6dJ04CmSjuznwJSS3pUeWmd/H0ffTlkXXgwZi+eq1UCmqQwCh+eLsYOYCwY991i2Fah4h1BEMCx4qThGbsiA==}
     engines: {node: '>=10'}
 
-  luxon@3.7.0:
-    resolution: {integrity: sha512-FWOR5aRqol+wq5WqqCj/zQ4sHIq48T0RdeNHH0oYRRY+Ds11SOSZQ89y11TyhiQ5BLZGJorlcxi4FxgBx0LNtw==}
+  luxon@3.7.1:
+    resolution: {integrity: sha512-RkRWjA926cTvz5rAb1BqyWkKbbjzCGchDUIKMCUvNi17j6f6j8uHGDV82Aqcqtzd+icoYpELmG3ksgGiFNNcNg==}
     engines: {node: '>=12'}
 
   make-dir@4.0.0:
@@ -6975,7 +6975,7 @@ snapshots:
     dependencies:
       yallist: 4.0.0
 
-  luxon@3.7.0: {}
+  luxon@3.7.1: {}
 
   make-dir@4.0.0:
     dependencies:
