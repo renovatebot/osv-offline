@@ -17,7 +17,7 @@
     "adm-zip": "~0.5.16",
     "fs-extra": "^11.3.0",
     "got": "^11.8.6",
-    "luxon": "^3.7.0"
+    "luxon": "^3.7.1"
   },
   "devDependencies": {
     "@types/adm-zip": "0.5.7",
