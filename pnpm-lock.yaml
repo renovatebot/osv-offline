@@ -115,8 +115,8 @@ importers:
         specifier: 3.6.2
         version: 3.6.2
       '@types/node':
-        specifier: 18.19.117
-        version: 18.19.117
+        specifier: 18.19.118
+        version: 18.19.118
 
   packages/osv-offline-db:
     dependencies:
@@ -134,8 +134,8 @@ importers:
         specifier: 11.0.4
         version: 11.0.4
       '@types/node':
-        specifier: 18.19.117
-        version: 18.19.117
+        specifier: 18.19.118
+        version: 18.19.118
       fs-extra:
         specifier: 11.3.0
         version: 11.3.0
@@ -981,8 +981,8 @@ packages:
   '@types/minimist@1.2.5':
     resolution: {integrity: sha512-hov8bUuiLiyFPGyFPE1lwWhmzYbirOXQNNo40+y3zow8aFVTeyn3VWL0VFFfdNddA8S4Vf0Tc062rzyNr7Paag==}
 
-  '@types/node@18.19.117':
-    resolution: {integrity: sha512-hcxGs9TfQGghOM8atpRT+bBMUX7V8WosdYt98bQ59wUToJck55eCOlemJ+0FpOZOQw5ff7LSi9+IO56KvYEFyQ==}
+  '@types/node@18.19.118':
+    resolution: {integrity: sha512-hIPK0hSrrcaoAu/gJMzN3QClXE4QdCdFvaenJ0JsjIbExP1JFFVH+RHcBt25c9n8bx5dkIfqKE+uw6BmBns7ug==}
 
   '@types/node@22.13.4':
     resolution: {integrity: sha512-ywP2X0DYtX3y08eFVx5fNIw7/uIv8hYUKgXoK8oayJlLnKcRfEYCxWMVE1XagUdVtCJlZT1AU4LXEABW+L1Peg==}
@@ -4870,7 +4870,7 @@ snapshots:
 
   '@types/minimist@1.2.5': {}
 
-  '@types/node@18.19.117':
+  '@types/node@18.19.118':
     dependencies:
       undici-types: 5.26.5
 
