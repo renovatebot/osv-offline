@@ -32,9 +32,10 @@ export async function tryDownloadDb(): Promise<Result> {
 
   // only download databases if local databases are missing or remote is newer
   try {
-    const stream = got.stream(
-      'https://github.com/renovatebot/osv-offline/releases/latest/download/osv-offline.zip'
-    );
+    const zipUrl =
+      process.env.OSV_OFFLINE_DB_URL ??
+      'https://github.com/renovatebot/osv-offline/releases/latest/download/osv-offline.zip';
+    const stream = got.stream(zipUrl);
     const zipPath = path.join(OsvOfflineDb.rootDirectory, 'osv-offline.zip');
     const writeStream = fs.createWriteStream(zipPath);
     await pipeline(stream, writeStream);
