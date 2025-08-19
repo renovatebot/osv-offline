@@ -2,7 +2,7 @@
   "dockerFile": "Dockerfile",
   "postStartCommand": "pnpm install",
   "extensions": [
-    "vitest.explorer",
+    "orta.vscode-jest",
     "dbaeumer.vscode-eslint",
     "esbenp.prettier-vscode"
   ]
