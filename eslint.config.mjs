@@ -9,7 +9,7 @@ import eslintContainerbase from '@containerbase/eslint-plugin';
 export default tseslint.config(
   {
     // TODO: fix ignores
-    ignores: ['**/dist/**/*', 'eslint.config.mjs', 'jest.config.ts'],
+    ignores: ['**/dist/**/*', 'eslint.config.mjs', 'vitest.config.mjs'],
   },
   js.configs.recommended,
   ...tseslint.configs.recommendedTypeChecked,
@@ -86,13 +86,6 @@ export default tseslint.config(
   },
   {
     files: ['**/*.spec.ts', 'test/**'],
-
-    languageOptions: {
-      globals: {
-        ...globals.jest,
-      },
-    },
-
     rules: {
       '@typescript-eslint/no-explicit-any': 0,
     },
