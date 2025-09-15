@@ -51,7 +51,7 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
 
   beforeAll(async () => {
     // Generates a unique temporary directory for this test suite
-    tempDirPath = fs.mkdtempSync(path.join(tmpdir(), 'osv-offline_'));
+    tempDirPath = await fs.mkdtemp(path.join(tmpdir(), 'osv-offline_'));
     // return temp dir when `rootDirectory` is used
     vi.spyOn(OsvOfflineDb, 'rootDirectory', 'get').mockReturnValue(tempDirPath);
 
