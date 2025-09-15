@@ -86,6 +86,12 @@ export default tseslint.config(
   },
   {
     files: ['**/*.spec.ts', 'test/**'],
+    languageOptions: {
+      globals: {
+        ...globals.vitest,
+      },
+    },
+
     rules: {
       '@typescript-eslint/no-explicit-any': 0,
     },
