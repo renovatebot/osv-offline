@@ -63,10 +63,10 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
     osvOfflineDb = await OsvOfflineDb.create();
   });
 
-  afterAll(() => {
+  afterAll(async () => {
     // Delete temporary directory after test suite has been finished.
     try {
-      fs.rmSync(tempDirPath, { recursive: true, force: true });
+      await fs.rm(tempDirPath, { recursive: true, force: true });
       console.log(`Temporary directory '${tempDirPath}' deleted successfully.`);
     } catch (err: any) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
