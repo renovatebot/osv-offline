@@ -2,9 +2,12 @@ import { OsvOfflineDb } from './db';
 import fs from 'fs-extra';
 import path from 'path';
 import type { Vulnerability } from './osv';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
+import { tmpdir } from 'os';
 
 describe('packages/osv-offline-db/src/lib/db.int', () => {
   let osvOfflineDb: OsvOfflineDb;
+  let tempDirPath: string;
 
   const sampleVuln: Vulnerability & { _id: string } = {
     id: 'GHSA-7jfh-2xc9-ccv7',
@@ -47,12 +50,22 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
   };
 
   beforeAll(async () => {
+    // Generates a unique temporary directory for this test suite
+    tempDirPath = await fs.mkdtemp(path.join(tmpdir(), 'osv-offline_'));
+    // return temp dir when `rootDirectory` is used
+    vi.spyOn(OsvOfflineDb, 'rootDirectory', 'get').mockReturnValue(tempDirPath);
+
     await fs.ensureDir(OsvOfflineDb.rootDirectory);
 
     const dbFile = path.join(OsvOfflineDb.rootDirectory, 'npm.nedb');
     await fs.writeFile(dbFile, JSON.stringify(sampleVuln), 'utf8');
 
     osvOfflineDb = await OsvOfflineDb.create();
+  });
+
+  afterAll(async () => {
+    // Delete temporary directory after test suite has been finished.
+    await fs.rm(tempDirPath, { recursive: true, force: true });
   });
 
   describe('create', () => {
@@ -73,7 +86,7 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
         'this-package-doesnt-exist'
       );
 
-      expect(result).toBeEmptyArray();
+      expect(result).toEqual([]);
     });
   });
 });
