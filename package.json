@@ -36,7 +36,7 @@
     "globals": "15.15.0",
     "husky": "9.1.7",
     "lint-staged": "15.5.2",
-    "npm-run-all2": "7.0.2",
+    "npm-run-all2": "8.0.4",
     "prettier": "3.6.2",
     "ts-node": "10.9.2",
     "tsx": "4.20.5",
