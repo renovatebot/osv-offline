@@ -20,7 +20,7 @@
     "@tsconfig/strictest": "2.0.5",
     "@types/fs-extra": "11.0.4",
     "@types/node": "18.19.124",
-    "fs-extra": "11.3.1"
+    "fs-extra": "11.3.2"
   },
   "engines": {
     "node": ">=18.12.0"
