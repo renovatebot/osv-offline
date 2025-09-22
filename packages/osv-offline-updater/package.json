@@ -28,7 +28,7 @@
     "@types/adm-zip": "0.5.7",
     "@types/fs-extra": "11.0.4",
     "@types/luxon": "3.7.1",
-    "@types/node": "22.18.3",
+    "@types/node": "22.18.4",
     "@types/signale": "1.4.7"
   }
 }
