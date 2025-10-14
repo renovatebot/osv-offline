@@ -1,9 +1,13 @@
 {
-  "dockerFile": "Dockerfile",
+  "image": "ghcr.io/containerbase/devcontainer:13.22.0",
   "postStartCommand": "pnpm install",
-  "extensions": [
-    "vitest.explorer",
-    "dbaeumer.vscode-eslint",
-    "esbenp.prettier-vscode"
-  ]
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "vitest.explorer",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode"
+      ]
+    }
+  }
 }
