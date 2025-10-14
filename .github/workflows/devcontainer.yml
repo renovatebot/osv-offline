@@ -4,9 +4,13 @@ on:
     branches:
       - '**'
       - '!main'
+      - '!next'
+      - '!maint/**'
   pull_request:
     branches:
       - main
+      - next
+      - maint/**
     types:
       - opened
       - synchronize
