@@ -109,8 +109,8 @@ importers:
         specifier: 3.7.1
         version: 3.7.1
       '@types/node':
-        specifier: 18.19.129
-        version: 18.19.129
+        specifier: 18.19.130
+        version: 18.19.130
 
   packages/osv-offline-db:
     dependencies:
@@ -128,8 +128,8 @@ importers:
         specifier: 11.0.4
         version: 11.0.4
       '@types/node':
-        specifier: 18.19.129
-        version: 18.19.129
+        specifier: 18.19.130
+        version: 18.19.130
       fs-extra:
         specifier: 11.3.2
         version: 11.3.2
@@ -793,8 +793,8 @@ packages:
   '@types/luxon@3.7.1':
     resolution: {integrity: sha512-H3iskjFIAn5SlJU7OuxUmTEpebK6TKB8rxZShDslBMZJ5u9S//KM1sbdAisiSrqwLQncVjnpi2OK2J51h+4lsg==}
 
-  '@types/node@18.19.129':
-    resolution: {integrity: sha512-hrmi5jWt2w60ayox3iIXwpMEnfUvOLJCRtrOPbHtH15nTjvO7uhnelvrdAs0dO0/zl5DZ3ZbahiaXEVb54ca/A==}
+  '@types/node@18.19.130':
+    resolution: {integrity: sha512-GRaXQx6jGfL8sKfaIDD6OupbIHBr9jv7Jnaml9tB7l4v068PAOXqfcujMMo5PhbIs6ggR1XODELqahT2R8v0fg==}
 
   '@types/node@22.18.8':
     resolution: {integrity: sha512-pAZSHMiagDR7cARo/cch1f3rXy0AEXwsVsVH09FcyeJVAzCnGgmYis7P3JidtTUjyadhTeSo8TgRPswstghDaw==}
@@ -3858,7 +3858,7 @@ snapshots:
 
   '@types/luxon@3.7.1': {}
 
-  '@types/node@18.19.129':
+  '@types/node@18.19.130':
     dependencies:
       undici-types: 5.26.5
 
