@@ -34,7 +34,7 @@ jobs:
           filter: blob:none # we don't need all blobs, only the full tree
           show-progress: false
 
-      - uses: containerbase/internal-tools/setup@fe770ba6b0bf4b72cb2e3e691f6e4e2974d5c80a # v3.14.4
+      - uses: containerbase/internal-tools/setup@ea80a3be1d45607f486ebac45c86541c3eabf136 # v3.14.5
         with:
           save-cache: true
           checkout: false
