@@ -1,5 +1,5 @@
 {
-  "image": "ghcr.io/containerbase/devcontainer:13.24.0",
+  "image": "ghcr.io/containerbase/devcontainer:13.24.1",
   "postStartCommand": "pnpm install",
   "customizations": {
     "vscode": {
