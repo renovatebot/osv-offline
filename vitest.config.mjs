@@ -5,12 +5,15 @@ const ci = !!env.CI;
 
 export default defineConfig({
   test: {
-    testTimeout: 15000,
-    hookTimeout: 15000,
+    testTimeout: 30_1000,
+    hookTimeout: 30_000,
     reporters: ci ? ['verbose', 'github-actions', 'junit'] : ['default'],
     coverage: {
       provider: 'v8',
-      reporter: ['text', 'json-summary', 'json'],
+      reporter: ci
+        ? ['text-summary', 'json']
+        : ['text-summary', 'html', 'json'],
+      enabled: ci ? true : undefined,
       reportOnFailure: true,
     },
   },

@@ -16,8 +16,8 @@
     "prettier-fix": "prettier --cache -w -u \"**/*.*\"",
     "start": "tsx ./packages/osv-offline-updater/src/index.ts",
     "test": "run-s eslint test:unit test:integration",
-    "test:unit": "vitest run unit.spec.ts",
-    "test:integration": "vitest run int.spec.ts --poolOptions.forks.singleFork"
+    "test:unit": "vitest run unit.spec.ts --outputFile.junit=.coverage/unit.junit.xml",
+    "test:integration": "vitest run int.spec.ts --poolOptions.forks.singleFork --outputFile.junit=.coverage/integration.junit.xml"
   },
   "devDependencies": {
     "@containerbase/eslint-plugin": "1.1.18",

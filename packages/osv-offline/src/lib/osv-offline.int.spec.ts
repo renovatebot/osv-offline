@@ -6,16 +6,12 @@ describe('packages/osv-offline/src/lib/osv-offline.int', () => {
 
   beforeAll(async () => {
     osvOffline = await OsvOffline.create();
-  }, 30 * 1000);
+  });
 
   describe('create', () => {
-    it(
-      'create',
-      async () => {
-        await expect(OsvOffline.create()).resolves.not.toThrow();
-      },
-      30 * 1000
-    );
+    it('create', async () => {
+      await expect(OsvOffline.create()).resolves.not.toThrow();
+    });
   });
 
   describe('getVulnerabilities', () => {
