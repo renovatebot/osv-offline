@@ -4,7 +4,8 @@
     "rootDir": "src",
     "outDir": "dist",
     "moduleResolution": "node10",
-    "module": "CommonJS"
+    "module": "CommonJS",
+    "esModuleInterop": true
   },
   "references": [
     {
