@@ -17,7 +17,7 @@
     "start": "tsx ./packages/osv-offline-updater/src/index.ts",
     "test": "run-s eslint test:unit test:integration",
     "test:unit": "vitest run unit.spec.ts",
-    "test:integration": "vitest run int.spec.ts --poolOptions.threads.singleThread"
+    "test:integration": "vitest run int.spec.ts --poolOptions.forks.singleFork"
   },
   "devDependencies": {
     "@containerbase/eslint-plugin": "1.1.18",

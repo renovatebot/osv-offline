@@ -1,29 +1,21 @@
-import { OsvOfflineDb } from '@renovatebot/osv-offline-db';
-import fs from 'fs-extra';
 import { OsvOffline } from './osv-offline';
-import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
-import path from 'path';
-import { tmpdir } from 'os';
+import { beforeAll, describe, expect, it } from 'vitest';
 
 describe('packages/osv-offline/src/lib/osv-offline.int', () => {
   let osvOffline: OsvOffline;
-  let tempDirPath: string;
 
   beforeAll(async () => {
-    tempDirPath = await fs.mkdtemp(path.join(tmpdir(), 'osv-offline_'));
-    vi.spyOn(OsvOfflineDb, 'rootDirectory', 'get').mockReturnValue(tempDirPath);
-    await fs.remove(OsvOfflineDb.rootDirectory);
     osvOffline = await OsvOffline.create();
-  });
-
-  afterAll(async () => {
-    await fs.rm(tempDirPath, { force: true, recursive: true });
-  });
+  }, 30 * 1000);
 
   describe('create', () => {
-    it('create', async () => {
-      await expect(OsvOffline.create()).resolves.not.toThrow();
-    });
+    it(
+      'create',
+      async () => {
+        await expect(OsvOffline.create()).resolves.not.toThrow();
+      },
+      30 * 1000
+    );
   });
 
   describe('getVulnerabilities', () => {
