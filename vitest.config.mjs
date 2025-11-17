@@ -1,10 +1,13 @@
 import { env } from 'node:process';
-import { defineConfig } from 'vitest/config';
+import { defineConfig, coverageConfigDefaults } from 'vitest/config';
 
 const ci = !!env.CI;
 
 export default defineConfig({
   test: {
+    env: {
+      DEBUG: 'osv-offline:*',
+    },
     testTimeout: 60_000,
     hookTimeout: 60_000,
     reporters: ci ? ['verbose', 'github-actions', 'junit'] : ['default'],
@@ -15,6 +18,10 @@ export default defineConfig({
         : ['text-summary', 'html', 'json'],
       enabled: ci ? true : undefined,
       reportOnFailure: true,
+      exclude: [
+        ...coverageConfigDefaults.exclude,
+        'packages/osv-offline-updater/**',
+      ],
     },
   },
 });

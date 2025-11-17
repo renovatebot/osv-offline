@@ -1,5 +1,8 @@
 import { Ecosystem, Osv, OsvOfflineDb } from '@renovatebot/osv-offline-db';
 import { tryDownloadDb } from './download';
+import debug from 'debug';
+
+const logger = debug('osv-offline:download');
 
 export class OsvOffline {
   private osvOfflineDb!: OsvOfflineDb;
@@ -15,7 +18,9 @@ export class OsvOffline {
     if (!result.success) {
       throw result.error;
     }
+    logger('Initializing databases ...');
     this.osvOfflineDb = await OsvOfflineDb.create();
+    logger('Initializing databases done.');
   }
 
   /**

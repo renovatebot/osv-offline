@@ -6,11 +6,15 @@ import path from 'path';
 import { DateTime } from 'luxon';
 import AdmZip from 'adm-zip';
 import { Result, failure, success } from './types';
+import debug from 'debug';
+
+const logger = debug('osv-offline:download');
 
 export async function tryDownloadDb(): Promise<Result> {
   await fs.ensureDir(OsvOfflineDb.rootDirectory);
 
   if (process.env.OSV_OFFLINE_DISABLE_DOWNLOAD?.toLowerCase() === 'true') {
+    logger('Skipping database download.');
     return success();
   }
 
@@ -27,19 +31,24 @@ export async function tryDownloadDb(): Promise<Result> {
     stats !== undefined &&
     DateTime.utc().diff(DateTime.fromJSDate(stats.mtime)).as('days') < 1
   ) {
+    logger('Skipping download, databases are up-to-date.');
     return success();
   }
 
   // only download databases if local databases are missing or remote is newer
   try {
+    logger('Downloading databases ...');
     const stream = got.stream(
       'https://github.com/renovatebot/osv-offline/releases/latest/download/osv-offline.zip'
     );
     const zipPath = path.join(OsvOfflineDb.rootDirectory, 'osv-offline.zip');
     const writeStream = fs.createWriteStream(zipPath);
     await pipeline(stream, writeStream);
+    logger('Downloading databases done.');
+    logger('Extracting databases ...');
     const zip = new AdmZip(zipPath);
     zip.extractAllTo(OsvOfflineDb.rootDirectory);
+    logger('Extracting databases done.');
   } catch (err) {
     return failure(err as Error);
   }
