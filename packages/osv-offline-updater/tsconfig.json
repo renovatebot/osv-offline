@@ -3,8 +3,8 @@
   "compilerOptions": {
     "rootDir": "src",
     "outDir": "dist",
-    "moduleResolution": "node10",
-    "module": "CommonJS",
+    "moduleResolution": "node",
+    "module": "esnext",
     "esModuleInterop": true
   },
   "references": [
