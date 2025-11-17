@@ -34,11 +34,15 @@ jobs:
     runs-on: ubuntu-24.04
 
     strategy:
+      fail-fast: false
       matrix:
         node-version:
           - 18
           - 20
           - 22
+
+    permissions:
+      id-token: write # required for codecov OIDC
 
     steps:
       - uses: containerbase/internal-tools/setup@cafacb746b412fd28fc671c1fc1b8a20ea2e34e9 # v3.14.18
@@ -54,6 +58,20 @@ jobs:
       - run: pnpm test:unit
 
       - run: pnpm test:integration
+
+      - name: Codecov Coverage
+        if: github.event_name != 'merge_group'
+        uses: codecov/codecov-action@5a1091511ad55cbe89839c7260b706298ca349f7 # v5.5.1
+        with:
+          use_oidc: true
+          flags: node${{ matrix.node-version }}-${{ runner.os }}
+
+      - name: Codecov Test Results
+        if: github.event_name != 'merge_group' && !cancelled()
+        uses: codecov/test-results-action@47f89e9acb64b76debcd5ea40642d25a4adced9f # v1.1.1
+        with:
+          use_oidc: true
+          flags: node${{ matrix.node-version }}-${{ runner.os }}
 
   # Catch-all required check for test matrix
   success:
