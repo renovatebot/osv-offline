@@ -7,7 +7,7 @@ export default defineConfig({
   test: {
     testTimeout: 15000,
     hookTimeout: 15000,
-    reporters: ci ? ['verbose', 'github-actions', 'json'] : ['default'],
+    reporters: ci ? ['verbose', 'github-actions', 'junit'] : ['default'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json-summary', 'json'],
