@@ -5,6 +5,9 @@ const ci = !!env.CI;
 
 export default defineConfig({
   test: {
+    env: {
+      DEBUG: 'osv-offline:*',
+    },
     testTimeout: 60_000,
     hookTimeout: 60_000,
     reporters: ci ? ['verbose', 'github-actions', 'junit'] : ['default'],
