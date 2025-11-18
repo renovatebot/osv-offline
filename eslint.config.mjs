@@ -57,15 +57,6 @@ export default tseslint.config(
 
       ecmaVersion: 11,
       sourceType: 'commonjs',
-
-      parserOptions: {
-        project: [
-          'tsconfig.json',
-          './packages/osv-offline/tsconfig.json',
-          './packages/osv-offline-db/tsconfig.json',
-          './packages/osv-offline-updater/tsconfig.json',
-        ],
-      },
     },
   },
   {
