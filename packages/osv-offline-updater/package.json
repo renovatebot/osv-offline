@@ -23,7 +23,7 @@
     "signale": "1.4.0"
   },
   "devDependencies": {
-    "@tsconfig/strictest": "2.0.7",
+    "@tsconfig/strictest": "2.0.8",
     "@types/adm-zip": "0.5.7",
     "@types/fs-extra": "11.0.4",
     "@types/luxon": "3.7.1",
