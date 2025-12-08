@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-24.04
 
     steps:
-      - uses: containerbase/internal-tools/setup@ed77a56ba412aa05f6ab51c25972d017439f8e3b # v3.14.27
+      - uses: containerbase/internal-tools/setup@cc94f4ddf9b0d82f558ac46f2daccbbba40426ab # v3.14.29
         with:
           save-cache: true
           pnpm-cache: |
@@ -44,7 +44,7 @@ jobs:
       id-token: write # required for codecov OIDC
 
     steps:
-      - uses: containerbase/internal-tools/setup@ed77a56ba412aa05f6ab51c25972d017439f8e3b # v3.14.27
+      - uses: containerbase/internal-tools/setup@cc94f4ddf9b0d82f558ac46f2daccbbba40426ab # v3.14.29
         with:
           save-cache: true
           node-version: ${{ matrix.node-version }}
