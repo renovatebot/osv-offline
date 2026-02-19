@@ -53,7 +53,7 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
     const dbFile = path.join(OsvOfflineDb.rootDirectory, 'npm.nedb');
     await fs.writeFile(dbFile, JSON.stringify(sampleVuln), 'utf8');
 
-    osvOfflineDb = await OsvOfflineDb.create();
+    osvOfflineDb = OsvOfflineDb.create();
   });
 
   afterAll(async () => {
@@ -61,8 +61,8 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
   });
 
   describe('create', () => {
-    it('create', async () => {
-      await expect(OsvOfflineDb.create()).resolves.not.toThrow();
+    it('create', () => {
+      expect(() => OsvOfflineDb.create()).not.toThrow();
     });
   });
 

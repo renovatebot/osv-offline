@@ -19,7 +19,7 @@ export class OsvOffline {
       throw result.error;
     }
     logger('Initializing databases ...');
-    this.osvOfflineDb = await OsvOfflineDb.create();
+    this.osvOfflineDb = OsvOfflineDb.create();
     logger('Initializing databases done.');
   }
 
