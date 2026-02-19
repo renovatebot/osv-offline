@@ -5,30 +5,39 @@ import { Ecosystem, ecosystems } from './ecosystem';
 import type { Vulnerability } from './osv';
 import type { Osv } from '..';
 import { packageToPurl } from './purl-helper';
+import debug from 'debug';
+
+const logger = debug('osv-offline:db');
 
 export class OsvOfflineDb {
   public static readonly rootDirectory =
     process.env.OSV_OFFLINE_ROOT_DIR ?? path.join(tmpdir(), 'osv-offline');
-  private db = {} as Record<Ecosystem, Datastore<Vulnerability>>;
+  private db = {} as Record<Ecosystem, Promise<Datastore<Vulnerability>>>;
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   private constructor() {}
 
-  private async initialize(): Promise<void> {
-    for (const ecosystem of ecosystems) {
-      this.db[ecosystem] = new Datastore({
-        filename: path.join(
-          OsvOfflineDb.rootDirectory,
-          `${ecosystem.toLowerCase()}.nedb`
-        ),
-      });
-      await this.db[ecosystem].loadDatabaseAsync();
+  private _load(ecosystem: Ecosystem): Promise<Datastore<Vulnerability>> {
+    return (this.db[ecosystem] ??= this._init(ecosystem));
+  }
+  private async _init(ecosystem: Ecosystem): Promise<Datastore<Vulnerability>> {
+    if (!ecosystems.includes(ecosystem)) {
+      throw new Error(`Ecosystem not supported`);
     }
+    logger(`Initializing database for ecosystem: ${ecosystem}`);
+    const db = new Datastore({
+      filename: path.join(
+        OsvOfflineDb.rootDirectory,
+        `${ecosystem.toLowerCase()}.nedb`
+      ),
+    });
+    await db.loadDatabaseAsync();
+
+    return db;
   }
 
-  public static async create(): Promise<OsvOfflineDb> {
+  public static create(): OsvOfflineDb {
     const osvOfflineDb = new OsvOfflineDb();
-    await osvOfflineDb.initialize();
     return osvOfflineDb;
   }
 
@@ -36,7 +45,9 @@ export class OsvOfflineDb {
     ecosystem: Ecosystem,
     packageName: string
   ): Promise<Osv.Vulnerability[]> {
-    return await this.db[ecosystem].findAsync({
+    return await (
+      await this._load(ecosystem)
+    ).findAsync({
       affected: {
         $elemMatch: {
           package: {

@@ -13,11 +13,13 @@
     "url": "https://github.com/renovatebot/osv-offline.git"
   },
   "dependencies": {
-    "@seald-io/nedb": "^4.1.2"
+    "@seald-io/nedb": "^4.1.2",
+    "debug": "^4.4.3"
   },
   "devDependencies": {
     "@tsconfig/node22": "22.0.5",
     "@tsconfig/strictest": "2.0.8",
+    "@types/debug": "4.1.12",
     "@types/fs-extra": "11.0.4",
     "@types/node": "22.19.11",
     "fs-extra": "11.3.3"
