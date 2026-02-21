@@ -41,6 +41,10 @@ export class OsvOfflineDb {
     return osvOfflineDb;
   }
 
+  private static escapeRegExp(s: string): string {
+    return s.replace(/[.*+?^${}()|[\]\\-]/g, '\\$&');
+  }
+
   async query(
     ecosystem: Ecosystem,
     packageName: string
@@ -50,11 +54,11 @@ export class OsvOfflineDb {
     ).findAsync({
       affected: {
         $elemMatch: {
-          package: {
-            name: packageName,
-            ecosystem,
-            purl: packageToPurl(ecosystem, packageName),
-          },
+          'package.name': packageName,
+          'package.ecosystem': new RegExp(
+            `^${OsvOfflineDb.escapeRegExp(ecosystem)}($|:)`
+          ),
+          'package.purl': packageToPurl(ecosystem, packageName),
         },
       },
     });
