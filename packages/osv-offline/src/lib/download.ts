@@ -1,5 +1,5 @@
 import fs from 'fs-extra';
-import got from 'got';
+import { got } from 'got';
 import { pipeline } from 'node:stream/promises';
 import { OsvOfflineDb } from '@renovatebot/osv-offline-db';
 import path from 'path';
