@@ -24,7 +24,7 @@ export class OsvOfflineDb {
     if (!ecosystems.includes(ecosystem)) {
       throw new Error(`Ecosystem not supported`);
     }
-    logger(`Initializing database for ecosystem: ${ecosystem}`);
+    logger(`Initializing database for ecosystem '${ecosystem}' ...`);
     const db = new Datastore({
       filename: path.join(
         OsvOfflineDb.rootDirectory,
@@ -32,6 +32,7 @@ export class OsvOfflineDb {
       ),
     });
     await db.loadDatabaseAsync();
+    logger(`Initializing database for ecosystem '${ecosystem}' done.`);
 
     return db;
   }
