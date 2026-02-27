@@ -18,11 +18,11 @@ interface RecordPointer {
 type EcosystemIndex = Map<string, RecordPointer[]>;
 
 export class OsvOfflineDb {
-  private readonly indices = {} as Record<Ecosystem, EcosystemIndex>;
-  private readonly fileHandles = {} as Record<Ecosystem, fs.FileHandle>;
+  private readonly indices: Partial<Record<Ecosystem, EcosystemIndex>> = {};
+  private readonly fileHandles: Partial<Record<Ecosystem, fs.FileHandle>> = {};
   public static readonly rootDirectory =
     process.env.OSV_OFFLINE_ROOT_DIR ?? path.join(tmpdir(), 'osv-offline');
-  private db = {} as Record<Ecosystem, Promise<void>>;
+  private db: Partial<Record<Ecosystem, Promise<void>>> = {};
 
   private constructor() {
     process.on('exit', () => {
