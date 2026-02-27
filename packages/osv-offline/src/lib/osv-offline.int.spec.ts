@@ -1,5 +1,5 @@
 import { OsvOffline } from './osv-offline';
-import { beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 describe('packages/osv-offline/src/lib/osv-offline.int', () => {
   let osvOffline: OsvOffline;
@@ -8,11 +8,7 @@ describe('packages/osv-offline/src/lib/osv-offline.int', () => {
     osvOffline = await OsvOffline.create();
   });
 
-  describe('create', () => {
-    it('create', async () => {
-      await expect(OsvOffline.create()).resolves.not.toThrow();
-    });
-  });
+  afterAll(() => osvOffline[Symbol.dispose]());
 
   describe('getVulnerabilities', () => {
     it('works', async () => {
