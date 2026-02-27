@@ -51,6 +51,10 @@ export class OsvOfflineDb {
 
   private constructor() {
     process.on('exit', () => {
+      if (this.disposed) {
+        return;
+      }
+      logger('Databases are not disposed! Please explicit dispose.');
       this[Symbol.dispose]();
     });
   }

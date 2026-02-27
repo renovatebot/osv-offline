@@ -2,7 +2,15 @@ import { OsvOfflineDb } from './db';
 import fs from 'fs-extra';
 import path from 'path';
 import type { Vulnerability } from './osv';
-import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import {
+  afterAll,
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+} from 'vitest';
 
 describe('packages/osv-offline-db/src/lib/db.int', () => {
   const rootDir = OsvOfflineDb.rootDirectory;
@@ -58,21 +66,21 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
 
   describe('create', () => {
     it('create', () => {
-      expect(() => OsvOfflineDb.create()).not.toThrow();
+      expect(() => OsvOfflineDb.create()[Symbol.dispose]()).not.toThrow();
     });
 
     it('silently skips missing ecosystem files', async () => {
       await fs.ensureDir(rootDir);
       await fs.emptyDir(rootDir);
 
-      const db = OsvOfflineDb.create();
+      using db = OsvOfflineDb.create();
 
       const result = await db.query('npm', 'public');
       expect(result).toEqual([]);
     });
 
     it('ignores records with missing affected field', async () => {
-      const osvOfflineDb = await createDbWithContent(
+      using osvOfflineDb = await createDbWithContent(
         'npm.nedb',
         JSON.stringify({
           ...sampleVuln,
@@ -91,7 +99,7 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
         JSON.stringify({ ...sampleVuln, id: 'GHSA-VALID-2' }),
       ].join('\n');
 
-      const osvOfflineDb = await createDbWithContent('npm.nedb', lines);
+      using osvOfflineDb = await createDbWithContent('npm.nedb', lines);
       const result1 = await osvOfflineDb.query('npm', 'public');
 
       expect(result1).toHaveLength(2);
@@ -104,7 +112,7 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
       const vuln2 = { ...sampleVuln, id: 'VULN-2' };
 
       const content = [JSON.stringify(vuln1), JSON.stringify(vuln2)].join('\n');
-      const osvOfflineDb = await createDbWithContent('npm.nedb', content);
+      using osvOfflineDb = await createDbWithContent('npm.nedb', content);
 
       const result = await osvOfflineDb.query('npm', 'public');
       expect(result).toEqual(
@@ -138,7 +146,7 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
         ],
       };
 
-      const osvOfflineDb = await createDbWithContent(
+      using osvOfflineDb = await createDbWithContent(
         'npm.nedb',
         JSON.stringify(multiRangeVuln)
       );
@@ -151,7 +159,7 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
     it('registers exit handler that invokes Symbol.dispose', () => {
       const processOnSpy = vi.spyOn(process, 'on');
 
-      const db = OsvOfflineDb.create();
+      using db = OsvOfflineDb.create();
       const closeHandlesSpy = vi.spyOn(db, Symbol.dispose);
       const exitCallback = processOnSpy.mock.calls.find(
         ([event]) => event === 'exit'
@@ -170,6 +178,10 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
         'npm.nedb',
         JSON.stringify(sampleVuln)
       );
+    });
+
+    afterEach(() => {
+      osvOfflineDb[Symbol.dispose]();
     });
 
     it('works', async () => {
