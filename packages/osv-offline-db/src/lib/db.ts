@@ -124,6 +124,7 @@ export class OsvOfflineDb {
 
     if (data.ac.signal.aborted) {
       logger(`Initializing ecosystem '${ecosystem}' aborted.`);
+      this._unload(data);
       return { valid: false };
     }
 
