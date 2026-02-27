@@ -43,6 +43,9 @@ jobs:
     permissions:
       id-token: write # required for codecov OIDC
 
+    env:
+      NODE_OPTIONS: --trace-warnings
+
     steps:
       - uses: containerbase/internal-tools/setup@47c5fbb8818143e740b3bed860012a9b19c740c4 # v4.1.15
         with:
