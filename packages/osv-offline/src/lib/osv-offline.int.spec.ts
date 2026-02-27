@@ -1,5 +1,7 @@
 import { OsvOffline } from './osv-offline';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import fs from 'fs-extra';
+import { OsvOfflineDb } from '@renovatebot/osv-offline-db';
 
 describe('packages/osv-offline/src/lib/osv-offline.int', () => {
   let osvOffline: OsvOffline;
@@ -8,7 +10,10 @@ describe('packages/osv-offline/src/lib/osv-offline.int', () => {
     osvOffline = await OsvOffline.create();
   });
 
-  afterAll(() => osvOffline[Symbol.dispose]());
+  afterAll(async () => {
+    osvOffline[Symbol.dispose]();
+    await fs.rm(OsvOfflineDb.rootDirectory, { recursive: true, force: true });
+  });
 
   describe('getVulnerabilities', () => {
     it('works', async () => {
