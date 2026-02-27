@@ -148,11 +148,11 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
       expect(result[0].id).toBe(sampleVuln.id);
     });
 
-    it('registers exit handler that invokes closeFileHandles', () => {
+    it('registers exit handler that invokes Symbol.dispose', () => {
       const processOnSpy = vi.spyOn(process, 'on');
 
       const db = OsvOfflineDb.create();
-      const closeHandlesSpy = vi.spyOn(db as any, 'closeFileHandles');
+      const closeHandlesSpy = vi.spyOn(db, Symbol.dispose);
       const exitCallback = processOnSpy.mock.calls.find(
         ([event]) => event === 'exit'
       )?.[1] as () => void;
