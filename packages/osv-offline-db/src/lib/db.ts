@@ -62,7 +62,7 @@ export class OsvOfflineDb {
     if (this.abort.signal.aborted) {
       return;
     }
-    const m = /(:?^|\/)(?<ecosystem>[a-z]+)\.nedb/.exec(file ?? '');
+    const m = /(?:^|\/)(?<ecosystem>[a-z]+)\.nedb/.exec(file ?? '');
     if (!m?.groups?.ecosystem) {
       // ignore other files
       return;
