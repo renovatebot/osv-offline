@@ -203,6 +203,39 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
     });
   });
 
+  describe('dispose', () => {
+    it('throws on query after sync dispose', async () => {
+      using db = await createDbWithContent(
+        'npm.nedb',
+        JSON.stringify(sampleVuln)
+      );
+      db[Symbol.dispose]();
+      await expect(db.query('npm', 'public')).rejects.toThrow(
+        'Database disposed'
+      );
+    });
+
+    it('throws on query after async dispose', async () => {
+      const db = await createDbWithContent(
+        'npm.nedb',
+        JSON.stringify(sampleVuln)
+      );
+      await db[Symbol.asyncDispose]();
+      await expect(db.query('npm', 'public')).rejects.toThrow(
+        'Database disposed'
+      );
+    });
+
+    it('double dispose does not throw', async () => {
+      const db = await createDbWithContent(
+        'npm.nedb',
+        JSON.stringify(sampleVuln)
+      );
+      db[Symbol.dispose]();
+      expect(() => db[Symbol.dispose]()).not.toThrow();
+    });
+  });
+
   describe('hot reload', () => {
     async function queryUntil(
       db: OsvOfflineDb,
