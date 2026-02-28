@@ -369,5 +369,118 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
       expect(mavenResult2).toHaveLength(1);
       expect(mavenResult2[0].id).toBe('MAVEN-VULN-1');
     });
+
+    it('concurrent queries during file change all resolve consistently', async () => {
+      const filePath = path.join(rootDir, 'npm.nedb');
+      using db = await createDbWithContent(
+        'npm.nedb',
+        JSON.stringify(sampleVuln)
+      );
+      await db.query('npm', 'public');
+
+      // Change file
+      const updatedVuln = { ...sampleVuln, id: 'RACE-UPDATED' };
+      await fs.writeFile(filePath, JSON.stringify(updatedVuln), 'utf8');
+      const future = new Date(Date.now() + 5000);
+      await fs.utimes(filePath, future, future);
+
+      // Fire many concurrent queries — some will hit mid-reload
+      const results = await Promise.all([
+        db.query('npm', 'public'),
+        db.query('npm', 'public'),
+        (async () => {
+          const secondUpdate = { ...sampleVuln, id: 'RACE-UPDATED-2' };
+          await fs.writeFile(filePath, JSON.stringify(secondUpdate), 'utf8');
+          const future2 = new Date(Date.now() + 10000);
+          await fs.utimes(filePath, future2, future2);
+          return db.query('npm', 'public');
+        })(),
+        db.query('npm', 'public'),
+        ...Array.from({ length: 16 }, () => db.query('npm', 'public')),
+      ]);
+
+      // Each result should be either the old data or the new data, never empty or mixed
+      for (const result of results) {
+        expect(result).toHaveLength(1);
+        expect([
+          'GHSA-7jfh-2xc9-ccv7',
+          'RACE-UPDATED',
+          'RACE-UPDATED-2',
+        ]).toContain(result[0].id);
+      }
+    });
+
+    it('dispose during reload does not hang or throw unexpectedly', async () => {
+      const filePath = path.join(rootDir, 'npm.nedb');
+      const db = await createDbWithContent(
+        'npm.nedb',
+        JSON.stringify(sampleVuln)
+      );
+      await db.query('npm', 'public');
+
+      // Change file to trigger reload
+      const updatedVuln = { ...sampleVuln, id: 'DISPOSE-RACE' };
+      await fs.writeFile(filePath, JSON.stringify(updatedVuln), 'utf8');
+      const future = new Date(Date.now() + 5000);
+      await fs.utimes(filePath, future, future);
+
+      // Start a query (triggers reload) and dispose concurrently
+      const queryPromise = db.query('npm', 'public');
+      await db[Symbol.asyncDispose]();
+
+      // The query should either:
+      // - resolve with data (reload completed before dispose)
+      // - resolve with [] (abort canceled reload after unload)
+      // - reject with "Database disposed"
+      const result = await queryPromise.catch((e: Error) => e.message);
+      if (Array.isArray(result)) {
+        if (result.length > 0) {
+          expect(result).toHaveLength(1);
+        } // empty array is also acceptable — abort hit between unload and index rebuild
+      } else {
+        expect(result).toBe('Database disposed');
+      }
+    });
+
+    it('double file change converges to latest content', async () => {
+      const filePath = path.join(rootDir, 'npm.nedb');
+      using db = await createDbWithContent(
+        'npm.nedb',
+        JSON.stringify(sampleVuln)
+      );
+
+      await db.query('npm', 'public');
+
+      // Two rapid overwrites
+      await fs.writeFile(
+        filePath,
+        JSON.stringify({ ...sampleVuln, id: 'V1' }),
+        'utf8'
+      );
+      await fs.utimes(
+        filePath,
+        new Date(Date.now() + 5000),
+        new Date(Date.now() + 5000)
+      );
+
+      await fs.writeFile(
+        filePath,
+        JSON.stringify({ ...sampleVuln, id: 'V2' }),
+        'utf8'
+      );
+      await fs.utimes(
+        filePath,
+        new Date(Date.now() + 10000),
+        new Date(Date.now() + 10000)
+      );
+
+      const result = await queryUntil(
+        db,
+        'npm',
+        'public',
+        (r) => r.length === 1 && r[0].id === 'V2'
+      );
+      expect(result[0].id).toBe('V2');
+    });
   });
 });
