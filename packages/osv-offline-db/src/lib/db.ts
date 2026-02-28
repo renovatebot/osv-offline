@@ -17,31 +17,20 @@ interface RecordPointer {
 
 type EcosystemIndex = Map<string, RecordPointer[]>;
 
-interface ValidData {
-  valid: true;
+interface EcosystemData {
   handle: fs.FileHandle;
   index: EcosystemIndex;
   ac: AbortController;
   mtime: number;
 }
 
-interface InvalidData {
-  valid: false;
-  handle?: never;
-  index?: never;
-  ac?: never;
-  mtime?: never;
-}
-
-type EcosystemData = ValidData | InvalidData;
-
 export class OsvOfflineDb {
   private disposed = false;
   public static readonly rootDirectory =
     process.env.OSV_OFFLINE_ROOT_DIR ?? path.join(tmpdir(), 'osv-offline');
 
-  private _data: Partial<Record<Ecosystem, ValidData>> = {};
-  private _db: Partial<Record<Ecosystem, Promise<EcosystemData>>> = {};
+  private _data: Partial<Record<Ecosystem, EcosystemData>> = {};
+  private _db: Partial<Record<Ecosystem, Promise<EcosystemData | null>>> = {};
 
   private readonly _exitHandler = () => {
     if (this.disposed) {
@@ -55,7 +44,7 @@ export class OsvOfflineDb {
     process.on('exit', this._exitHandler);
   }
 
-  private async _load(ecosystem: Ecosystem): Promise<EcosystemData> {
+  private async _load(ecosystem: Ecosystem): Promise<EcosystemData | null> {
     const cached = this._data[ecosystem];
     if (cached) {
       const filePath = path.join(
@@ -87,7 +76,7 @@ export class OsvOfflineDb {
     return (this._db[ecosystem] ??= this._init(ecosystem));
   }
 
-  private async _init(ecosystem: Ecosystem): Promise<EcosystemData> {
+  private async _init(ecosystem: Ecosystem): Promise<EcosystemData | null> {
     logger(`Initializing ecosystem '${ecosystem}' ...`);
     const filePath = path.join(
       OsvOfflineDb.rootDirectory,
@@ -98,11 +87,10 @@ export class OsvOfflineDb {
     if (!stat) {
       logger(`Missing data for ecosystem '${ecosystem}'`);
       delete this._db[ecosystem];
-      return { valid: false };
+      return null;
     }
 
-    const data: ValidData = {
-      valid: true,
+    const data: EcosystemData = {
       handle: await fs.open(filePath, 'r'),
       index: new Map(),
       ac: new AbortController(),
@@ -115,7 +103,7 @@ export class OsvOfflineDb {
       logger(`Initializing ecosystem '${ecosystem}' aborted.`);
       await this._unload(data);
       delete this._db[ecosystem];
-      return { valid: false };
+      return null;
     }
 
     this._data[ecosystem] = data;
@@ -124,7 +112,10 @@ export class OsvOfflineDb {
     return data;
   }
 
-  private async _buildIndex(data: ValidData, filePath: string): Promise<void> {
+  private async _buildIndex(
+    data: EcosystemData,
+    filePath: string
+  ): Promise<void> {
     const { index, ac } = data;
     const fileStream = createReadStream(filePath);
     const rl = readline.createInterface({
@@ -180,13 +171,13 @@ export class OsvOfflineDb {
     if (this.disposed) {
       throw new Error('Database disposed');
     }
-    const { valid, index, handle } = await this._load(ecosystem);
+    const data = await this._load(ecosystem);
 
-    if (!valid) {
+    if (!data) {
       return [];
     }
 
-    const pointers = index.get(packageName);
+    const pointers = data.index.get(packageName);
 
     if (!pointers || pointers.length === 0) {
       return [];
@@ -195,7 +186,7 @@ export class OsvOfflineDb {
     const candidates = await Promise.allSettled(
       pointers.map(async ({ offset, length }) => {
         const buffer = Buffer.allocUnsafe(length);
-        const { bytesRead } = await handle.read(buffer, 0, length, offset);
+        const { bytesRead } = await data.handle.read(buffer, 0, length, offset);
         return JSON.parse(
           buffer.toString('utf8', 0, bytesRead)
         ) as Vulnerability;
@@ -239,7 +230,7 @@ export class OsvOfflineDb {
     await this._disposeCore();
   }
 
-  private async _unload(d: ValidData): Promise<void> {
+  private async _unload(d: EcosystemData): Promise<void> {
     d.ac.abort();
     try {
       await d.handle.close();
