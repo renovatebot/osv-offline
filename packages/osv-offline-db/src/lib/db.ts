@@ -43,14 +43,16 @@ export class OsvOfflineDb {
   private _data: Partial<Record<Ecosystem, ValidData>> = {};
   private _db: Partial<Record<Ecosystem, Promise<EcosystemData>>> = {};
 
+  private readonly _exitHandler = () => {
+    if (this.disposed) {
+      return;
+    }
+    logger('Databases are not disposed! Please explicitly dispose.');
+    this[Symbol.dispose]();
+  };
+
   private constructor() {
-    process.on('exit', () => {
-      if (this.disposed) {
-        return;
-      }
-      logger('Databases are not disposed! Please explicit dispose.');
-      this[Symbol.dispose]();
-    });
+    process.on('exit', this._exitHandler);
   }
 
   private async _load(ecosystem: Ecosystem): Promise<EcosystemData> {
@@ -95,6 +97,7 @@ export class OsvOfflineDb {
     const stat = await fs.stat(filePath).catch(() => null);
     if (!stat) {
       logger(`Missing data for ecosystem '${ecosystem}'`);
+      delete this._db[ecosystem];
       return { valid: false };
     }
 
@@ -111,6 +114,7 @@ export class OsvOfflineDb {
     if (data.ac.signal.aborted) {
       logger(`Initializing ecosystem '${ecosystem}' aborted.`);
       await this._unload(data);
+      delete this._db[ecosystem];
       return { valid: false };
     }
 
@@ -133,7 +137,7 @@ export class OsvOfflineDb {
 
     for await (const line of rl) {
       if (ac.signal.aborted) {
-        // skip futher initialization
+        fileStream.destroy();
         return;
       }
       const lineByteLength = Buffer.byteLength(line, 'utf8');
@@ -215,26 +219,24 @@ export class OsvOfflineDb {
       );
   }
 
-  [Symbol.dispose](): void {
-    if (this.disposed) return;
+  private _disposeCore(): Promise<void[]> {
+    if (this.disposed) return Promise.resolve([]);
     logger(`Disposing databases ...`);
     this.disposed = true;
+    process.off('exit', this._exitHandler);
 
-    for (const d of Object.values(this._data)) {
-      void this._unload(d);
-    }
+    const promises = Object.values(this._data).map((d) => this._unload(d));
     this._db = {};
     this._data = {};
+    return Promise.all(promises);
+  }
+
+  [Symbol.dispose](): void {
+    void this._disposeCore();
   }
 
   async [Symbol.asyncDispose](): Promise<void> {
-    if (this.disposed) return;
-    logger(`Disposing databases ...`);
-    this.disposed = true;
-
-    await Promise.all(Object.values(this._data).map((d) => this._unload(d)));
-    this._db = {};
-    this._data = {};
+    await this._disposeCore();
   }
 
   private async _unload(d: ValidData): Promise<void> {
