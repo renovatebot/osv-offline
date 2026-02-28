@@ -181,7 +181,7 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
     });
 
     afterEach(() => {
-      osvOfflineDb[Symbol.dispose]();
+      osvOfflineDb?.[Symbol.dispose]();
     });
 
     it('works', async () => {

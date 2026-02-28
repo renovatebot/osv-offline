@@ -1,11 +1,5 @@
 import fs from 'node:fs/promises';
-import {
-  WatchEventType,
-  closeSync,
-  createReadStream,
-  existsSync,
-  watch,
-} from 'node:fs';
+import { WatchEventType, createReadStream, existsSync, watch } from 'node:fs';
 import path from 'node:path';
 import { tmpdir } from 'node:os';
 import readline from 'node:readline';
@@ -244,11 +238,9 @@ export class OsvOfflineDb {
   }
 
   private _unload(d: ValidData) {
-    try {
-      d.ac.abort(); // abort any loading
-      closeSync(d.handle.fd);
-    } catch {
+    d.ac.abort(); // abort any loading
+    d.handle.close().catch(() => {
       // Ignore errors on close
-    }
+    });
   }
 }
