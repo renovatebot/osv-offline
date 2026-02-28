@@ -36,7 +36,6 @@ export class OsvOfflineDb {
     if (this.disposed) {
       return;
     }
-    logger('Databases are not disposed! Please explicitly dispose.');
     this[Symbol.dispose]();
   };
 
@@ -211,7 +210,9 @@ export class OsvOfflineDb {
   }
 
   private _disposeCore(): Promise<void[]> {
-    if (this.disposed) return Promise.resolve([]);
+    if (this.disposed) {
+      return Promise.resolve([]);
+    }
     logger(`Disposing databases ...`);
     this.disposed = true;
     process.off('exit', this._exitHandler);
