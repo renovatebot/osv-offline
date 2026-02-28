@@ -1,5 +1,5 @@
 import fs from 'node:fs/promises';
-import { WatchEventType, createReadStream, existsSync, watch } from 'node:fs';
+import { createReadStream } from 'node:fs';
 import path from 'node:path';
 import { tmpdir } from 'node:os';
 import readline from 'node:readline';
@@ -22,6 +22,7 @@ interface ValidData {
   handle: fs.FileHandle;
   index: EcosystemIndex;
   ac: AbortController;
+  mtime: number;
 }
 
 interface InvalidData {
@@ -29,14 +30,13 @@ interface InvalidData {
   handle?: never;
   index?: never;
   ac?: never;
+  mtime?: never;
 }
 
 type EcosystemData = ValidData | InvalidData;
 
 export class OsvOfflineDb {
   private disposed = false;
-  private watching = false;
-  private abort = new AbortController();
   public static readonly rootDirectory =
     process.env.OSV_OFFLINE_ROOT_DIR ?? path.join(tmpdir(), 'osv-offline');
 
@@ -53,32 +53,36 @@ export class OsvOfflineDb {
     });
   }
 
-  private _load(ecosystem: Ecosystem): Promise<EcosystemData> {
+  private async _load(ecosystem: Ecosystem): Promise<EcosystemData> {
+    const cached = this._data[ecosystem];
+    if (cached) {
+      const filePath = path.join(
+        OsvOfflineDb.rootDirectory,
+        `${ecosystem.toLowerCase()}.nedb`
+      );
+      const stat = await fs.stat(filePath).catch(() => null);
+
+      // Check if the data currently in memory is still the same object we checked against
+      // If not, another request has already handled the reload/unload.
+      if (this._data[ecosystem] !== cached) {
+        return (this._db[ecosystem] ??= this._init(ecosystem));
+      }
+
+      if (stat?.mtimeMs !== cached.mtime) {
+        logger(
+          stat
+            ? `File changed for ecosystem '${ecosystem}', reloading ...`
+            : `File removed for ecosystem '${ecosystem}', unloading ...`
+        );
+        // Delete references synchronously BEFORE the async unload
+        // to prevent concurrent callers from picking up stale data
+        delete this._data[ecosystem];
+        delete this._db[ecosystem];
+        await this._unload(cached);
+      }
+    }
+
     return (this._db[ecosystem] ??= this._init(ecosystem));
-  }
-
-  private _watch(ev: WatchEventType, file: string | null): void {
-    // v8 ignore if -- hard to test
-    if (this.abort.signal.aborted) {
-      return;
-    }
-    const m = /(?:^|\/)(?<ecosystem>[a-z]+)\.nedb/.exec(file ?? '');
-    if (!m?.groups?.ecosystem) {
-      // ignore other files
-      return;
-    }
-    const ecosystem = m.groups.ecosystem as Ecosystem;
-
-    const data = this._data[ecosystem];
-    if (!data) {
-      // data not loaded
-      return;
-    }
-
-    logger(`Unloading database '${ecosystem}' for file '${file}' (${ev}) ...`);
-    this._unload(data);
-    delete this._data[ecosystem];
-    delete this._db[ecosystem];
   }
 
   private async _init(ecosystem: Ecosystem): Promise<EcosystemData> {
@@ -88,23 +92,10 @@ export class OsvOfflineDb {
       `${ecosystem.toLowerCase()}.nedb`
     );
 
-    // no equivalent on fs/promises
-    if (!existsSync(filePath)) {
+    const stat = await fs.stat(filePath).catch(() => null);
+    if (!stat) {
       logger(`Missing data for ecosystem '${ecosystem}'`);
       return { valid: false };
-    }
-
-    // only watch if path exists
-    if (!this.watching) {
-      this.watching = true;
-      watch(
-        OsvOfflineDb.rootDirectory,
-        {
-          signal: this.abort.signal,
-          recursive: true,
-        },
-        (e, f) => this._watch(e, f)
-      );
     }
 
     const data: ValidData = {
@@ -112,13 +103,14 @@ export class OsvOfflineDb {
       handle: await fs.open(filePath, 'r'),
       index: new Map(),
       ac: new AbortController(),
+      mtime: stat.mtimeMs,
     };
 
     await this._buildIndex(data, filePath);
 
     if (data.ac.signal.aborted) {
       logger(`Initializing ecosystem '${ecosystem}' aborted.`);
-      this._unload(data);
+      await this._unload(data);
       return { valid: false };
     }
 
@@ -184,9 +176,9 @@ export class OsvOfflineDb {
     if (this.disposed) {
       throw new Error('Database disposed');
     }
-    const { valid, index, handle, ac } = await this._load(ecosystem);
+    const { valid, index, handle } = await this._load(ecosystem);
 
-    if (!valid || ac.signal.aborted) {
+    if (!valid) {
       return [];
     }
 
@@ -206,8 +198,7 @@ export class OsvOfflineDb {
       })
     );
 
-    // TODO: throw?
-    if (ac.signal.aborted || candidates.some((c) => c.status !== 'fulfilled'))
+    if (this.disposed || candidates.some((c) => c.status !== 'fulfilled'))
       return [];
 
     const targetPurl = packageToPurl(ecosystem, packageName);
@@ -228,19 +219,30 @@ export class OsvOfflineDb {
     if (this.disposed) return;
     logger(`Disposing databases ...`);
     this.disposed = true;
-    this.abort.abort();
 
     for (const d of Object.values(this._data)) {
-      this._unload(d);
+      void this._unload(d);
     }
     this._db = {};
     this._data = {};
   }
 
-  private _unload(d: ValidData) {
-    d.ac.abort(); // abort any loading
-    d.handle.close().catch(() => {
-      // Ignore errors on close
-    });
+  async [Symbol.asyncDispose](): Promise<void> {
+    if (this.disposed) return;
+    logger(`Disposing databases ...`);
+    this.disposed = true;
+
+    await Promise.all(Object.values(this._data).map((d) => this._unload(d)));
+    this._db = {};
+    this._data = {};
+  }
+
+  private async _unload(d: ValidData): Promise<void> {
+    d.ac.abort();
+    try {
+      await d.handle.close();
+    } catch {
+      // ignore
+    }
   }
 }
