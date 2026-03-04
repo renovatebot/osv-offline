@@ -2,7 +2,7 @@ name: Upload Database
 
 on:
   schedule:
-    - cron: '0 5,17 * * *'
+    - cron: '0 */4 * * *'
   workflow_dispatch:
 
 permissions:
