@@ -1,5 +1,6 @@
-import fs from 'node:fs/promises';
-import { createReadStream } from 'node:fs';
+import { stat } from 'node:fs/promises';
+import { closeSync, createReadStream, read as fsRead, openSync } from 'node:fs';
+import { promisify } from 'node:util';
 import path from 'node:path';
 import { tmpdir } from 'node:os';
 import readline from 'node:readline';
@@ -9,6 +10,7 @@ import { packageToPurl } from './purl-helper';
 import debug from 'debug';
 
 const logger = debug('osv-offline:db');
+const readAsync = promisify(fsRead);
 
 interface RecordPointer {
   readonly offset: number;
@@ -18,7 +20,7 @@ interface RecordPointer {
 type EcosystemIndex = Map<string, RecordPointer[]>;
 
 interface EcosystemData {
-  handle: fs.FileHandle;
+  fd: number;
   index: EcosystemIndex;
   ac: AbortController;
   mtime: number;
@@ -36,6 +38,7 @@ export class OsvOfflineDb {
     if (this.disposed) {
       return;
     }
+    logger('Databases are not disposed! Please explicitly dispose.');
     this[Symbol.dispose]();
   };
 
@@ -50,7 +53,7 @@ export class OsvOfflineDb {
         OsvOfflineDb.rootDirectory,
         `${ecosystem.toLowerCase()}.nedb`
       );
-      const stat = await fs.stat(filePath).catch(() => null);
+      const fileStat = await stat(filePath).catch(() => null);
 
       // Check if the data currently in memory is still the same object we checked against
       // If not, another request has already handled the reload/unload.
@@ -58,9 +61,9 @@ export class OsvOfflineDb {
         return (this._db[ecosystem] ??= this._init(ecosystem));
       }
 
-      if (stat?.mtimeMs !== cached.mtime) {
+      if (fileStat?.mtimeMs !== cached.mtime) {
         logger(
-          stat
+          fileStat
             ? `File changed for ecosystem '${ecosystem}', reloading ...`
             : `File removed for ecosystem '${ecosystem}', unloading ...`
         );
@@ -68,7 +71,7 @@ export class OsvOfflineDb {
         // to prevent concurrent callers from picking up stale data
         delete this._data[ecosystem];
         delete this._db[ecosystem];
-        await this._unload(cached);
+        this._unload(cached);
       }
     }
 
@@ -82,18 +85,18 @@ export class OsvOfflineDb {
       `${ecosystem.toLowerCase()}.nedb`
     );
 
-    const stat = await fs.stat(filePath).catch(() => null);
-    if (!stat) {
+    const fileStat = await stat(filePath).catch(() => null);
+    if (!fileStat) {
       logger(`Missing data for ecosystem '${ecosystem}'`);
       delete this._db[ecosystem];
       return null;
     }
 
     const data: EcosystemData = {
-      handle: await fs.open(filePath, 'r'),
+      fd: openSync(filePath, 'r'),
       index: new Map(),
       ac: new AbortController(),
-      mtime: stat.mtimeMs,
+      mtime: fileStat.mtimeMs,
     };
 
     await this._buildIndex(data, filePath);
@@ -101,7 +104,7 @@ export class OsvOfflineDb {
     if (data.ac.signal.aborted) {
       logger(`Initializing ecosystem '${ecosystem}' aborted.`);
       delete this._db[ecosystem];
-      await this._unload(data);
+      this._unload(data);
       return null;
     }
 
@@ -185,7 +188,13 @@ export class OsvOfflineDb {
     const candidates = await Promise.allSettled(
       pointers.map(async ({ offset, length }) => {
         const buffer = Buffer.allocUnsafe(length);
-        const { bytesRead } = await data.handle.read(buffer, 0, length, offset);
+        const { bytesRead } = await readAsync(
+          data.fd,
+          buffer,
+          0,
+          length,
+          offset
+        );
         return JSON.parse(
           buffer.toString('utf8', 0, bytesRead)
         ) as Vulnerability;
@@ -209,32 +218,25 @@ export class OsvOfflineDb {
       );
   }
 
-  private _disposeCore(): Promise<void[]> {
+  [Symbol.dispose](): void {
     if (this.disposed) {
-      return Promise.resolve([]);
+      return;
     }
     logger(`Disposing databases ...`);
     this.disposed = true;
     process.off('exit', this._exitHandler);
 
-    const promises = Object.values(this._data).map((d) => this._unload(d));
+    for (const d of Object.values(this._data)) {
+      this._unload(d);
+    }
     this._db = {};
     this._data = {};
-    return Promise.all(promises);
   }
 
-  [Symbol.dispose](): void {
-    void this._disposeCore();
-  }
-
-  async [Symbol.asyncDispose](): Promise<void> {
-    await this._disposeCore();
-  }
-
-  private async _unload(d: EcosystemData): Promise<void> {
+  private _unload(d: EcosystemData): void {
     d.ac.abort();
     try {
-      await d.handle.close();
+      closeSync(d.fd);
     } catch {
       // ignore
     }

@@ -216,17 +216,6 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
       );
     });
 
-    it('throws on query after async dispose', async () => {
-      const db = await createDbWithContent(
-        'npm.nedb',
-        JSON.stringify(sampleVuln)
-      );
-      await db[Symbol.asyncDispose]();
-      await expect(db.query('npm', 'public')).rejects.toThrow(
-        'Database disposed'
-      );
-    });
-
     it('double dispose does not throw', async () => {
       const db = await createDbWithContent(
         'npm.nedb',
@@ -427,7 +416,7 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
 
       // Start a query (triggers reload) and dispose concurrently
       const queryPromise = db.query('npm', 'public');
-      await db[Symbol.asyncDispose]();
+      db[Symbol.dispose]();
 
       // The query should either:
       // - resolve with data (reload completed before dispose)
