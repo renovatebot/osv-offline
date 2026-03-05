@@ -249,7 +249,7 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
       while (Date.now() < deadline) {
         const results = await db.query(ecosystem, packageName);
         if (predicate(results)) return results;
-        await new Promise((resolve) => setTimeout(resolve, intervalMs));
+        await setTimeout(intervalMs);
       }
 
       return db.query(ecosystem, packageName);
