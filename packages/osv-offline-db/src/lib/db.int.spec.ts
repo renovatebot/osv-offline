@@ -1,6 +1,7 @@
 import { OsvOfflineDb } from './db';
 import fs from 'fs-extra';
 import path from 'path';
+import { setTimeout } from 'timers/promises';
 import type { Vulnerability } from './osv';
 import {
   afterAll,
