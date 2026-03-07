@@ -108,9 +108,9 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
       expect(result1[1].id).toBe('GHSA-VALID-2');
     });
 
-    it('groups multiple offset pointers per package', async () => {
-      const vuln1 = { ...sampleVuln, id: 'VULN-1' };
-      const vuln2 = { ...sampleVuln, id: 'VULN-2' };
+    it('returns multiple matching vulnerabilities for the same package', async () => {
+      const vuln1 = { ...sampleVuln, id: 'VULN-1', _id: 'UNIQUE_ID_1' };
+      const vuln2 = { ...sampleVuln, id: 'VULN-2', _id: 'UNIQUE_ID_2' };
 
       const content = [JSON.stringify(vuln1), JSON.stringify(vuln2)].join('\n');
       using osvOfflineDb = await createDbWithContent('npm.nedb', content);
