@@ -157,6 +157,29 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
       expect(result[0].id).toBe(sampleVuln.id);
     });
 
+    it('destroys stream and returns empty when initialization is aborted', async () => {
+      using db = await createDbWithContent(
+        'npm.nedb',
+        JSON.stringify(sampleVuln)
+      );
+
+      const OriginalAbortController = globalThis.AbortController;
+      vi.stubGlobal(
+        'AbortController',
+        class extends OriginalAbortController {
+          constructor() {
+            super();
+            this.abort();
+          }
+        }
+      );
+
+      const result = await db.query('npm', 'public');
+      expect(result).toEqual([]);
+
+      vi.stubGlobal('AbortController', OriginalAbortController);
+    });
+
     it('registers exit handler that invokes Symbol.dispose', () => {
       const processOnSpy = vi.spyOn(process, 'on');
 
@@ -223,6 +246,21 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
       );
       db[Symbol.dispose]();
       expect(() => db[Symbol.dispose]()).not.toThrow();
+    });
+
+    it('ignores stale exit callback after disposal', () => {
+      const processOnSpy = vi.spyOn(process, 'on');
+
+      const db = OsvOfflineDb.create();
+      const disposeSpy = vi.spyOn(db, Symbol.dispose);
+      const exitCallback = processOnSpy.mock.calls.find(
+        ([event]) => event === 'exit'
+      )?.[1] as () => void;
+
+      db[Symbol.dispose]();
+      exitCallback();
+
+      expect(disposeSpy).toHaveBeenCalledTimes(1);
     });
   });
 
