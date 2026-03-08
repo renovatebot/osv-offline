@@ -187,7 +187,7 @@ export class OsvOfflineDb {
       return [];
     }
 
-    const candidates = await Promise.allSettled(
+    const advisories = await Promise.all(
       pointers.map(async ({ offset, length }) => {
         const buffer = Buffer.allocUnsafe(length);
         const { bytesRead } = await readAsync(
@@ -203,21 +203,17 @@ export class OsvOfflineDb {
       })
     );
 
-    if (this.disposed || candidates.some((c) => c.status !== 'fulfilled'))
-      return [];
+    if (this.disposed) return [];
 
     const targetPurl = packageToPurl(ecosystem, packageName);
-    return candidates
-      .filter((c) => c.status === 'fulfilled')
-      .map((c) => c.value)
-      .filter((vuln) =>
-        vuln.affected?.some(
-          (a) =>
-            a.package?.name === packageName &&
-            a.package.ecosystem === ecosystem &&
-            a.package.purl === targetPurl
-        )
-      );
+    return advisories.filter((vuln) =>
+      vuln.affected?.some(
+        (a) =>
+          a.package?.name === packageName &&
+          a.package.ecosystem === ecosystem &&
+          a.package.purl === targetPurl
+      )
+    );
   }
 
   [Symbol.dispose](): void {
