@@ -427,7 +427,7 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
       }
     });
 
-    it('dispose during reload does not hang or throw unexpectedly', async () => {
+    it('returns empty when disposed during reload', async () => {
       const filePath = path.join(rootDir, 'npm.nedb');
       const db = await createDbWithContent(
         'npm.nedb',
@@ -441,22 +441,12 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
       const future = new Date(Date.now() + 5000);
       await fs.utimes(filePath, future, future);
 
-      // Start a query (triggers reload) and dispose concurrently
+      // Start a query that will detect the file change, then dispose immediately. Reload completes on the disposed
+      // instance but query returns [] because the post-read disposed check catches it.
       const queryPromise = db.query('npm', 'public');
       db[Symbol.dispose]();
 
-      // The query should either:
-      // - resolve with data (reload completed before dispose)
-      // - resolve with [] (abort canceled reload after unload)
-      // - reject with "Database disposed"
-      const result = await queryPromise.catch((e: Error) => e.message);
-      if (Array.isArray(result)) {
-        if (result.length > 0) {
-          expect(result).toHaveLength(1);
-        } // empty array is also acceptable — abort hit between unload and index rebuild
-      } else {
-        expect(result).toBe('Database disposed');
-      }
+      expect(await queryPromise).toEqual([]);
     });
 
     it('double file change converges to latest content', async () => {
