@@ -20,6 +20,7 @@ interface RecordPointer {
 type EcosystemIndex = Map<string, RecordPointer[]>;
 
 interface EcosystemData {
+  filePath: string;
   fd: number;
   index: EcosystemIndex;
   mtime: number;
@@ -49,14 +50,10 @@ export class OsvOfflineDb {
   private async _load(ecosystem: Ecosystem): Promise<EcosystemData | null> {
     const cached = this._data[ecosystem];
     if (cached) {
-      const filePath = path.join(
-        OsvOfflineDb.rootDirectory,
-        `${ecosystem.toLowerCase()}.nedb`
-      );
-      const fileStat = await stat(filePath).catch(() => null);
+      const fileStat = await stat(cached.filePath).catch(() => null);
 
       // Check if the data currently in memory is still the same object we checked against
-      // If not, another request has already handled the reload/unload.
+      // If not, another request has already handled the reload/unload
       if (this._data[ecosystem] !== cached) {
         return (this._db[ecosystem] ??= this._init(ecosystem));
       }
@@ -67,8 +64,7 @@ export class OsvOfflineDb {
             ? `File changed for ecosystem '${ecosystem}', reloading ...`
             : `File removed for ecosystem '${ecosystem}', unloading ...`
         );
-        // Delete references synchronously BEFORE the async unload
-        // to prevent concurrent callers from picking up stale data
+        // Delete references before unloading to prevent concurrent callers from picking up stale data
         delete this._data[ecosystem];
         delete this._db[ecosystem];
         this._unload(cached);
@@ -97,12 +93,13 @@ export class OsvOfflineDb {
       }
 
       const data: EcosystemData = {
+        filePath,
         fd: openSync(filePath, 'r'),
         index: new Map(),
         mtime: fileStat.mtimeMs,
       };
 
-      await this._buildIndex(ac, data, filePath);
+      await this._buildIndex(ac, data);
 
       if (ac.signal.aborted) {
         logger(`Initializing ecosystem '${ecosystem}' aborted.`);
@@ -122,10 +119,9 @@ export class OsvOfflineDb {
 
   private async _buildIndex(
     ac: AbortController,
-    data: EcosystemData,
-    filePath: string
+    data: EcosystemData
   ): Promise<void> {
-    const fileStream = createReadStream(filePath);
+    const fileStream = createReadStream(data.filePath);
     const rl = readline.createInterface({
       input: fileStream,
       crlfDelay: Infinity,
