@@ -157,27 +157,16 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
       expect(result[0].id).toBe(sampleVuln.id);
     });
 
-    it('destroys stream and returns empty when initialization is aborted', async () => {
-      using db = await createDbWithContent(
+    it('returns no results if disposed during the first query', async () => {
+      const db = await createDbWithContent(
         'npm.nedb',
         JSON.stringify(sampleVuln)
       );
 
-      const OriginalAbortController = globalThis.AbortController;
-      vi.stubGlobal(
-        'AbortController',
-        class extends OriginalAbortController {
-          constructor() {
-            super();
-            this.abort();
-          }
-        }
-      );
+      const queryPromise = db.query('npm', 'public');
+      db[Symbol.dispose]();
 
-      const result = await db.query('npm', 'public');
-      expect(result).toEqual([]);
-
-      vi.stubGlobal('AbortController', OriginalAbortController);
+      expect(await queryPromise).toEqual([]);
     });
 
     it('registers exit handler that invokes Symbol.dispose', () => {

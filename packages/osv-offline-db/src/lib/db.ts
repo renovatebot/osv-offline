@@ -22,7 +22,6 @@ type EcosystemIndex = Map<string, RecordPointer[]>;
 interface EcosystemData {
   fd: number;
   index: EcosystemIndex;
-  ac: AbortController;
   mtime: number;
 }
 
@@ -33,6 +32,7 @@ export class OsvOfflineDb {
 
   private _data: Partial<Record<Ecosystem, EcosystemData>> = {};
   private _db: Partial<Record<Ecosystem, Promise<EcosystemData | null>>> = {};
+  private _pendingAcs = new Set<AbortController>();
 
   private readonly _exitHandler = () => {
     if (this.disposed) {
@@ -80,45 +80,51 @@ export class OsvOfflineDb {
 
   private async _init(ecosystem: Ecosystem): Promise<EcosystemData | null> {
     logger(`Initializing ecosystem '${ecosystem}' ...`);
-    const filePath = path.join(
-      OsvOfflineDb.rootDirectory,
-      `${ecosystem.toLowerCase()}.nedb`
-    );
+    const ac = new AbortController();
+    this._pendingAcs.add(ac);
 
-    const fileStat = await stat(filePath).catch(() => null);
-    if (!fileStat) {
-      logger(`Missing data for ecosystem '${ecosystem}'`);
-      delete this._db[ecosystem];
-      return null;
+    try {
+      const filePath = path.join(
+        OsvOfflineDb.rootDirectory,
+        `${ecosystem.toLowerCase()}.nedb`
+      );
+
+      const fileStat = await stat(filePath).catch(() => null);
+      if (!fileStat) {
+        logger(`Missing data for ecosystem '${ecosystem}'`);
+        delete this._db[ecosystem];
+        return null;
+      }
+
+      const data: EcosystemData = {
+        fd: openSync(filePath, 'r'),
+        index: new Map(),
+        mtime: fileStat.mtimeMs,
+      };
+
+      await this._buildIndex(ac, data, filePath);
+
+      if (ac.signal.aborted) {
+        logger(`Initializing ecosystem '${ecosystem}' aborted.`);
+        delete this._db[ecosystem];
+        this._unload(data);
+        return null;
+      }
+
+      this._data[ecosystem] = data;
+      logger(`Initializing ecosystem '${ecosystem}' done.`);
+
+      return data;
+    } finally {
+      this._pendingAcs.delete(ac);
     }
-
-    const data: EcosystemData = {
-      fd: openSync(filePath, 'r'),
-      index: new Map(),
-      ac: new AbortController(),
-      mtime: fileStat.mtimeMs,
-    };
-
-    await this._buildIndex(data, filePath);
-
-    if (data.ac.signal.aborted) {
-      logger(`Initializing ecosystem '${ecosystem}' aborted.`);
-      delete this._db[ecosystem];
-      this._unload(data);
-      return null;
-    }
-
-    this._data[ecosystem] = data;
-    logger(`Initializing ecosystem '${ecosystem}' done.`);
-
-    return data;
   }
 
   private async _buildIndex(
+    ac: AbortController,
     data: EcosystemData,
     filePath: string
   ): Promise<void> {
-    const { index, ac } = data;
     const fileStream = createReadStream(filePath);
     const rl = readline.createInterface({
       input: fileStream,
@@ -144,10 +150,10 @@ export class OsvOfflineDb {
             if (packageName && !affectedPackageNames.has(packageName)) {
               affectedPackageNames.add(packageName);
 
-              let pointers = index.get(packageName);
+              let pointers = data.index.get(packageName);
               if (!pointers) {
                 pointers = [];
-                index.set(packageName, pointers);
+                data.index.set(packageName, pointers);
               }
               pointers.push({ offset: currentOffset, length: lineByteLength });
             }
@@ -226,6 +232,11 @@ export class OsvOfflineDb {
     this.disposed = true;
     process.off('exit', this._exitHandler);
 
+    for (const ac of this._pendingAcs) {
+      ac.abort();
+    }
+    this._pendingAcs.clear();
+
     for (const d of Object.values(this._data)) {
       this._unload(d);
     }
@@ -234,7 +245,6 @@ export class OsvOfflineDb {
   }
 
   private _unload(d: EcosystemData): void {
-    d.ac.abort();
     try {
       closeSync(d.fd);
     } catch {
