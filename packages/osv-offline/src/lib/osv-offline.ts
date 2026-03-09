@@ -5,22 +5,22 @@ import debug from 'debug';
 const logger = debug('osv-offline:download');
 
 export class OsvOffline {
-  private osvOfflineDb!: OsvOfflineDb;
+  private osvOfflineDb: OsvOfflineDb;
 
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  protected constructor() {}
+  protected constructor() {
+    logger('Initializing databases ...');
+    this.osvOfflineDb = OsvOfflineDb.create();
+    logger('Initializing databases done.');
+  }
 
   /**
    * Asynchronous code required as part of class instantiation
    */
-  private async initialize(): Promise<void> {
+  private static async initialize(): Promise<void> {
     const result = await tryDownloadDb();
     if (!result.success) {
       throw result.error;
     }
-    logger('Initializing databases ...');
-    this.osvOfflineDb = OsvOfflineDb.create();
-    logger('Initializing databases done.');
   }
 
   /**
@@ -28,8 +28,8 @@ export class OsvOffline {
    * @returns A new instance of {@link OsvOffline}
    */
   static async create(): Promise<OsvOffline> {
+    await OsvOffline.initialize();
     const instance = new OsvOffline();
-    await instance.initialize();
     return instance;
   }
 
@@ -44,5 +44,9 @@ export class OsvOffline {
     packageName: string
   ): Promise<Osv.Vulnerability[]> {
     return this.osvOfflineDb.query(ecosystem, packageName);
+  }
+
+  [Symbol.dispose](): void {
+    this.osvOfflineDb?.[Symbol.dispose]();
   }
 }

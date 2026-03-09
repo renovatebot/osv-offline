@@ -6,6 +6,10 @@ import { afterAll, beforeEach, describe, expect, it } from 'vitest';
 
 describe('packages/osv-offline/src/lib/download.int', () => {
   describe('tryDownloadDb', () => {
+    afterAll(async () => {
+      await fs.rm(OsvOfflineDb.rootDirectory, { recursive: true, force: true });
+    });
+
     beforeEach(() => {
       delete process.env.OSV_OFFLINE_DISABLE_DOWNLOAD;
     });
