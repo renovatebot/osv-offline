@@ -21,7 +21,7 @@
     "@types/debug": "4.1.12",
     "@types/fs-extra": "11.0.4",
     "@types/node": "22.19.13",
-    "fs-extra": "11.3.3"
+    "fs-extra": "11.3.4"
   },
   "engines": {
     "node": ">=22.12.0"
