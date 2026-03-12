@@ -11,6 +11,7 @@ export interface Vulnerability {
   withdrawn?: string;
   aliases?: string[];
   related?: string[];
+  upstream?: string[];
   summary?: string;
   details?: string;
   severity?: Severity[];
@@ -34,7 +35,7 @@ export interface Severity {
   score: string;
 }
 
-export type SeverityType = 'CVSS_V4' | 'CVSS_V3' | 'CVSS_V2';
+export type SeverityType = 'CVSS_V4' | 'CVSS_V3' | 'CVSS_V2' | 'Ubuntu';
 
 export interface Package {
   ecosystem: string;
@@ -66,7 +67,7 @@ export interface Reference {
 export interface Credit {
   name: string;
   contact?: string[];
-  type: CreditType;
+  type?: CreditType;
 }
 
 export type ReferenceType =
