@@ -214,6 +214,32 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
     it('returns empty array for ecosystem that was not loaded', async () => {
       expect(await osvOfflineDb.query('Maven', 'public')).toEqual([]);
     });
+
+    it('works with ecosystem suffixes', async () => {
+      const ecosystemVuln: Vulnerability & { _id: string } = {
+        id: 'DRUPAL-CONTRIB-2026-027',
+        published: '2026-03-04T18:02:59Z',
+        modified: '2026-03-04T19:01:55.854399Z',
+        affected: [
+          {
+            package: {
+              name: 'drupal/openid_connect',
+              ecosystem: 'Packagist:https://packages.drupal.org/8',
+              purl: 'pkg:composer/drupal/openid_connect',
+            },
+          },
+        ],
+        _id: '7ONtcn2IGYE8U39z',
+      };
+
+      osvOfflineDb = await createDbWithContent(
+        'packagist.nedb',
+        JSON.stringify(ecosystemVuln)
+      );
+      expect(
+        await osvOfflineDb.query('Packagist', 'drupal/openid_connect')
+      ).toStrictEqual([ecosystemVuln]);
+    });
   });
 
   describe('dispose', () => {
