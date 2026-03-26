@@ -24,10 +24,10 @@
   },
   "devDependencies": {
     "@tsconfig/strictest": "2.0.8",
-    "@types/adm-zip": "0.5.7",
+    "@types/adm-zip": "0.5.8",
     "@types/fs-extra": "11.0.4",
     "@types/luxon": "3.7.1",
-    "@types/node": "22.19.13",
+    "@types/node": "22.19.15",
     "@types/signale": "1.4.7"
   }
 }
