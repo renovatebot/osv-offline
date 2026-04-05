@@ -26,7 +26,7 @@
     "@tsconfig/node22": "22.0.5",
     "@tsconfig/strictest": "2.0.8",
     "@vitest/coverage-v8": "4.1.2",
-    "conventional-changelog-conventionalcommits": "9.3.0",
+    "conventional-changelog-conventionalcommits": "9.3.1",
     "eslint": "9.39.4",
     "eslint-config-prettier": "10.1.8",
     "eslint-formatter-gha": "2.0.1",
