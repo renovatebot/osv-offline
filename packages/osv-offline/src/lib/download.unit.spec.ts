@@ -27,10 +27,6 @@ describe('packages/osv-offline/src/lib/download.unit', () => {
       vi.clearAllMocks();
     });
 
-    afterEach(() => {
-      vi.restoreAllMocks();
-    });
-
     it('uses default URL when OSV_OFFLINE_DATABASE_URL is not set', async () => {
       mockStream.mockImplementationOnce(() => {
         throw new Error('intentional stream error');
