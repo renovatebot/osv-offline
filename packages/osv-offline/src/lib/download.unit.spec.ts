@@ -1,7 +1,7 @@
 import { OsvOfflineDb } from '@renovatebot/osv-offline-db';
 import fs from 'fs-extra';
 import path from 'path';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { tryDownloadDb } from './download';
 
 const mockStream = vi.hoisted(() => vi.fn());
