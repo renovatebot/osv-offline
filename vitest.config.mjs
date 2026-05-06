@@ -1,5 +1,5 @@
 import { env } from 'node:process';
-import { defineConfig, coverageConfigDefaults } from 'vitest/config';
+import { coverageConfigDefaults, defineConfig } from 'vitest/config';
 
 const ci = !!env.CI;
 

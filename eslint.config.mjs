@@ -2,33 +2,31 @@ import globals from 'globals';
 import js from '@eslint/js';
 import tseslint from 'typescript-eslint';
 import eslintConfigPrettier from 'eslint-config-prettier';
-import eslintPluginImport from 'eslint-plugin-import';
 import eslintPluginPromise from 'eslint-plugin-promise';
 import eslintContainerbase from '@containerbase/eslint-plugin';
+import { createTypeScriptImportResolver } from 'eslint-import-resolver-typescript';
+import * as importX from 'eslint-plugin-import-x';
+import { defineConfig, globalIgnores } from 'eslint/config';
+import vitest from '@vitest/eslint-plugin';
 
-export default tseslint.config(
+const jsFiles = { files: ['**/*.{js,cjs,mjs,mts,ts}'] };
+
+export default defineConfig(
+  globalIgnores(['**/dist/**', '**/coverage/**']),
   {
-    // TODO: fix ignores
-    ignores: [
-      '**/dist/**/*',
-      'coverage/**',
-      'eslint.config.mjs',
-      'vitest.config.mjs',
-    ],
+    linterOptions: {
+      reportUnusedDisableDirectives: 'error',
+    },
   },
   js.configs.recommended,
   ...tseslint.configs.recommendedTypeChecked,
   ...tseslint.configs.stylisticTypeChecked,
-  eslintPluginImport.flatConfigs.errors,
-  eslintPluginImport.flatConfigs.warnings,
-  eslintPluginImport.flatConfigs.recommended,
-  eslintPluginImport.flatConfigs.typescript,
+  vitest.configs.recommended,
   eslintPluginPromise.configs['flat/recommended'],
   eslintContainerbase.configs.all,
   {
-    linterOptions: {
-      reportUnusedDisableDirectives: true,
-    },
+    ...jsFiles,
+    extends: [importX.flatConfigs.recommended, importX.flatConfigs.typescript],
 
     languageOptions: {
       globals: {
@@ -39,18 +37,22 @@ export default tseslint.config(
       sourceType: 'module',
 
       parserOptions: {
-        projectService: true,
+        projectService: {
+          allowDefaultProject: ['eslint.config.mjs', 'vitest.config.mjs'],
+          defaultProject: 'tsconfig.lint.json',
+        },
+        // false positive on typescript v6
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         tsconfigRootDir: import.meta.dirname,
       },
     },
 
     settings: {
-      'import/resolver': {
-        typescript: {
-          alwaysTryTypes: true,
-          project: './tsconfig.lint.json',
-        },
-      },
+      'import-x/resolver-next': [
+        createTypeScriptImportResolver({ project: 'tsconfig.lint.json' }),
+      ],
+      // TODO: fix me
+      'import-x/ignore': ['fs-extra'],
     },
   },
   eslintConfigPrettier,
@@ -65,7 +67,7 @@ export default tseslint.config(
     },
   },
   {
-    files: ['**/*.{js,mjs,cjs,ts}'],
+    ...jsFiles,
     rules: {
       'sort-imports': [
         'error',
@@ -77,7 +79,7 @@ export default tseslint.config(
         },
       ],
 
-      'import/no-unresolved': 0,
+      'import-x/no-named-as-default-member': 0,
     },
   },
   {
