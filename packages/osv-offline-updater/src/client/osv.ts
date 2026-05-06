@@ -13,7 +13,7 @@ export class OsvDownloader {
   public async download(): Promise<Osv.Vulnerability[]> {
     const downloadUrl = format(OsvDownloader.downloadUrlFormat, this.ecosystem);
     const response = await got.get(downloadUrl, { responseType: 'buffer' });
-    return new AdmZip(response.body)
+    return new AdmZip(Buffer.from(response.body))
       .getEntries()
       .map(
         (entry) => JSON.parse(entry.getData().toString()) as Osv.Vulnerability
