@@ -1,9 +1,9 @@
 import fs from 'fs-extra';
 import { Osv, OsvOfflineDb, ecosystems } from '@renovatebot/osv-offline-db';
-import { GitHub } from './client/github';
+import { GitHub } from './client/github.ts';
 import signale from 'signale';
 import Datastore from '@seald-io/nedb';
-import { OsvDownloader } from './client/osv';
+import { OsvDownloader } from './client/osv.ts';
 import path from 'path';
 import AdmZip from 'adm-zip';
 

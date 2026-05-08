@@ -2,6 +2,8 @@
   "extends": "@tsconfig/node22/tsconfig",
   "compilerOptions": {
     "composite": true,
+    "allowImportingTsExtensions": true,
+    "rewriteRelativeImportExtensions": true,
     "types": ["node"]
   }
 }

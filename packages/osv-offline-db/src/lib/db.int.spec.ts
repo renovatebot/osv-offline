@@ -1,8 +1,8 @@
-import { OsvOfflineDb } from './db';
+import { OsvOfflineDb } from './db.ts';
 import fs from 'fs-extra';
 import path from 'path';
 import { setTimeout } from 'timers/promises';
-import type { Vulnerability } from './osv';
+import type { Vulnerability } from './osv.ts';
 import {
   afterAll,
   afterEach,

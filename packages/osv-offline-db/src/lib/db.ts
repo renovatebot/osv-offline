@@ -4,9 +4,9 @@ import { promisify } from 'node:util';
 import path from 'node:path';
 import { tmpdir } from 'node:os';
 import readline from 'node:readline';
-import { Ecosystem } from './ecosystem';
-import type { Vulnerability } from './osv';
-import { packageToPurl } from './purl-helper';
+import { Ecosystem } from './ecosystem.ts';
+import type { Vulnerability } from './osv.ts';
+import { packageToPurl } from './purl-helper.ts';
 import debug from 'debug';
 
 const logger = debug('osv-offline:db');

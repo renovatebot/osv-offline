@@ -1,4 +1,4 @@
-import { OsvOffline } from './osv-offline';
+import { OsvOffline } from './osv-offline.ts';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import fs from 'fs-extra';
 import { OsvOfflineDb } from '@renovatebot/osv-offline-db';

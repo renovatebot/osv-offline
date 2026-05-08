@@ -1,4 +1,4 @@
-import type { Ecosystem } from './ecosystem';
+import type { Ecosystem } from './ecosystem.ts';
 
 // https://github.com/google/osv.dev/blob/edacbd3c32b1d632bad8c5b506a14d0850b2e537/osv/purl_helpers.py#L18-L30
 const PURL_ECOSYSTEMS: Record<Ecosystem, string> = {

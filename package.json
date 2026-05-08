@@ -1,7 +1,7 @@
 {
   "name": "@renovatebot/osv-offline-monorepo",
   "private": true,
-  "type": "commonjs",
+  "type": "module",
   "version": "0.0.0-semantic-release",
   "repository": {
     "type": "git",
