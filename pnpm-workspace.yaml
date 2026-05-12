@@ -23,3 +23,7 @@ minimumReleaseAgeExclude:
   - '@containerbase/eslint-plugin'
   - '@containerbase/istanbul-reports-html'
   - '@containerbase/semantic-release-pnpm'
+  
+# currently broken
+# https://github.com/pnpm/pnpm/issues/11238
+minimumReleaseAgeStrict: false
