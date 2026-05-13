@@ -100,8 +100,8 @@ importers:
         specifier: ^11.3.4
         version: 11.3.4
       got:
-        specifier: ^15.0.3
-        version: 15.0.3
+        specifier: ^15.0.4
+        version: 15.0.4
       luxon:
         specifier: ^3.7.2
         version: 3.7.2
@@ -165,8 +165,8 @@ importers:
         specifier: 11.3.4
         version: 11.3.4
       got:
-        specifier: 15.0.3
-        version: 15.0.3
+        specifier: 15.0.4
+        version: 15.0.4
       luxon:
         specifier: 3.7.2
         version: 3.7.2
@@ -1634,8 +1634,8 @@ packages:
     resolution: {integrity: sha512-ZUKRh6/kUFoAiTAtTYPZJ3hw9wNxx+BIBOijnlG9PnrJsCcSjs1wyyD6vJpaYtgnzDrKYRSqf3OO6Rfa93xsRg==}
     engines: {node: '>= 0.4'}
 
-  got@15.0.3:
-    resolution: {integrity: sha512-630of5aMTYM6g6epok5nuqvctP8InJISvt39iNt7y0r27rcGCdiPv9Cc6EbwfnkyT1g/shBoVhvDjtXZUbn/Rw==}
+  got@15.0.4:
+    resolution: {integrity: sha512-yzTQs1oldWpv9cNKn8sMe0ou0sskuPEFetIcfM2W06A4j7CLRcd8njJFfaMORFGJ06YV8pbd+u4IvOvkNMKs1w==}
     engines: {node: '>=22'}
 
   graceful-fs@4.2.10:
@@ -4396,7 +4396,7 @@ snapshots:
 
   gopd@1.2.0: {}
 
-  got@15.0.3:
+  got@15.0.4:
     dependencies:
       '@sindresorhus/is': 8.0.0
       byte-counter: 0.1.0
