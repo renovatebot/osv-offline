@@ -1,5 +1,4 @@
 import fs from 'fs-extra';
-import got from 'got';
 import { pipeline } from 'node:stream/promises';
 import { OsvOfflineDb } from '@renovatebot/osv-offline-db';
 import path from 'path';
@@ -8,9 +7,13 @@ import AdmZip from 'adm-zip';
 import { Result, failure, success } from './types.ts';
 import debug from 'debug';
 
+export type Fetcher = typeof globalThis.fetch;
+
 const logger = debug('osv-offline:download');
 
-export async function tryDownloadDb(): Promise<Result> {
+export async function tryDownloadDb(
+  fetcher: Fetcher = globalThis.fetch
+): Promise<Result> {
   await fs.ensureDir(OsvOfflineDb.rootDirectory);
 
   if (process.env.OSV_OFFLINE_DISABLE_DOWNLOAD?.toLowerCase() === 'true') {
@@ -41,10 +44,14 @@ export async function tryDownloadDb(): Promise<Result> {
     const databaseUrl =
       process.env.OSV_OFFLINE_DATABASE_URL ??
       'https://github.com/renovatebot/osv-offline/releases/latest/download/osv-offline.zip';
-    const stream = got.stream(databaseUrl);
+    const response = await fetcher(databaseUrl);
+    if (!response.ok || !response.body) {
+      return failure(
+        new Error(`Download failed with status ${response.status}`)
+      );
+    }
     const zipPath = path.join(OsvOfflineDb.rootDirectory, 'osv-offline.zip');
-    const writeStream = fs.createWriteStream(zipPath);
-    await pipeline(stream, writeStream);
+    await pipeline(response.body, fs.createWriteStream(zipPath));
     logger('Downloading databases done.');
     logger('Extracting databases ...');
     const zip = new AdmZip(zipPath);
