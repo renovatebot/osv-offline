@@ -41,5 +41,16 @@ describe('packages/osv-offline/src/lib/download.unit', () => {
       expect(result.success).toBe(false);
       expect(fetcher).toHaveBeenCalledWith(customUrl);
     });
+
+    it('returns failure when response has no body', async () => {
+      const fetcher = vi.fn().mockResolvedValue({
+        ok: true,
+        body: null,
+        status: 200,
+      });
+
+      const result = await tryDownloadDb(fetcher);
+      expect(result.success).toBe(false);
+    });
   });
 });
