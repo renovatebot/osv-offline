@@ -24,7 +24,7 @@
     "@types/debug": "4.1.13",
     "@types/fs-extra": "11.0.4",
     "@types/luxon": "3.7.1",
-    "@types/node": "22.19.20"
+    "@types/node": "22.19.21"
   },
   "engines": {
     "node": ">=22.12.0",
