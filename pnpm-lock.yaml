@@ -2013,8 +2013,8 @@ packages:
   mz@2.7.0:
     resolution: {integrity: sha512-z81GNO7nnYMEhrGh9LeymoE4+Yr0Wn5McHIZMK5cfQCl+NDX08sCZgUc9/6MHni9IWuFLm1Z3HTCXu2z9fN62Q==}
 
-  nanoid@3.3.12:
-    resolution: {integrity: sha512-ZB9RH/39qpq5Vu6Y+NmUaFhQR6pp+M2Xt76XBnEwDaGcVAqhlvxrl3B2bKS5D3NH3QR76v3aSrKaF/Kiy7lEtQ==}
+  nanoid@3.3.15:
+    resolution: {integrity: sha512-y7Wygv/7mEOvxTuEQDB8StXdMRBWf1kR/tlhAzBRUFkB2jfcLOAxO/SHmOO2zgz1pVgK29/kyupn059/bCHdjA==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
 
@@ -2397,8 +2397,8 @@ packages:
     resolution: {integrity: sha512-hunMQrEy1T6Jr2uEVjrAIqjwWcQTgOAcIM52C8MY1EZSD3DDNft04XzvYKPqjED65bNVVko0YI38nYeEHCX3yw==}
     engines: {node: '>=12'}
 
-  semver@7.8.4:
-    resolution: {integrity: sha512-rUCObTnP32Q08R2uuIrt7r9PlEonuTmtuXYcW6s5kjdlj3xbnwe+21yXptAUYcMAABLkYYTtnmzb3w3EDZfueA==}
+  semver@7.8.5:
+    resolution: {integrity: sha512-Y7/KDsb8LjooZpwaqGyulO6DQlksgCncchHGk+sZIY4SBvUocMBEFH5Ur1fI4dV+Jvl0w6cjvucaIi40puRioA==}
     engines: {node: '>=10'}
     hasBin: true
 
@@ -2663,12 +2663,12 @@ packages:
   undici-types@6.21.0:
     resolution: {integrity: sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==}
 
-  undici@6.26.0:
-    resolution: {integrity: sha512-4yqz8a3n5HmGTlsbADNtr/dJlhkh/55Rq798G6ibiULcXbDtaLpTl1pvdqcbFfeoj3iSi52lePFM7h9H21cw/A==}
+  undici@6.27.0:
+    resolution: {integrity: sha512-YmfV3YnEDzXRC5lZ2jWtWWHKGUm1zIt8AhesR1tens+HTNv+YZlN/dp6G727LOvMJ8xjP9Be7Y2Sdr96LDm+pg==}
     engines: {node: '>=18.17'}
 
-  undici@7.27.2:
-    resolution: {integrity: sha512-uZsKNuzQxDMUY6M3pIMvy5tvlGmtq8XJ2oLAkfRKGNu+1VQAIvLy2xIVG5ATZl5wDXl/tddByAWCizRbOme+TA==}
+  undici@7.28.0:
+    resolution: {integrity: sha512-cRZYrTDwWznlnRiPjggAGxZXanty6M8RV1ff8Wm4LWXBp7/IG8v5DnOm74DtUBp9OONpK75YlPnIjQqX0dBDtA==}
     engines: {node: '>=20.18.1'}
 
   unicode-emoji-modifier-base@1.0.0:
@@ -2859,8 +2859,8 @@ packages:
     resolution: {integrity: sha512-rwu/ClNdSMpkSrUb+d6BRsSkLUq1fmfsY6TOpYzTwvwkg1/NRG85KBy3kq++A8LKQwX6lsu+aWad+2khvuXrqw==}
     engines: {node: ^20.19.0 || ^22.12.0 || >=23}
 
-  yargs@16.2.0:
-    resolution: {integrity: sha512-D1mvvtDG0L5ft/jGWkLpG1+m0eQxOfaBvTNELraWj22wSVUMWxZUvYgJYcKh6jGGIkJFhH4IZPQhR4TKpc8mBw==}
+  yargs@16.2.2:
+    resolution: {integrity: sha512-Nt9ZJjXTv5R8MHbqby/wXQ6Gi0Bb3TcYZkR1bzuL4yB2OxWPkXknz513gEF0GoA6tn00UpbPvERW8rzCuWCA6w==}
     engines: {node: '>=10'}
 
   yargs@18.0.0:
@@ -2893,7 +2893,7 @@ snapshots:
   '@actions/http-client@4.0.1':
     dependencies:
       tunnel: 0.0.6
-      undici: 6.26.0
+      undici: 6.27.0
 
   '@actions/io@3.0.2': {}
 
@@ -2932,7 +2932,7 @@ snapshots:
       aggregate-error: 5.0.0
       execa: 9.6.1
       semantic-release: 25.0.5(typescript@6.0.3)
-      semver: 7.8.4
+      semver: 7.8.5
 
   '@cspotcode/source-map-support@0.8.1':
     dependencies:
@@ -3284,7 +3284,7 @@ snapshots:
       p-filter: 4.1.0
       semantic-release: 25.0.5(typescript@6.0.3)
       tinyglobby: 0.2.17
-      undici: 7.27.2
+      undici: 7.28.0
       url-join: 5.0.0
     transitivePeerDependencies:
       - kerberos
@@ -3306,7 +3306,7 @@ snapshots:
       read-pkg: 10.1.0
       registry-auth-token: 5.1.1
       semantic-release: 25.0.5(typescript@6.0.3)
-      semver: 7.8.4
+      semver: 7.8.5
       tempy: 3.2.0
 
   '@semantic-release/release-notes-generator@14.1.1(semantic-release@25.0.5)':
@@ -3464,7 +3464,7 @@ snapshots:
       '@typescript-eslint/visitor-keys': 8.61.1
       debug: 4.4.3
       minimatch: 10.2.5
-      semver: 7.8.4
+      semver: 7.8.5
       tinyglobby: 0.2.17
       ts-api-utils: 2.5.0(typescript@6.0.3)
       typescript: 6.0.3
@@ -3750,7 +3750,7 @@ snapshots:
       mz: 2.7.0
       parse5: 5.1.1
       parse5-htmlparser2-tree-adapter: 6.0.1
-      yargs: 16.2.0
+      yargs: 16.2.2
 
   cli-table3@0.6.5:
     dependencies:
@@ -3815,7 +3815,7 @@ snapshots:
       conventional-commits-filter: 5.0.0
       handlebars: 4.7.9
       meow: 13.2.0
-      semver: 7.8.4
+      semver: 7.8.5
 
   conventional-commits-filter@5.0.0: {}
 
@@ -3986,7 +3986,7 @@ snapshots:
       eslint-import-context: 0.1.9(unrs-resolver@1.12.2)
       is-glob: 4.0.3
       minimatch: 10.2.5
-      semver: 7.8.4
+      semver: 7.8.5
       stable-hash-x: 0.2.0
       unrs-resolver: 1.12.2
     optionalDependencies:
@@ -4299,7 +4299,7 @@ snapshots:
 
   is-bun-module@2.0.0:
     dependencies:
-      semver: 7.8.4
+      semver: 7.8.5
 
   is-extglob@2.1.1: {}
 
@@ -4527,7 +4527,7 @@ snapshots:
 
   make-dir@4.0.0:
     dependencies:
-      semver: 7.8.4
+      semver: 7.8.5
 
   make-error@1.3.6: {}
 
@@ -4577,7 +4577,7 @@ snapshots:
       object-assign: 4.1.1
       thenify-all: 1.6.0
 
-  nanoid@3.3.12: {}
+  nanoid@3.3.15: {}
 
   napi-postinstall@0.3.4: {}
 
@@ -4597,13 +4597,13 @@ snapshots:
   normalize-package-data@6.0.2:
     dependencies:
       hosted-git-info: 7.0.2
-      semver: 7.8.4
+      semver: 7.8.5
       validate-npm-package-license: 3.0.4
 
   normalize-package-data@8.0.0:
     dependencies:
       hosted-git-info: 9.0.3
-      semver: 7.8.4
+      semver: 7.8.5
       validate-npm-package-license: 3.0.4
 
   normalize-url@8.1.1: {}
@@ -4750,7 +4750,7 @@ snapshots:
 
   postcss@8.5.15:
     dependencies:
-      nanoid: 3.3.12
+      nanoid: 3.3.15
       picocolors: 1.1.1
       source-map-js: 1.2.1
 
@@ -4897,7 +4897,7 @@ snapshots:
       p-reduce: 3.0.0
       read-package-up: 12.0.0
       resolve-from: 5.0.0
-      semver: 7.8.4
+      semver: 7.8.5
       signale: 1.4.0
       yargs: 18.0.0
     transitivePeerDependencies:
@@ -4907,7 +4907,7 @@ snapshots:
 
   semver-regex@4.0.5: {}
 
-  semver@7.8.4: {}
+  semver@7.8.5: {}
 
   shebang-command@2.0.0:
     dependencies:
@@ -5148,9 +5148,9 @@ snapshots:
 
   undici-types@6.21.0: {}
 
-  undici@6.26.0: {}
+  undici@6.27.0: {}
 
-  undici@7.27.2: {}
+  undici@7.28.0: {}
 
   unicode-emoji-modifier-base@1.0.0: {}
 
@@ -5300,7 +5300,7 @@ snapshots:
 
   yargs-parser@22.0.0: {}
 
-  yargs@16.2.0:
+  yargs@16.2.2:
     dependencies:
       cliui: 7.0.4
       escalade: 3.2.0
