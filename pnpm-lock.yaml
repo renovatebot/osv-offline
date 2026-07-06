@@ -64,8 +64,8 @@ importers:
         specifier: 8.0.4
         version: 8.0.4
       prettier:
-        specifier: 3.9.2
-        version: 3.9.2
+        specifier: 3.9.3
+        version: 3.9.3
       semantic-release:
         specifier: 25.0.5
         version: 25.0.5(typescript@6.0.3)
@@ -2294,8 +2294,8 @@ packages:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}
     engines: {node: '>= 0.8.0'}
 
-  prettier@3.9.2:
-    resolution: {integrity: sha512-8LHNw4SKae4PyiAful3l/eTTDW818iaDsY03G3XAguuSbo7IUUrmDhQjTdTy453P5dt6MQMnX6fVMXPasfV77w==}
+  prettier@3.9.3:
+    resolution: {integrity: sha512-HWmu+K+zvHNpaMfSnYeqdqrDbR16cuIXaPx8WoHaviQkDJh1/0BNtOZmHVQI5jc3wXv0H1yXc9wjvFdXh+n3hQ==}
     engines: {node: '>=14'}
     hasBin: true
 
@@ -4782,7 +4782,7 @@ snapshots:
 
   prelude-ls@1.2.1: {}
 
-  prettier@3.9.2: {}
+  prettier@3.9.3: {}
 
   pretty-ms@9.3.0:
     dependencies:
