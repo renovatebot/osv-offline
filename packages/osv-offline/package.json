@@ -16,7 +16,7 @@
     "adm-zip": "~0.5.18",
     "debug": "^4.4.3",
     "fs-extra": "^11.3.6",
-    "got": "^15.0.7",
+    "got": "^15.1.0",
     "luxon": "^3.7.2"
   },
   "devDependencies": {
