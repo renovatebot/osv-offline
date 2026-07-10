@@ -41,7 +41,7 @@
     "prettier": "3.9.4",
     "semantic-release": "25.0.5",
     "ts-node": "10.9.2",
-    "tsx": "4.22.5",
+    "tsx": "4.23.0",
     "typescript": "6.0.3",
     "typescript-eslint": "8.62.1",
     "vitest": "4.1.9"
