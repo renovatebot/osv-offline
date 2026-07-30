@@ -16,7 +16,7 @@
     "@renovatebot/osv-offline-db": "workspace:*",
     "@octokit/rest": "22.0.1",
     "adm-zip": "0.6.0",
-    "fs-extra": "11.3.6",
+    "fs-extra": "11.4.0",
     "got": "15.1.0",
     "luxon": "3.7.2",
     "signale": "1.4.0"
