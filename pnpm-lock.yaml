@@ -19,8 +19,8 @@ importers:
         specifier: 10.0.1
         version: 10.0.1(eslint@10.8.1)
       '@tsconfig/node22':
-        specifier: 22.0.5
-        version: 22.0.5
+        specifier: 22.0.6
+        version: 22.0.6
       '@tsconfig/strictest':
         specifier: 2.0.8
         version: 2.0.8
@@ -129,8 +129,8 @@ importers:
         version: 4.4.3(supports-color@7.2.0)
     devDependencies:
       '@tsconfig/node22':
-        specifier: 22.0.5
-        version: 22.0.5
+        specifier: 22.0.6
+        version: 22.0.6
       '@tsconfig/strictest':
         specifier: 2.0.8
         version: 2.0.8
@@ -737,8 +737,8 @@ packages:
   '@tsconfig/node16@1.0.4':
     resolution: {integrity: sha512-vxhUy4J8lyeyinH7Azl1pdd43GJhZH/tP2weN8TntQblOY+A0XbT8DJk1/oCPuOOyg/Ja757rG0CgHcWC8OfMA==}
 
-  '@tsconfig/node22@22.0.5':
-    resolution: {integrity: sha512-hLf2ld+sYN/BtOJjHUWOk568dvjFQkHnLNa6zce25GIH+vxKfvTgm3qpaH6ToF5tu/NN0IH66s+Bb5wElHrLcw==}
+  '@tsconfig/node22@22.0.6':
+    resolution: {integrity: sha512-/5thavHAnWDZwH2H6eEn/T8pBEBhtuKaWGMslsj82kJfvzQgOgEMK7X4goBbIUjgVtAzPTtM9Ml64LA0uxO6Iw==}
 
   '@tsconfig/strictest@2.0.8':
     resolution: {integrity: sha512-XnQ7vNz5HRN0r88GYf1J9JJjqtZPiHt2woGJOo2dYqyHGGcd6OLGqSlBB6p1j9mpzja6Oe5BoPqWmeDx6X9rLw==}
@@ -3287,7 +3287,7 @@ snapshots:
 
   '@tsconfig/node16@1.0.4': {}
 
-  '@tsconfig/node22@22.0.5': {}
+  '@tsconfig/node22@22.0.6': {}
 
   '@tsconfig/strictest@2.0.8': {}
 
