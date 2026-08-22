@@ -15,7 +15,6 @@ import {
 import { Ecosystem } from './ecosystem.ts';
 import { createLogger } from './logger.ts';
 import type { Vulnerability } from './osv.ts';
-import { packageToPurl } from './purl-helper.ts';
 
 const logger = createLogger('osv-offline:db');
 const readAsync = promisify(fsRead);
@@ -193,6 +192,13 @@ export class OsvOfflineDb {
     return osvOfflineDb;
   }
 
+  /**
+   * Returns advisories whose `affected[].package` has exactly `packageName`
+   * as name and `ecosystem` as ecosystem (optionally with a `:suffix`).
+   * `package.purl` is not consulted: OSV sources spell it inconsistently
+   * (for example npm scopes as `%40scope/name`, `%40scope%2Fname` or
+   * `@scope/name`) and it may be absent, so it adds nothing over the name.
+   */
   async query(ecosystem: Ecosystem, packageName: string): Promise<Vulnerability[]> {
     if (this.disposed) {
       throw new Error('Database disposed');
@@ -217,13 +223,12 @@ export class OsvOfflineDb {
       return [];
     }
 
-    const targetPurl = packageToPurl(ecosystem, packageName);
     return advisories.filter((vuln) =>
       vuln.affected?.some(
         (a) =>
           a.package?.name === packageName &&
-          (a.package.ecosystem === ecosystem || a.package.ecosystem.startsWith(`${ecosystem}:`)) &&
-          a.package.purl === targetPurl,
+          (a.package.ecosystem === ecosystem ||
+            a.package.ecosystem.startsWith(`${ecosystem}:`)),
       ),
     );
   }
