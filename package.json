@@ -23,7 +23,7 @@
     "@containerbase/eslint-plugin": "2.1.1",
     "@containerbase/semantic-release-pnpm": "1.4.3",
     "@eslint/js": "10.0.1",
-    "@tsconfig/node22": "22.0.5",
+    "@tsconfig/node22": "22.0.6",
     "@tsconfig/strictest": "2.0.8",
     "@vitest/coverage-v8": "4.1.10",
     "@vitest/eslint-plugin": "1.6.27",
