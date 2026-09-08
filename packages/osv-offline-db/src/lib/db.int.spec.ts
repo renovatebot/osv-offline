@@ -240,6 +240,53 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
         await osvOfflineDb.query('Packagist', 'drupal/openid_connect')
       ).toStrictEqual([ecosystemVuln]);
     });
+
+    it('matches records whose purl url-encodes the scope separator', async () => {
+      const encodedPurlVuln: Vulnerability & { _id: string } = {
+        id: 'GHSA-p2fr-6hmx-4528',
+        published: '2026-08-05T20:34:26Z',
+        modified: '2026-08-05T20:34:26Z',
+        affected: [
+          {
+            package: {
+              name: '@better-auth/oauth-provider',
+              ecosystem: 'npm',
+              purl: 'pkg:npm/%40better-auth%2Foauth-provider',
+            },
+          },
+        ],
+        _id: 'ENCODEDPURL000001',
+      };
+
+      osvOfflineDb = await createDbWithContent(
+        'npm.nedb',
+        JSON.stringify(encodedPurlVuln)
+      );
+      expect(
+        await osvOfflineDb.query('npm', '@better-auth/oauth-provider')
+      ).toStrictEqual([encodedPurlVuln]);
+    });
+
+    it('matches records without a purl', async () => {
+      const noPurlVuln: Vulnerability & { _id: string } = {
+        ...sampleVuln,
+        id: 'NO-PURL-VULN',
+        affected: [
+          {
+            package: { name: 'public', ecosystem: 'npm' },
+          },
+        ],
+        _id: 'NOPURL0000000001',
+      };
+
+      osvOfflineDb = await createDbWithContent(
+        'npm.nedb',
+        JSON.stringify(noPurlVuln)
+      );
+      expect(await osvOfflineDb.query('npm', 'public')).toStrictEqual([
+        noPurlVuln,
+      ]);
+    });
   });
 
   describe('dispose', () => {
