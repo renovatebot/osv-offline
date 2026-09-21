@@ -167,6 +167,13 @@ export class OsvOfflineDb {
     return osvOfflineDb;
   }
 
+  /**
+   * Returns advisories whose `affected[].package` has exactly `packageName`
+   * as name and `ecosystem` as ecosystem (optionally with a `:suffix`).
+   * `package.purl` is not consulted: OSV sources spell it inconsistently
+   * (for example npm scopes as `%40scope/name`, `%40scope%2Fname` or
+   * `@scope/name`) and it may be absent, so it adds nothing over the name.
+   */
   async query(
     ecosystem: Ecosystem,
     packageName: string

@@ -241,8 +241,15 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
       ).toStrictEqual([ecosystemVuln]);
     });
 
-    it('matches records whose purl url-encodes the scope separator', async () => {
-      const encodedPurlVuln: Vulnerability & { _id: string } = {
+    it.each`
+      description                   | purl
+      ${'scope separator as "/"'}   | ${'pkg:npm/%40better-auth/oauth-provider'}
+      ${'scope separator as %2F'}   | ${'pkg:npm/%40better-auth%2Foauth-provider'}
+      ${'unencoded "@" and "/"'}    | ${'pkg:npm/@better-auth/oauth-provider'}
+      ${'purl for another package'} | ${'pkg:npm/%40better-auth/core'}
+      ${'no purl'}                  | ${undefined}
+    `('matches by name and ecosystem with $description', async ({ purl }) => {
+      const scopedVuln: Vulnerability & { _id: string } = {
         id: 'GHSA-p2fr-6hmx-4528',
         published: '2026-08-05T20:34:26Z',
         modified: '2026-08-05T20:34:26Z',
@@ -251,41 +258,45 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
             package: {
               name: '@better-auth/oauth-provider',
               ecosystem: 'npm',
-              purl: 'pkg:npm/%40better-auth%2Foauth-provider',
+              ...(purl === undefined ? {} : { purl: purl as string }),
             },
           },
         ],
-        _id: 'ENCODEDPURL000001',
+        _id: 'SCOPEDPURL0000001',
       };
 
       osvOfflineDb = await createDbWithContent(
         'npm.nedb',
-        JSON.stringify(encodedPurlVuln)
+        JSON.stringify(scopedVuln)
       );
       expect(
         await osvOfflineDb.query('npm', '@better-auth/oauth-provider')
-      ).toStrictEqual([encodedPurlVuln]);
+      ).toStrictEqual([scopedVuln]);
     });
 
-    it('matches records without a purl', async () => {
-      const noPurlVuln: Vulnerability & { _id: string } = {
+    it('does not match a purl-only record whose name differs', async () => {
+      const otherNameVuln: Vulnerability & { _id: string } = {
         ...sampleVuln,
-        id: 'NO-PURL-VULN',
+        id: 'OTHER-NAME-VULN',
         affected: [
           {
-            package: { name: 'public', ecosystem: 'npm' },
+            package: {
+              name: '@better-auth/core',
+              ecosystem: 'npm',
+              purl: 'pkg:npm/%40better-auth/oauth-provider',
+            },
           },
         ],
-        _id: 'NOPURL0000000001',
+        _id: 'OTHERNAME00000001',
       };
 
       osvOfflineDb = await createDbWithContent(
         'npm.nedb',
-        JSON.stringify(noPurlVuln)
+        JSON.stringify(otherNameVuln)
       );
-      expect(await osvOfflineDb.query('npm', 'public')).toStrictEqual([
-        noPurlVuln,
-      ]);
+      expect(
+        await osvOfflineDb.query('npm', '@better-auth/oauth-provider')
+      ).toStrictEqual([]);
     });
   });
 
