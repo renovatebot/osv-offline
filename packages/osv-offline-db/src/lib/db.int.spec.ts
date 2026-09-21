@@ -241,6 +241,8 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
       ).toStrictEqual([ecosystemVuln]);
     });
 
+    // The first two spellings occur in OSV npm data. The rest are not observed
+    // but allowed by the Package type; they document that the purl is ignored.
     it.each`
       description                   | purl
       ${'scope separator as "/"'}   | ${'pkg:npm/%40better-auth/oauth-provider'}
