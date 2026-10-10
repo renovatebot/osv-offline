@@ -12,7 +12,7 @@ jobs:
   update:
     runs-on: ubuntu-24.04
     steps:
-      - uses: containerbase/internal-tools/setup@e16d53d6bd770a44251028540390e0eff801aef5 # v5.0.55
+      - uses: containerbase/internal-tools/setup@ee76afeb5280d841ce0731c3e29d0b808876c200 # v5.0.56
         with:
           pnpm-cache: |
             node_modules
