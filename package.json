@@ -16,8 +16,8 @@
     "prettier-fix": "prettier --cache -w -u \"**/*.*\"",
     "start": "tsx ./packages/osv-offline-updater/src/index.ts",
     "test": "run-s eslint test:unit test:integration",
-    "test:unit": "vitest run unit.spec.ts --outputFile.junit=.coverage/unit.junit.xml",
-    "test:integration": "vitest run int.spec.ts --maxWorkers=1 --outputFile.junit=.coverage/integration.junit.xml"
+    "test:unit": "vitest run unit.spec.ts --coverage.reportsDirectory=coverage/unit --outputFile.junit=.coverage/unit.junit.xml",
+    "test:integration": "vitest run int.spec.ts --maxWorkers=1 --coverage.reportsDirectory=coverage/integration --outputFile.junit=.coverage/integration.junit.xml"
   },
   "devDependencies": {
     "@containerbase/eslint-plugin": "3.0.0",
