@@ -43,13 +43,13 @@ function splitIndex(dbSha = db.sha256): SplitIndex {
     ecosystems: {
       npm: {
         database: {
-          file: 'npm-2026102712.nedb.zst',
+          file: 'npm-20261027120000.nedb.zst',
           sha256: dbSha,
           size: db.data.length,
           uncompressedSize: Buffer.byteLength(database),
         },
         index: {
-          file: 'npm-2026102712.idx.json.zst',
+          file: 'npm-20261027120000.idx.json.zst',
           sha256: idx.sha256,
           size: idx.data.length,
           uncompressedSize: Buffer.byteLength(databaseIndex),
@@ -78,6 +78,13 @@ function serveFiles() {
 
 const statePath = path.join(rootDir, 'npm.split.json');
 
+async function writeExistingFiles(names = ['npm.nedb', 'npm.idx.json']) {
+  await fs.ensureDir(rootDir);
+  for (const name of names) {
+    await fs.writeFile(path.join(rootDir, name), 'old');
+  }
+}
+
 describe('packages/osv-offline/src/lib/split.unit', () => {
   beforeEach(async () => {
     vi.resetAllMocks();
@@ -102,8 +109,8 @@ describe('packages/osv-offline/src/lib/split.unit', () => {
       { headers: {} }
     );
     expect(gotMock.stream.mock.calls.map(([url]) => String(url))).toEqual([
-      'https://example.com/files/npm-2026102712.idx.json.zst',
-      'https://example.com/files/npm-2026102712.nedb.zst',
+      'https://example.com/files/npm-20261027120000.idx.json.zst',
+      'https://example.com/files/npm-20261027120000.nedb.zst',
     ]);
     await expect(
       fs.readFile(path.join(rootDir, 'npm.nedb'), 'utf8')
@@ -131,7 +138,7 @@ describe('packages/osv-offline/src/lib/split.unit', () => {
     await new SplitDownloader().ensure('npm');
 
     expect(String(gotMock.stream.mock.calls[0]?.[0])).toBe(
-      'https://mirror.example.com/osv/npm-2026102712.idx.json.zst'
+      'https://mirror.example.com/osv/npm-20261027120000.idx.json.zst'
     );
   });
 
@@ -147,6 +154,7 @@ describe('packages/osv-offline/src/lib/split.unit', () => {
   });
 
   it('skips the download while the recorded files are younger than the maximum age', async () => {
+    await writeExistingFiles();
     await fs.writeJson(statePath, { database: 'x', index: 'y' });
 
     await new SplitDownloader().ensure('npm');
@@ -154,8 +162,22 @@ describe('packages/osv-offline/src/lib/split.unit', () => {
     expect(gotMock).not.toHaveBeenCalled();
   });
 
+  it('downloads again when a recorded file is missing', async () => {
+    await writeExistingFiles(['npm.idx.json']);
+    await fs.writeJson(statePath, { database: db.sha256, index: idx.sha256 });
+    gotMock.mockResolvedValue(indexResponse(splitIndex()));
+    serveFiles();
+
+    await new SplitDownloader().ensure('npm');
+
+    await expect(
+      fs.readFile(path.join(rootDir, 'npm.nedb'), 'utf8')
+    ).resolves.toBe(database);
+  });
+
   it('only touches the state when the checksums are unchanged', async () => {
     process.env.OSV_OFFLINE_MAX_AGE = '1h';
+    await writeExistingFiles();
     await fs.writeJson(statePath, { database: db.sha256, index: idx.sha256 });
     const old = new Date(Date.now() - 2 * 60 * 60 * 1000);
     await fs.utimes(statePath, old, old);
@@ -227,8 +249,7 @@ describe('packages/osv-offline/src/lib/split.unit', () => {
   `(
     'keeps the existing files when $reason',
     async ({ index }: { index: () => SplitIndex }) => {
-      await fs.ensureDir(rootDir);
-      await fs.writeFile(path.join(rootDir, 'npm.nedb'), 'old');
+      await writeExistingFiles();
       gotMock.mockResolvedValue(indexResponse(index()));
       serveFiles();
 
@@ -241,7 +262,8 @@ describe('packages/osv-offline/src/lib/split.unit', () => {
     }
   );
 
-  it('ignores an invalid index', async () => {
+  it('keeps the existing files when the index is invalid', async () => {
+    await writeExistingFiles();
     gotMock.mockResolvedValue({
       statusCode: 200,
       body: 'not json',
@@ -250,6 +272,21 @@ describe('packages/osv-offline/src/lib/split.unit', () => {
 
     await expect(new SplitDownloader().ensure('npm')).resolves.toBeUndefined();
     expect(gotMock.stream).not.toHaveBeenCalled();
+  });
+
+  it('fails without existing files and retries on the next call', async () => {
+    gotMock
+      .mockRejectedValueOnce(new Error('offline'))
+      .mockResolvedValue(indexResponse(splitIndex()));
+    serveFiles();
+    const downloader = new SplitDownloader();
+
+    await expect(downloader.ensure('npm')).rejects.toThrow('offline');
+    await downloader.ensure('npm');
+
+    await expect(
+      fs.readFile(path.join(rootDir, 'npm.nedb'), 'utf8')
+    ).resolves.toBe(database);
   });
 
   it('fetches the index once for several ecosystems', async () => {

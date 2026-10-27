@@ -59,6 +59,11 @@ class Digest extends Transform {
   }
 }
 
+/** the names of the database and the index of `ecosystem` */
+function getFileNames(ecosystem: Ecosystem): [string, string] {
+  return [`${ecosystem.toLowerCase()}.nedb`, getIndexFileName(ecosystem)];
+}
+
 function isNotFound(err: unknown): boolean {
   return (
     (err as { response?: { statusCode?: number } }).response?.statusCode === 404
@@ -80,7 +85,8 @@ export class SplitDownloader {
   >();
 
   /**
-   * Makes sure the files of `ecosystem` are up-to-date. Failures are logged, and existing files are kept.
+   * Makes sure the files of `ecosystem` are up-to-date. Failures are logged and existing files are kept; without
+   * existing files, failures are thrown. A failed update is retried on the next call.
    */
   ensure(ecosystem: Ecosystem): Promise<void> {
     if (process.env.OSV_OFFLINE_DISABLE_DOWNLOAD?.toLowerCase() === 'true') {
@@ -90,7 +96,11 @@ export class SplitDownloader {
     if (checked && Date.now() - checked.started < this.maxAge) {
       return checked.promise;
     }
-    const promise = this.update(ecosystem).catch((err: unknown) => {
+    const promise = this.update(ecosystem).catch(async (err: unknown) => {
+      this.checked.delete(ecosystem);
+      if (!(await this.hasFiles(ecosystem))) {
+        throw err;
+      }
       logger(`Updating ecosystem '${ecosystem}' failed: ${String(err)}`);
     });
     this.checked.set(ecosystem, { promise, started: Date.now() });
@@ -100,7 +110,11 @@ export class SplitDownloader {
   private async update(ecosystem: Ecosystem): Promise<void> {
     const statePath = this.getStatePath(ecosystem);
     const stateStat = await fs.stat(statePath).catch(() => null);
-    if (stateStat && Date.now() - stateStat.mtimeMs < this.maxAge) {
+    if (
+      stateStat &&
+      Date.now() - stateStat.mtimeMs < this.maxAge &&
+      (await this.hasFiles(ecosystem))
+    ) {
       logger(`Ecosystem '${ecosystem}' is up-to-date.`);
       return;
     }
@@ -134,7 +148,8 @@ export class SplitDownloader {
       .catch(() => null)) as SplitState | null;
     if (
       state?.database === files.database.sha256 &&
-      state.index === files.index.sha256
+      state.index === files.index.sha256 &&
+      (await this.hasFiles(ecosystem))
     ) {
       logger(`Ecosystem '${ecosystem}' is unchanged.`);
       const now = new Date();
@@ -149,8 +164,9 @@ export class SplitDownloader {
     );
     try {
       const baseUrl = index.baseUrl ?? this.indexUrl;
-      const indexPath = path.join(tmpDir, getIndexFileName(ecosystem));
-      const databasePath = path.join(tmpDir, `${ecosystem.toLowerCase()}.nedb`);
+      const [databaseName, indexName] = getFileNames(ecosystem);
+      const indexPath = path.join(tmpDir, indexName);
+      const databasePath = path.join(tmpDir, databaseName);
       await this.download(
         new URL(files.index.file, baseUrl),
         files.index,
@@ -237,6 +253,15 @@ export class SplitDownloader {
     if (digest.digest() !== file.sha256) {
       throw new Error(`Checksum mismatch for ${file.file}`);
     }
+  }
+
+  private async hasFiles(ecosystem: Ecosystem): Promise<boolean> {
+    for (const name of getFileNames(ecosystem)) {
+      if (!(await fs.pathExists(path.join(OsvOfflineDb.rootDirectory, name)))) {
+        return false;
+      }
+    }
+    return true;
   }
 
   private getStatePath(ecosystem: Ecosystem): string {
