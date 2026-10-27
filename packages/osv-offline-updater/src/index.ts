@@ -24,9 +24,9 @@ const splitBaseUrl =
   }
 
   const generated = new Date();
-  // e.g. 2026102712, the same format as the tags of the database releases
+  // e.g. 20261027120513: unique per run, as files with the same name aren't uploaded again
   const version = DateTime.fromJSDate(generated, { zone: 'utc' }).toFormat(
-    'yyyyMMddHH'
+    'yyyyMMddHHmmss'
   );
   const splitDir = path.join(OsvOfflineDb.rootDirectory, 'split');
   const pagesDir =
