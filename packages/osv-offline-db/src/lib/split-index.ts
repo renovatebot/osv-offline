@@ -38,7 +38,7 @@ export interface SplitIndex {
 }
 
 /**
- * Returns the file name of a compressed database or index of the split format, e.g. `npm-2026102712.nedb.zst`.
+ * Returns the file name of a compressed database or index of the split format, e.g. `npm-20261027120513.nedb.zst`.
  */
 export function getSplitFileName(
   ecosystem: Ecosystem,

@@ -15,13 +15,13 @@ const index: SplitIndex = {
   ecosystems: {
     npm: {
       database: {
-        file: 'npm-2026102712.nedb.zst',
+        file: 'npm-20261027120513.nedb.zst',
         sha256,
         size: 30198989,
         uncompressedSize: 394263607,
       },
       index: {
-        file: 'npm-2026102712.idx.json.zst',
+        file: 'npm-20261027120513.idx.json.zst',
         sha256,
         size: 2411724,
         uncompressedSize: 9646899,
@@ -33,11 +33,13 @@ const index: SplitIndex = {
 describe('packages/osv-offline-db/src/lib/split-index.unit', () => {
   describe('getSplitFileName', () => {
     it.each([
-      ['npm', 'database', 'npm-2026102712.nedb.zst'],
-      ['PyPI', 'index', 'pypi-2026102712.idx.json.zst'],
-      ['crates.io', 'database', 'crates.io-2026102712.nedb.zst'],
+      ['npm', 'database', 'npm-20261027120513.nedb.zst'],
+      ['PyPI', 'index', 'pypi-20261027120513.idx.json.zst'],
+      ['crates.io', 'database', 'crates.io-20261027120513.nedb.zst'],
     ] as const)('returns the name of %s %s', (ecosystem, kind, expected) => {
-      expect(getSplitFileName(ecosystem, kind, '2026102712')).toBe(expected);
+      expect(getSplitFileName(ecosystem, kind, '20261027120513')).toBe(
+        expected
+      );
     });
   });
 
