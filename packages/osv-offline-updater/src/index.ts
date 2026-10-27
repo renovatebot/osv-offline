@@ -2,7 +2,13 @@ import fs from 'fs-extra';
 import { createWriteStream } from 'node:fs';
 import { randomBytes } from 'node:crypto';
 import { finished } from 'node:stream/promises';
-import { OsvOfflineDb, ecosystems } from '@renovatebot/osv-offline-db';
+import {
+  DatabaseIndexBuilder,
+  type DatabaseRecord,
+  OsvOfflineDb,
+  ecosystems,
+  getIndexFileName,
+} from '@renovatebot/osv-offline-db';
 import { GitHub } from './client/github.ts';
 import signale from 'signale';
 import { OsvDownloader } from './client/osv.ts';
@@ -44,8 +50,12 @@ async function deleteIfExists(path: string): Promise<void> {
     );
 
     const out = createWriteStream(databasePath, { encoding: 'utf8' });
+    // a precomputed index saves clients from scanning the whole database
+    const index = new DatabaseIndexBuilder();
     for (const vuln of vulnerabilities) {
-      const line = JSON.stringify({ ...vuln, _id: generateId() });
+      const record: DatabaseRecord = { ...vuln, _id: generateId() };
+      const line = JSON.stringify(record);
+      index.add(line, record);
       if (!out.write(line + '\n')) {
         await new Promise<void>((resolve) => out.once('drain', resolve));
       }
@@ -53,7 +63,14 @@ async function deleteIfExists(path: string): Promise<void> {
     out.end();
     await finished(out);
 
+    const indexPath = path.join(
+      OsvOfflineDb.rootDirectory,
+      getIndexFileName(ecosystem)
+    );
+    await fs.writeFile(indexPath, index.serialize(), 'utf8');
+
     zip.addLocalFile(databasePath);
+    zip.addLocalFile(indexPath);
   }
 
   const zipFile = zip.toBuffer();
