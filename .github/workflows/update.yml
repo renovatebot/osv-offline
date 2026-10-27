@@ -6,17 +6,14 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
-  pages: write # deploy the index of the split format
-  id-token: write # required by actions/deploy-pages
+  contents: read
 
 jobs:
   update:
     runs-on: ubuntu-24.04
 
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+    permissions:
+      contents: write
 
     steps:
       - uses: containerbase/internal-tools/setup@2082203142ae62859ac4a86919258077c6460403 # v5.3.12
@@ -37,5 +34,19 @@ jobs:
         with:
           path: ${{ runner.temp }}/pages
 
+  # deploys the index of the split format
+  deploy:
+    needs: update
+    runs-on: ubuntu-24.04
+
+    permissions:
+      pages: write
+      id-token: write # required by actions/deploy-pages
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
       - id: deployment
         uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1

@@ -1,5 +1,5 @@
 import { Octokit } from '@octokit/rest';
-import type { SplitIndex } from '@renovatebot/osv-offline-db';
+import { type SplitIndex, parseSplitIndex } from '@renovatebot/osv-offline-db';
 import fs from 'fs-extra';
 import path from 'node:path';
 import signale from 'signale';
@@ -17,8 +17,12 @@ const splitReleaseTag = 'database';
 /** how long older files of the split format are kept: a day for proxies caching the index, plus one run */
 const splitRetention = { hours: 28 };
 
-/** e.g. `npm-2026102712.nedb.zst`: the file without version (`npm`, `nedb`) and its version */
-const splitFileRegex = /^(?<name>.+)-(?<version>\d{10})\.(?<kind>.+)\.zst$/;
+/** e.g. `npm-20261027120513.nedb.zst`: the file without version (`npm`, `nedb`) and its version */
+const splitFileRegex = /^(?<name>.+)-(?<version>\d{14})\.(?<kind>.+)\.zst$/;
+
+/** the index of the split format currently deployed to GitHub Pages */
+const publishedSplitIndexUrl =
+  'https://renovatebot.github.io/osv-offline/v2/index.json';
 
 export class GitHub {
   private readonly octokit: Octokit;
@@ -49,17 +53,16 @@ export class GitHub {
 
   /**
    * Uploads the files of the split format listed in `index` from `directory` to the `database` release, then deletes
-   * files older than the retention, except the newest version of each file.
+   * files older than the retention, except the newest version of each file and the files listed by the published index.
    */
   async uploadSplitFiles(directory: string, index: SplitIndex) {
     const release = await this.getSplitRelease();
     const existing = new Set(
       (await this.listReleaseAssets(release.id)).map(({ name }) => name)
     );
-    const files = Object.values(index.ecosystems).flatMap(
-      ({ database, index }) => [database.file, index.file]
-    );
-    for (const file of files.filter((file) => !existing.has(file))) {
+    for (const file of getSplitFiles(index).filter(
+      (file) => !existing.has(file)
+    )) {
       const data = await fs.readFile(path.join(directory, file));
       await this.octokit.repos.uploadReleaseAsset({
         ...this.baseParameters,
@@ -73,7 +76,16 @@ export class GitHub {
       });
       signale.info(`Uploaded ${file}`);
     }
-    await this.deleteOldSplitFiles(release.id);
+    // when a deployment of GitHub Pages failed, the published index still lists older files
+    const published = await getPublishedSplitIndex();
+    if (!published) {
+      signale.warn('Skipping deletion of old split files');
+      return;
+    }
+    await this.deleteOldSplitFiles(
+      release.id,
+      new Set(getSplitFiles(published))
+    );
   }
 
   /**
@@ -111,7 +123,7 @@ export class GitHub {
     });
   }
 
-  private async deleteOldSplitFiles(releaseId: number) {
+  private async deleteOldSplitFiles(releaseId: number, kept: Set<string>) {
     const cutoff = DateTime.utc().minus(splitRetention);
     const versions = (await this.listReleaseAssets(releaseId))
       .map((asset) => ({ asset, match: splitFileRegex.exec(asset.name) }))
@@ -129,9 +141,10 @@ export class GitHub {
       }
     }
     const old = versions.filter(
-      ({ file, version }) =>
+      ({ asset, file, version }) =>
         newest.get(file) !== version &&
-        DateTime.fromFormat(version, 'yyyyMMddHH', { zone: 'utc' }) < cutoff
+        !kept.has(asset.name) &&
+        DateTime.fromFormat(version, 'yyyyMMddHHmmss', { zone: 'utc' }) < cutoff
     );
     for (const { asset } of old) {
       await this.octokit.repos.deleteReleaseAsset({
@@ -220,5 +233,30 @@ export class GitHub {
       },
       name: 'osv-offline.zip',
     });
+  }
+}
+
+function getSplitFiles(index: SplitIndex): string[] {
+  return Object.values(index.ecosystems).flatMap(({ database, index }) => [
+    database.file,
+    index.file,
+  ]);
+}
+
+/**
+ * Returns the index deployed to GitHub Pages, or `null` when it can't be fetched.
+ */
+async function getPublishedSplitIndex(): Promise<SplitIndex | null> {
+  try {
+    const response = await fetch(publishedSplitIndexUrl, {
+      headers: { 'cache-control': 'no-cache' },
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+    return parseSplitIndex(await response.text());
+  } catch (err) {
+    signale.warn(`Failed to fetch ${publishedSplitIndexUrl}: ${String(err)}`);
+    return null;
   }
 }

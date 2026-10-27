@@ -159,8 +159,8 @@ describe('packages/osv-offline-updater/src/client/github.unit', () => {
       generated: '2026-10-27T12:00:00Z',
       ecosystems: {
         npm: {
-          database: file('npm-2026102712.nedb.zst'),
-          index: file('npm-2026102712.idx.json.zst'),
+          database: file('npm-20261027120000.nedb.zst'),
+          index: file('npm-20261027120000.idx.json.zst'),
         },
       },
     };
@@ -169,15 +169,22 @@ describe('packages/osv-offline-updater/src/client/github.unit', () => {
       return { id, name };
     }
 
+    const fetch = vi.fn();
+
     beforeEach(async () => {
       vi.resetAllMocks();
       vi.useFakeTimers({ now: new Date('2026-10-27T12:00:00Z') });
+      vi.stubGlobal('fetch', fetch);
+      fetch.mockResolvedValue(new Response(JSON.stringify(index)));
       octokit.repos.uploadReleaseAsset.mockResolvedValue(undefined);
       octokit.repos.deleteReleaseAsset.mockResolvedValue(undefined);
       directory = await fs.mkdtemp(path.join(os.tmpdir(), 'osv-offline-gh-'));
-      await fs.writeFile(path.join(directory, 'npm-2026102712.nedb.zst'), 'db');
       await fs.writeFile(
-        path.join(directory, 'npm-2026102712.idx.json.zst'),
+        path.join(directory, 'npm-20261027120000.nedb.zst'),
+        'db'
+      );
+      await fs.writeFile(
+        path.join(directory, 'npm-20261027120000.idx.json.zst'),
         'idx'
       );
       octokit.repos.getReleaseByTag.mockResolvedValue({ data: { id: 20 } });
@@ -186,6 +193,7 @@ describe('packages/osv-offline-updater/src/client/github.unit', () => {
 
     afterEach(async () => {
       vi.useRealTimers();
+      vi.unstubAllGlobals();
       await fs.remove(directory);
     });
 
@@ -213,14 +221,16 @@ describe('packages/osv-offline-updater/src/client/github.unit', () => {
     });
 
     it('uploads only the files which are missing', async () => {
-      octokit.paginate.mockResolvedValue([asset(1, 'npm-2026102712.nedb.zst')]);
+      octokit.paginate.mockResolvedValue([
+        asset(1, 'npm-20261027120000.nedb.zst'),
+      ]);
 
       await new GitHub().uploadSplitFiles(directory, index);
 
       expect(octokit.repos.uploadReleaseAsset).toHaveBeenCalledExactlyOnceWith(
         expect.objectContaining({
           release_id: 20,
-          name: 'npm-2026102712.idx.json.zst',
+          name: 'npm-20261027120000.idx.json.zst',
           headers: expect.objectContaining({
             'content-type': 'application/zstd',
             'content-length': 3,
@@ -231,15 +241,15 @@ describe('packages/osv-offline-updater/src/client/github.unit', () => {
 
     it('deletes files older than the retention, except the newest version of each file', async () => {
       octokit.paginate.mockResolvedValue([
-        asset(1, 'npm-2026102712.nedb.zst'),
-        asset(7, 'npm-2026102712.idx.json.zst'),
+        asset(1, 'npm-20261027120000.nedb.zst'),
+        asset(7, 'npm-20261027120000.idx.json.zst'),
         // exactly 28 hours old
-        asset(2, 'npm-2026102608.nedb.zst'),
+        asset(2, 'npm-20261026080000.nedb.zst'),
         // older than 28 hours
-        asset(3, 'npm-2026102604.nedb.zst'),
-        asset(4, 'npm-2026102604.idx.json.zst'),
+        asset(3, 'npm-20261026075959.nedb.zst'),
+        asset(4, 'npm-20261026075959.idx.json.zst'),
         // the newest version of this file, so it's kept although it's old
-        asset(5, 'pypi-2026102000.nedb.zst'),
+        asset(5, 'pypi-20261020000000.nedb.zst'),
         // not a file of the split format
         asset(6, 'notes.txt'),
       ]);
@@ -250,6 +260,58 @@ describe('packages/osv-offline-updater/src/client/github.unit', () => {
         [expect.objectContaining({ asset_id: 3 })],
         [expect.objectContaining({ asset_id: 4 })],
       ]);
+      expect(fetch).toHaveBeenCalledExactlyOnceWith(
+        'https://renovatebot.github.io/osv-offline/v2/index.json',
+        { headers: { 'cache-control': 'no-cache' } }
+      );
     });
+
+    it('keeps the files listed by the published index', async () => {
+      fetch.mockResolvedValue(
+        new Response(
+          JSON.stringify({
+            ...index,
+            ecosystems: {
+              npm: {
+                database: file('npm-20261026000000.nedb.zst'),
+                index: file('npm-20261026000000.idx.json.zst'),
+              },
+            },
+          })
+        )
+      );
+      octokit.paginate.mockResolvedValue([
+        asset(1, 'npm-20261027120000.nedb.zst'),
+        asset(2, 'npm-20261027120000.idx.json.zst'),
+        asset(3, 'npm-20261026000000.nedb.zst'),
+        asset(4, 'npm-20261026000000.idx.json.zst'),
+        asset(5, 'npm-20261025000000.nedb.zst'),
+      ]);
+
+      await new GitHub().uploadSplitFiles(directory, index);
+
+      expect(octokit.repos.deleteReleaseAsset).toHaveBeenCalledExactlyOnceWith(
+        expect.objectContaining({ asset_id: 5 })
+      );
+    });
+
+    it.each([
+      ['is missing', () => Promise.resolve(new Response('', { status: 404 }))],
+      ['is invalid', () => Promise.resolve(new Response('{}'))],
+      ['fails', () => Promise.reject(new Error('network'))],
+    ] as const)(
+      'deletes nothing when the published index %s',
+      async (_, response) => {
+        fetch.mockImplementation(response);
+        octokit.paginate.mockResolvedValue([
+          asset(1, 'npm-20261027120000.nedb.zst'),
+          asset(3, 'npm-20261025000000.nedb.zst'),
+        ]);
+
+        await new GitHub().uploadSplitFiles(directory, index);
+
+        expect(octokit.repos.deleteReleaseAsset).not.toHaveBeenCalled();
+      }
+    );
   });
 });
