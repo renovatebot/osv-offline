@@ -153,16 +153,22 @@ describe('packages/osv-offline/src/lib/split.unit', () => {
     expect(gotMock).toHaveBeenCalledOnce();
   });
 
-  it('skips the download while the recorded files are younger than the maximum age', async () => {
-    await writeExistingFiles();
-    await fs.writeJson(statePath, { database: 'x', index: 'y' });
+  it.each([
+    ['database and index', ['npm.nedb', 'npm.idx.json']],
+    ['database without index', ['npm.nedb']],
+  ])(
+    'skips the download while the recorded %s are younger than the maximum age',
+    async (_, names) => {
+      await writeExistingFiles(names);
+      await fs.writeJson(statePath, { database: 'x', index: 'y' });
 
-    await new SplitDownloader().ensure('npm');
+      await new SplitDownloader().ensure('npm');
 
-    expect(gotMock).not.toHaveBeenCalled();
-  });
+      expect(gotMock).not.toHaveBeenCalled();
+    }
+  );
 
-  it('downloads again when a recorded file is missing', async () => {
+  it('downloads again when the recorded database is missing', async () => {
     await writeExistingFiles(['npm.idx.json']);
     await fs.writeJson(statePath, { database: db.sha256, index: idx.sha256 });
     gotMock.mockResolvedValue(indexResponse(splitIndex()));
@@ -262,8 +268,8 @@ describe('packages/osv-offline/src/lib/split.unit', () => {
     }
   );
 
-  it('keeps the existing files when the index is invalid', async () => {
-    await writeExistingFiles();
+  it('keeps an existing database without its index file when index.json is invalid', async () => {
+    await writeExistingFiles(['npm.nedb']);
     gotMock.mockResolvedValue({
       statusCode: 200,
       body: 'not json',

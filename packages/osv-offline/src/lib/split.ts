@@ -59,9 +59,8 @@ class Digest extends Transform {
   }
 }
 
-/** the names of the database and the index of `ecosystem` */
-function getFileNames(ecosystem: Ecosystem): [string, string] {
-  return [`${ecosystem.toLowerCase()}.nedb`, getIndexFileName(ecosystem)];
+function getDatabaseFileName(ecosystem: Ecosystem): string {
+  return `${ecosystem.toLowerCase()}.nedb`;
 }
 
 function isNotFound(err: unknown): boolean {
@@ -85,8 +84,8 @@ export class SplitDownloader {
   >();
 
   /**
-   * Makes sure the files of `ecosystem` are up-to-date. Failures are logged and existing files are kept; without
-   * existing files, failures are thrown. A failed update is retried on the next call.
+   * Makes sure the files of `ecosystem` are up-to-date. Failures are logged and existing files are kept; without an
+   * existing database, failures are thrown. A failed update is retried on the next call.
    */
   ensure(ecosystem: Ecosystem): Promise<void> {
     if (process.env.OSV_OFFLINE_DISABLE_DOWNLOAD?.toLowerCase() === 'true') {
@@ -98,7 +97,7 @@ export class SplitDownloader {
     }
     const promise = this.update(ecosystem).catch(async (err: unknown) => {
       this.checked.delete(ecosystem);
-      if (!(await this.hasFiles(ecosystem))) {
+      if (!(await this.hasDatabase(ecosystem))) {
         throw err;
       }
       logger(`Updating ecosystem '${ecosystem}' failed: ${String(err)}`);
@@ -113,7 +112,7 @@ export class SplitDownloader {
     if (
       stateStat &&
       Date.now() - stateStat.mtimeMs < this.maxAge &&
-      (await this.hasFiles(ecosystem))
+      (await this.hasDatabase(ecosystem))
     ) {
       logger(`Ecosystem '${ecosystem}' is up-to-date.`);
       return;
@@ -149,7 +148,7 @@ export class SplitDownloader {
     if (
       state?.database === files.database.sha256 &&
       state.index === files.index.sha256 &&
-      (await this.hasFiles(ecosystem))
+      (await this.hasDatabase(ecosystem))
     ) {
       logger(`Ecosystem '${ecosystem}' is unchanged.`);
       const now = new Date();
@@ -164,9 +163,8 @@ export class SplitDownloader {
     );
     try {
       const baseUrl = index.baseUrl ?? this.indexUrl;
-      const [databaseName, indexName] = getFileNames(ecosystem);
-      const indexPath = path.join(tmpDir, indexName);
-      const databasePath = path.join(tmpDir, databaseName);
+      const indexPath = path.join(tmpDir, getIndexFileName(ecosystem));
+      const databasePath = path.join(tmpDir, getDatabaseFileName(ecosystem));
       await this.download(
         new URL(files.index.file, baseUrl),
         files.index,
@@ -255,13 +253,13 @@ export class SplitDownloader {
     }
   }
 
-  private async hasFiles(ecosystem: Ecosystem): Promise<boolean> {
-    for (const name of getFileNames(ecosystem)) {
-      if (!(await fs.pathExists(path.join(OsvOfflineDb.rootDirectory, name)))) {
-        return false;
-      }
-    }
-    return true;
+  /**
+   * Whether the database of `ecosystem` exists. Its index is optional, the database is read without it.
+   */
+  private async hasDatabase(ecosystem: Ecosystem): Promise<boolean> {
+    return await fs.pathExists(
+      path.join(OsvOfflineDb.rootDirectory, getDatabaseFileName(ecosystem))
+    );
   }
 
   private getStatePath(ecosystem: Ecosystem): string {
