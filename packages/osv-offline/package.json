@@ -13,7 +13,6 @@
   },
   "dependencies": {
     "@renovatebot/osv-offline-db": "workspace:*",
-    "adm-zip": "~0.6.1",
     "debug": "^4.4.3",
     "fs-extra": "^11.4.1",
     "got": "^15.1.0",
@@ -22,6 +21,7 @@
   "devDependencies": {
     "@types/adm-zip": "0.6.0",
     "@types/debug": "4.1.13",
+    "adm-zip": "0.6.1",
     "@types/fs-extra": "11.0.4",
     "@types/luxon": "3.7.6",
     "@types/node": "22.20.5"

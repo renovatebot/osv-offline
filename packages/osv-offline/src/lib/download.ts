@@ -4,8 +4,8 @@ import { pipeline } from 'node:stream/promises';
 import { OsvOfflineDb } from '@renovatebot/osv-offline-db';
 import path from 'path';
 import { DateTime } from 'luxon';
-import AdmZip from 'adm-zip';
 import { Result, failure, success } from './types.ts';
+import { extractZip } from './unzip.ts';
 import debug from 'debug';
 
 const logger = debug('osv-offline:download');
@@ -52,10 +52,10 @@ export async function tryDownloadDb(): Promise<Result> {
     logger('Downloading databases done.');
     logger('Extracting databases ...');
     const extractDir = path.join(tmpDir, 'extracted');
-    const zip = new AdmZip(tmpZipPath);
-    zip.extractAllTo(extractDir);
+    await fs.ensureDir(extractDir);
+    const files = await extractZip(tmpZipPath, extractDir);
     // renaming replaces existing databases, while readers which already opened them keep reading the old files
-    for (const file of await fs.readdir(extractDir)) {
+    for (const file of files) {
       await fs.rename(
         path.join(extractDir, file),
         path.join(OsvOfflineDb.rootDirectory, file)
