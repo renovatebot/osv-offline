@@ -20,9 +20,9 @@ export default defineConfig({
       reportOnFailure: true,
       exclude: [
         ...coverageConfigDefaults.exclude,
-        // the updater script and its network clients
+        // the updater script and its OSV download client
         'packages/osv-offline-updater/src/index.ts',
-        'packages/osv-offline-updater/src/client/**',
+        'packages/osv-offline-updater/src/client/osv.ts',
         'packages/osv-offline-updater/dist/**',
       ],
     },
