@@ -6,12 +6,20 @@
 
 ## Environment variables
 
-| Name                           | Description                                                                                                                             | Default                                                                               |
-| ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| `OSV_OFFLINE_ROOT_DIR`         | Directory of the downloaded databases                                                                                                   | `<tmpdir>/osv-offline`                                                                |
-| `OSV_OFFLINE_DATABASE_URL`     | URL of the database zip                                                                                                                 | `https://github.com/renovatebot/osv-offline/releases/latest/download/osv-offline.zip` |
-| `OSV_OFFLINE_DISABLE_DOWNLOAD` | Set to `true` to use the databases in `OSV_OFFLINE_ROOT_DIR` without downloading them                                                   | -                                                                                     |
-| `OSV_OFFLINE_MAX_AGE`          | How old the downloaded databases may be before they are downloaded again, as a [`ms`](https://github.com/vercel/ms) duration, e.g. `4h` | `1d`                                                                                  |
+| Name                             | Description                                                                                                                             | Default                                                                               |
+| -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| `OSV_OFFLINE_ROOT_DIR`           | Directory of the downloaded databases                                                                                                   | `<tmpdir>/osv-offline`                                                                |
+| `OSV_OFFLINE_DATABASE_FORMAT`    | `zip` downloads all databases as one zip; `split` downloads each ecosystem on its first query, and again only when it changed           | `zip`                                                                                 |
+| `OSV_OFFLINE_DATABASE_URL`       | URL of the database zip                                                                                                                 | `https://github.com/renovatebot/osv-offline/releases/latest/download/osv-offline.zip` |
+| `OSV_OFFLINE_DATABASE_INDEX_URL` | URL of the `index.json` of the split format                                                                                             | `https://renovatebot.github.io/osv-offline/v2/index.json`                             |
+| `OSV_OFFLINE_DISABLE_DOWNLOAD`   | Set to `true` to use the databases in `OSV_OFFLINE_ROOT_DIR` without downloading them                                                   | -                                                                                     |
+| `OSV_OFFLINE_MAX_AGE`            | How old the downloaded databases may be before they are downloaded again, as a [`ms`](https://github.com/vercel/ms) duration, e.g. `4h` | `1d`                                                                                  |
+
+### Split format
+
+With `OSV_OFFLINE_DATABASE_FORMAT=split`, the databases are downloaded from `https://github.com/renovatebot/osv-offline/releases/download/database/`, as listed by the index on `https://renovatebot.github.io/osv-offline/`. Allow both hosts when outgoing traffic is restricted.
+
+To mirror the split format, copy `index.json` without its `baseUrl` and the files it lists into one directory, and set `OSV_OFFLINE_DATABASE_INDEX_URL` to the mirrored `index.json`. Files are resolved relative to the index then.
 
 ## License
 

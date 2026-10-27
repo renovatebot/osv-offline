@@ -16,7 +16,7 @@ const defaultMaxAge = '1d';
 /**
  * Returns how many milliseconds old the local databases may be before they are downloaded again: `OSV_OFFLINE_MAX_AGE` (e.g. `4h`), or one day.
  */
-function getMaxAge(): number {
+export function getMaxAge(): number {
   const value = process.env.OSV_OFFLINE_MAX_AGE;
   if (!value) {
     return ms(defaultMaxAge);
