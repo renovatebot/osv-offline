@@ -2,7 +2,15 @@
   "plugins": [
     "@semantic-release/commit-analyzer",
     "@semantic-release/release-notes-generator",
-    "@containerbase/semantic-release-pnpm"
+    "@containerbase/semantic-release-pnpm",
+    [
+      "@semantic-release/github",
+      {
+        "draftRelease": true,
+        "releasedLabels": false,
+        "successCommentCondition": "<% return branch.channel !== 'next' && issue.user.type !== 'Bot'; %>"
+      }
+    ]
   ],
   "analyzeCommits": {
     "releaseRules": [

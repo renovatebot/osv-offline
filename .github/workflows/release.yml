@@ -22,6 +22,7 @@ env:
 permissions:
   contents: write
   issues: write
+  pull-requests: write
   id-token: write
 
 jobs:
@@ -55,3 +56,14 @@ jobs:
       - run: pnpm semantic-release --dry-run ${{env.DRY_RUN}}
         env:
           GITHUB_TOKEN: ${{ github.token }}
+
+      # clients download the database from the latest release, so a package release must not become the latest one
+      - name: Publish the release without marking it as latest
+        if: env.DRY_RUN == 'false'
+        run: |
+          tag=$(git tag --points-at HEAD --list '[0-9]*.[0-9]*.[0-9]*')
+          if [[ -n "$tag" ]]; then
+            gh release edit "$tag" --draft=false --latest=false
+          fi
+        env:
+          GH_TOKEN: ${{ github.token }}
