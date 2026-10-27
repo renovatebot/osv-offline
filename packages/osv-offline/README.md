@@ -4,6 +4,15 @@
 [![Build status](https://img.shields.io/github/actions/workflow/status/renovatebot/osv-offline/build.yml?branch=main&style=for-the-badge)](https://github.com/renovatebot/osv-offline/actions/workflows/build.yml)
 [![MIT license](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge)](./LICENSE)
 
+## Environment variables
+
+| Name                           | Description                                                                                                                                                        | Default                                                                               |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------- |
+| `OSV_OFFLINE_ROOT_DIR`         | Directory of the downloaded databases                                                                                                                              | `<tmpdir>/osv-offline`                                                                |
+| `OSV_OFFLINE_DATABASE_URL`     | URL of the database zip                                                                                                                                            | `https://github.com/renovatebot/osv-offline/releases/latest/download/osv-offline.zip` |
+| `OSV_OFFLINE_DISABLE_DOWNLOAD` | Set to `true` to use the databases in `OSV_OFFLINE_ROOT_DIR` without downloading them                                                                              | -                                                                                     |
+| `OSV_OFFLINE_MAX_AGE`          | How old the downloaded databases may be before they are downloaded again, as an [ISO 8601 duration](https://en.wikipedia.org/wiki/ISO_8601#Durations), e.g. `PT4H` | `P1D`                                                                                 |
+
 ## License
 
 This package is licensed under [the MIT license](https://opensource.org/licenses/MIT).
