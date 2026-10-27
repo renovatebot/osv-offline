@@ -102,6 +102,9 @@ importers:
       luxon:
         specifier: ^3.7.2
         version: 3.7.2
+      ms:
+        specifier: ^2.1.3
+        version: 2.1.3
       yauzl:
         specifier: ^3.4.0
         version: 3.4.0
@@ -118,6 +121,9 @@ importers:
       '@types/luxon':
         specifier: 3.7.6
         version: 3.7.6
+      '@types/ms':
+        specifier: 2.1.0
+        version: 2.1.0
       '@types/node':
         specifier: 22.20.5
         version: 22.20.5

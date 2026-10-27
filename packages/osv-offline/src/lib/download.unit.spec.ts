@@ -48,7 +48,7 @@ describe('packages/osv-offline/src/lib/download.unit', () => {
     }
 
     it('skips the download while younger than OSV_OFFLINE_MAX_AGE', async () => {
-      process.env.OSV_OFFLINE_MAX_AGE = 'PT4H';
+      process.env.OSV_OFFLINE_MAX_AGE = '4h';
       await writeZip(3);
 
       const result = await tryDownloadDb();
@@ -58,7 +58,7 @@ describe('packages/osv-offline/src/lib/download.unit', () => {
     });
 
     it('downloads when older than OSV_OFFLINE_MAX_AGE', async () => {
-      process.env.OSV_OFFLINE_MAX_AGE = 'PT4H';
+      process.env.OSV_OFFLINE_MAX_AGE = '4h';
       await writeZip(5);
       mockStream.mockImplementationOnce(() => {
         throw new Error('intentional stream error');

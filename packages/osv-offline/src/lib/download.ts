@@ -3,29 +3,29 @@ import got from 'got';
 import { pipeline } from 'node:stream/promises';
 import { OsvOfflineDb } from '@renovatebot/osv-offline-db';
 import path from 'path';
-import { DateTime, Duration } from 'luxon';
+import { DateTime } from 'luxon';
+import ms from 'ms';
 import { Result, failure, success } from './types.ts';
 import { extractZip } from './unzip.ts';
 import debug from 'debug';
 
 const logger = debug('osv-offline:download');
 
-const defaultMaxAge = Duration.fromObject({ days: 1 });
+const defaultMaxAge = '1d';
 
 /**
- * Returns how old the local databases may be before they are downloaded again: `OSV_OFFLINE_MAX_AGE` as an ISO 8601 duration (e.g. `PT4H`), or one day.
+ * Returns how many milliseconds old the local databases may be before they are downloaded again: `OSV_OFFLINE_MAX_AGE` (e.g. `4h`), or one day.
  */
-function getMaxAge(): Duration {
+function getMaxAge(): number {
   const value = process.env.OSV_OFFLINE_MAX_AGE;
   if (!value) {
-    return defaultMaxAge;
+    return ms(defaultMaxAge);
   }
-  const maxAge = Duration.fromISO(value);
-  if (!maxAge.isValid) {
-    logger(
-      `Invalid OSV_OFFLINE_MAX_AGE '${value}', using ${defaultMaxAge.toISO()}.`
-    );
-    return defaultMaxAge;
+  // returns `undefined` for an invalid value, despite the type
+  const maxAge: number | undefined = ms(value as ms.StringValue);
+  if (maxAge === undefined) {
+    logger(`Invalid OSV_OFFLINE_MAX_AGE '${value}', using ${defaultMaxAge}.`);
+    return ms(defaultMaxAge);
   }
   return maxAge;
 }
@@ -50,7 +50,7 @@ export async function tryDownloadDb(): Promise<Result> {
   if (
     stats !== undefined &&
     DateTime.utc().diff(DateTime.fromJSDate(stats.mtime)).toMillis() <
-      getMaxAge().toMillis()
+      getMaxAge()
   ) {
     logger('Skipping download, databases are up-to-date.');
     return success();
