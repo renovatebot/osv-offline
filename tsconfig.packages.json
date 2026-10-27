@@ -1,5 +1,5 @@
 {
-  "extends": "@tsconfig/node22/tsconfig",
+  "extends": "@tsconfig/node24/tsconfig",
   "compilerOptions": {
     "composite": true,
     "allowImportingTsExtensions": true,
