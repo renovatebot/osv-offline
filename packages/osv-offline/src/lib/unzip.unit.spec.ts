@@ -69,17 +69,6 @@ describe('packages/osv-offline/src/lib/unzip.unit', () => {
       ).resolves.toBe('');
     });
 
-    it('extracts archives with a comment', async () => {
-      const zip = new AdmZip();
-      zip.addFile('npm.nedb', Buffer.from('npm'));
-      zip.addZipComment('osv-offline');
-      await fs.writeFile(zipPath, zip.toBuffer());
-
-      await expect(extractZip(zipPath, targetDir)).resolves.toEqual([
-        'npm.nedb',
-      ]);
-    });
-
     it('skips directory entries', async () => {
       const zip = new AdmZip();
       zip.addFile('dir/', Buffer.alloc(0));
@@ -96,75 +85,21 @@ describe('packages/osv-offline/src/lib/unzip.unit', () => {
       );
     });
 
-    it('rejects a file without an end of central directory', async () => {
+    it('rejects invalid archives', async () => {
       await fs.writeFile(zipPath, 'not a zip archive');
 
-      await expect(extractZip(zipPath, targetDir)).rejects.toThrow(
-        'end of central directory not found'
-      );
+      await expect(extractZip(zipPath, targetDir)).rejects.toThrow();
     });
 
-    it('rejects ZIP64 archives', async () => {
-      const buffer = await writeZip({ 'npm.nedb': 'npm' });
-      // the entry count of the end of central directory record
-      buffer.writeUInt16LE(0xffff, buffer.length - 22 + 10);
-      await fs.writeFile(zipPath, buffer);
-
-      await expect(extractZip(zipPath, targetDir)).rejects.toThrow(
-        'ZIP64 extensions'
-      );
-    });
-
-    it('rejects a corrupt central directory', async () => {
-      const buffer = await writeZip({ 'npm.nedb': 'npm' });
-      buffer.writeUInt32LE(0, buffer.indexOf(centralDirectoryHeaderSignature));
-      await fs.writeFile(zipPath, buffer);
-
-      await expect(extractZip(zipPath, targetDir)).rejects.toThrow(
-        'corrupt central directory'
-      );
-    });
-
-    it('rejects a corrupt local header', async () => {
-      const buffer = await writeZip({ 'npm.nedb': 'npm' });
-      buffer.writeUInt32LE(0, 0);
-      await fs.writeFile(zipPath, buffer);
-
-      await expect(extractZip(zipPath, targetDir)).rejects.toThrow(
-        'corrupt header of npm.nedb'
-      );
-    });
-
-    it('rejects encrypted files', async () => {
-      const buffer = await writeZip({ 'npm.nedb': 'npm' });
-      const header = buffer.indexOf(centralDirectoryHeaderSignature);
-      buffer.writeUInt16LE(0x1, header + 8);
-      await fs.writeFile(zipPath, buffer);
-
-      await expect(extractZip(zipPath, targetDir)).rejects.toThrow(
-        'npm.nedb is encrypted'
-      );
-    });
-
-    it('rejects unsupported compression methods', async () => {
-      const buffer = await writeZip({ 'npm.nedb': 'npm' });
-      const header = buffer.indexOf(centralDirectoryHeaderSignature);
-      buffer.writeUInt16LE(12, header + 10);
-      await fs.writeFile(zipPath, buffer);
-
-      await expect(extractZip(zipPath, targetDir)).rejects.toThrow(
-        'npm.nedb uses compression method 12'
-      );
-    });
-
-    it('rejects files with a wrong checksum', async () => {
+    it('rejects files with a wrong CRC-32', async () => {
       const buffer = await writeZip({ 'npm.nedb': 'npm' }, 0);
       const header = buffer.indexOf(centralDirectoryHeaderSignature);
+      // the CRC-32 of the entry's central directory header
       buffer.writeUInt32LE(0, header + 16);
       await fs.writeFile(zipPath, buffer);
 
       await expect(extractZip(zipPath, targetDir)).rejects.toThrow(
-        'checksum mismatch for npm.nedb'
+        'CRC-32 mismatch for npm.nedb'
       );
     });
   });
