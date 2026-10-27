@@ -47,6 +47,8 @@ export async function extractZip(
  * Passes the data through, and fails when its CRC-32 differs from the zip entry's.
  *
  * yauzl only verifies the size of an entry.
+ *
+ * @see https://github.com/thejoshwolfe/yauzl/issues/49
  */
 class Crc32Verifier extends Transform {
   private crc = 0;
