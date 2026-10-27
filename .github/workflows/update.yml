@@ -7,10 +7,17 @@ on:
 
 permissions:
   contents: write
+  pages: write # deploy the index of the split format
+  id-token: write # required by actions/deploy-pages
 
 jobs:
   update:
     runs-on: ubuntu-24.04
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
     steps:
       - uses: containerbase/internal-tools/setup@2082203142ae62859ac4a86919258077c6460403 # v5.3.12
         with:
@@ -23,3 +30,12 @@ jobs:
       - run: pnpm start
         env:
           GITHUB_TOKEN: ${{ github.token }}
+          OSV_OFFLINE_PAGES_DIR: ${{ runner.temp }}/pages
+
+      # only after the files listed by the index are uploaded
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: ${{ runner.temp }}/pages
+
+      - id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
