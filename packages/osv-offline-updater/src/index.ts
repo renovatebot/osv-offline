@@ -1,10 +1,21 @@
 import fs from 'fs-extra';
-import { OsvOfflineDb, ecosystems } from '@renovatebot/osv-offline-db';
+import path from 'node:path';
+import {
+  OsvOfflineDb,
+  type SplitIndex,
+  ecosystems,
+} from '@renovatebot/osv-offline-db';
+import { DateTime } from 'luxon';
 import { GitHub } from './client/github.ts';
 import signale from 'signale';
 import { OsvDownloader } from './client/osv.ts';
 import AdmZip from 'adm-zip';
 import { writeDatabase } from './lib/database.ts';
+import { writeSplitFiles, writeSplitIndex } from './lib/split.ts';
+
+/** where the files of the split format are downloaded from */
+const splitBaseUrl =
+  'https://github.com/renovatebot/osv-offline/releases/download/database/';
 
 // eslint-disable-next-line @typescript-eslint/no-floating-promises
 (async () => {
@@ -12,7 +23,18 @@ import { writeDatabase } from './lib/database.ts';
     await fs.mkdir(OsvOfflineDb.rootDirectory);
   }
 
+  const generated = new Date();
+  // e.g. 2026102712, the same format as the tags of the database releases
+  const version = DateTime.fromJSDate(generated, { zone: 'utc' }).toFormat(
+    'yyyyMMddHH'
+  );
+  const splitDir = path.join(OsvOfflineDb.rootDirectory, 'split');
+  const pagesDir =
+    process.env.OSV_OFFLINE_PAGES_DIR ??
+    path.join(OsvOfflineDb.rootDirectory, 'pages');
+
   const zip = new AdmZip();
+  const splitEcosystems: SplitIndex['ecosystems'] = {};
 
   for (const ecosystem of ecosystems) {
     signale.info(`Processing ecosystem ${ecosystem}`);
@@ -22,14 +44,28 @@ import { writeDatabase } from './lib/database.ts';
       `Downloaded ${vulnerabilities.length} vulnerabilities for ecosystem ${ecosystem}`
     );
 
-    for (const file of await writeDatabase(
+    const files = await writeDatabase(
       OsvOfflineDb.rootDirectory,
       ecosystem,
       vulnerabilities
-    )) {
+    );
+    for (const file of files) {
       zip.addLocalFile(file);
     }
+    splitEcosystems[ecosystem] = await writeSplitFiles(
+      splitDir,
+      ecosystem,
+      version,
+      files
+    );
   }
+
+  await writeSplitIndex(
+    path.join(pagesDir, 'v2', 'index.json'),
+    splitEcosystems,
+    generated,
+    splitBaseUrl
+  );
 
   const zipFile = zip.toBuffer();
 
