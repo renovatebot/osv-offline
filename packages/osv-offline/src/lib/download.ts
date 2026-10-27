@@ -36,22 +36,41 @@ export async function tryDownloadDb(): Promise<Result> {
   }
 
   // only download databases if local databases are missing or remote is newer
+  // download and extract into a temporary directory first, so a failed attempt leaves the current databases untouched
+  const tmpDir = await fs.mkdtemp(
+    path.join(OsvOfflineDb.rootDirectory, '.download-')
+  );
   try {
     logger('Downloading databases ...');
     const databaseUrl =
       process.env.OSV_OFFLINE_DATABASE_URL ??
       'https://github.com/renovatebot/osv-offline/releases/latest/download/osv-offline.zip';
     const stream = got.stream(databaseUrl);
-    const zipPath = path.join(OsvOfflineDb.rootDirectory, 'osv-offline.zip');
-    const writeStream = fs.createWriteStream(zipPath);
+    const tmpZipPath = path.join(tmpDir, 'osv-offline.zip');
+    const writeStream = fs.createWriteStream(tmpZipPath);
     await pipeline(stream, writeStream);
     logger('Downloading databases done.');
     logger('Extracting databases ...');
-    const zip = new AdmZip(zipPath);
-    zip.extractAllTo(OsvOfflineDb.rootDirectory);
+    const extractDir = path.join(tmpDir, 'extracted');
+    const zip = new AdmZip(tmpZipPath);
+    zip.extractAllTo(extractDir);
+    // renaming replaces existing databases, while readers which already opened them keep reading the old files
+    for (const file of await fs.readdir(extractDir)) {
+      await fs.rename(
+        path.join(extractDir, file),
+        path.join(OsvOfflineDb.rootDirectory, file)
+      );
+    }
+    // the zip's modification time marks the databases as up-to-date, so it's moved last
+    await fs.rename(
+      tmpZipPath,
+      path.join(OsvOfflineDb.rootDirectory, 'osv-offline.zip')
+    );
     logger('Extracting databases done.');
   } catch (err) {
     return failure(err as Error);
+  } finally {
+    await fs.remove(tmpDir);
   }
 
   return success();
