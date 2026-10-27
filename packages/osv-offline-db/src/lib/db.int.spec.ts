@@ -1,5 +1,7 @@
 import { OsvOfflineDb } from './db.ts';
+import { DatabaseIndexBuilder, type DatabaseRecord } from './db-index.ts';
 import fs from 'fs-extra';
+import readline from 'node:readline';
 import path from 'path';
 import { setTimeout } from 'timers/promises';
 import type { Vulnerability } from './osv.ts';
@@ -240,6 +242,81 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
         await osvOfflineDb.query('Packagist', 'drupal/openid_connect')
       ).toStrictEqual([ecosystemVuln]);
     });
+  });
+
+  describe('precomputed index', () => {
+    const vuln1 = { ...sampleVuln, id: 'VULN-1', _id: 'UNIQUE_ID_1' };
+    const vuln2 = { ...sampleVuln, id: 'VULN-2', _id: 'UNIQUE_ID_2' };
+
+    function buildIndex(records: DatabaseRecord[]): string {
+      const builder = new DatabaseIndexBuilder();
+      for (const record of records) {
+        builder.add(JSON.stringify(record), record);
+      }
+      return builder.serialize();
+    }
+
+    async function writeDb(records: DatabaseRecord[], index: string) {
+      await fs.ensureDir(rootDir);
+      await fs.writeFile(
+        path.join(rootDir, 'npm.nedb'),
+        records.map((record) => `${JSON.stringify(record)}\n`).join(''),
+        'utf8'
+      );
+      await fs.writeFile(path.join(rootDir, 'npm.idx.json'), index, 'utf8');
+    }
+
+    afterEach(async () => {
+      await fs.rm(path.join(rootDir, 'npm.idx.json'), { force: true });
+      vi.restoreAllMocks();
+    });
+
+    it('uses a precomputed index instead of scanning the database', async () => {
+      await writeDb([vuln1, vuln2], buildIndex([vuln1, vuln2]));
+      const scan = vi.spyOn(readline, 'createInterface');
+
+      using db = OsvOfflineDb.create();
+      const result = await db.query('npm', 'public');
+
+      expect(result.map(({ id }) => id)).toEqual(['VULN-1', 'VULN-2']);
+      expect(scan).not.toHaveBeenCalled();
+    });
+
+    it('uses an index without a last record', async () => {
+      const withoutId1 = { ...vuln1, _id: undefined };
+      const withoutId2 = { ...vuln2, _id: undefined };
+      await writeDb(
+        [withoutId1, withoutId2],
+        buildIndex([withoutId1, withoutId2])
+      );
+      const scan = vi.spyOn(readline, 'createInterface');
+
+      using db = OsvOfflineDb.create();
+      const result = await db.query('npm', 'public');
+
+      expect(result).toHaveLength(2);
+      expect(scan).not.toHaveBeenCalled();
+    });
+
+    it.each`
+      reason                                       | index
+      ${'is no index'}                             | ${() => 'not json'}
+      ${'was built from a database of other size'} | ${() => buildIndex([vuln1])}
+      ${'was built with another last record'}      | ${() => buildIndex([vuln1, { ...vuln2, _id: 'UNIQUE_ID_3' }])}
+      ${'points the last record elsewhere'}        | ${() => buildIndex([vuln1, vuln2]).replace('"last":{"offset":', '"last":{"offset":1')}
+    `(
+      'scans the database when the index $reason',
+      async ({ index }: { index: () => string }) => {
+        await writeDb([vuln1, vuln2], index());
+        const scan = vi.spyOn(readline, 'createInterface');
+
+        using db = OsvOfflineDb.create();
+        const result = await db.query('npm', 'public');
+
+        expect(result.map(({ id }) => id)).toEqual(['VULN-1', 'VULN-2']);
+        expect(scan).toHaveBeenCalledOnce();
+      }
+    );
   });
 
   describe('dispose', () => {

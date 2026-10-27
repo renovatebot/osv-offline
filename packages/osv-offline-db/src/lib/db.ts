@@ -1,9 +1,17 @@
-import { stat } from 'node:fs/promises';
+import { readFile, stat } from 'node:fs/promises';
 import { closeSync, createReadStream, read as fsRead, openSync } from 'node:fs';
 import { promisify } from 'node:util';
 import path from 'node:path';
 import { tmpdir } from 'node:os';
 import readline from 'node:readline';
+import {
+  DatabaseIndexBuilder,
+  type DatabaseRecord,
+  type EcosystemIndex,
+  type IndexCheck,
+  getIndexFileName,
+  parseIndex,
+} from './db-index.ts';
 import { Ecosystem } from './ecosystem.ts';
 import type { Vulnerability } from './osv.ts';
 import { packageToPurl } from './purl-helper.ts';
@@ -11,13 +19,6 @@ import debug from 'debug';
 
 const logger = debug('osv-offline:db');
 const readAsync = promisify(fsRead);
-
-interface RecordPointer {
-  readonly offset: number;
-  readonly length: number;
-}
-
-type EcosystemIndex = Map<string, RecordPointer[]>;
 
 interface EcosystemData {
   filePath: string;
@@ -99,7 +100,13 @@ export class OsvOfflineDb {
         mtime: fileStat.mtimeMs,
       };
 
-      await this._buildIndex(ac, data);
+      const index = await this._loadIndex(ecosystem, data, fileStat.size);
+      if (index) {
+        logger(`Using precomputed index for ecosystem '${ecosystem}'`);
+        data.index = index;
+      } else {
+        await this._buildIndex(ac, data);
+      }
 
       if (ac.signal.aborted) {
         logger(`Initializing ecosystem '${ecosystem}' aborted.`);
@@ -117,6 +124,52 @@ export class OsvOfflineDb {
     }
   }
 
+  /**
+   * Returns the precomputed index of an ecosystem database, if there is one and it was built from this database.
+   */
+  private async _loadIndex(
+    ecosystem: Ecosystem,
+    data: EcosystemData,
+    size: number
+  ): Promise<EcosystemIndex | null> {
+    const content = await readFile(
+      path.join(OsvOfflineDb.rootDirectory, getIndexFileName(ecosystem)),
+      'utf8'
+    ).catch(() => null);
+    if (content === null) {
+      return null;
+    }
+    const parsed = parseIndex(content, size);
+    if (!parsed || !(await this._isLastRecord(data, parsed.last))) {
+      logger(`Ignoring outdated index for ecosystem '${ecosystem}'`);
+      return null;
+    }
+    return parsed.index;
+  }
+
+  /**
+   * Checks that the database holds the last record the index was built with.
+   */
+  private async _isLastRecord(
+    data: EcosystemData,
+    last: IndexCheck | undefined
+  ): Promise<boolean> {
+    if (!last) {
+      return true;
+    }
+    const record = await this._readRecord(data, last).catch(() => null);
+    return record?._id === last.id;
+  }
+
+  private async _readRecord(
+    data: EcosystemData,
+    { offset, length }: { offset: number; length: number }
+  ): Promise<DatabaseRecord> {
+    const buffer = Buffer.allocUnsafe(length);
+    const { bytesRead } = await readAsync(data.fd, buffer, 0, length, offset);
+    return JSON.parse(buffer.toString('utf8', 0, bytesRead)) as DatabaseRecord;
+  }
+
   private async _buildIndex(
     ac: AbortController,
     data: EcosystemData
@@ -127,40 +180,21 @@ export class OsvOfflineDb {
       crlfDelay: Infinity,
     });
 
-    let currentOffset = 0;
-    const affectedPackageNames = new Set<string>();
-
+    const builder = new DatabaseIndexBuilder();
     for await (const line of rl) {
       if (ac.signal.aborted) {
         fileStream.destroy();
         return;
       }
-      const lineByteLength = Buffer.byteLength(line, 'utf8');
-
+      let record: DatabaseRecord | undefined;
       try {
-        const record = JSON.parse(line) as Vulnerability;
-        if (record.affected) {
-          for (const affected of record.affected) {
-            const packageName = affected.package?.name;
-
-            if (packageName && !affectedPackageNames.has(packageName)) {
-              affectedPackageNames.add(packageName);
-
-              let pointers = data.index.get(packageName);
-              if (!pointers) {
-                pointers = [];
-                data.index.set(packageName, pointers);
-              }
-              pointers.push({ offset: currentOffset, length: lineByteLength });
-            }
-          }
-          affectedPackageNames.clear();
-        }
+        record = JSON.parse(line) as DatabaseRecord;
       } catch {
         // Skip malformed lines
       }
-      currentOffset += lineByteLength + 1;
+      builder.add(line, record);
     }
+    data.index = builder.index;
   }
 
   public static create(): OsvOfflineDb {
@@ -187,20 +221,8 @@ export class OsvOfflineDb {
       return [];
     }
 
-    const advisories = await Promise.all(
-      pointers.map(async ({ offset, length }) => {
-        const buffer = Buffer.allocUnsafe(length);
-        const { bytesRead } = await readAsync(
-          data.fd,
-          buffer,
-          0,
-          length,
-          offset
-        );
-        return JSON.parse(
-          buffer.toString('utf8', 0, bytesRead)
-        ) as Vulnerability;
-      })
+    const advisories: Vulnerability[] = await Promise.all(
+      pointers.map((pointer) => this._readRecord(data, pointer))
     );
 
     if (this.disposed) return [];
