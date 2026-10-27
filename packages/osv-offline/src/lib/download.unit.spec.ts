@@ -21,6 +21,7 @@ describe('packages/osv-offline/src/lib/download.unit', () => {
     beforeEach(async () => {
       delete process.env.OSV_OFFLINE_DISABLE_DOWNLOAD;
       delete process.env.OSV_OFFLINE_DATABASE_URL;
+      delete process.env.OSV_OFFLINE_MAX_AGE;
       const zipFilePath = path.join(
         OsvOfflineDb.rootDirectory,
         'osv-offline.zip'
@@ -33,6 +34,60 @@ describe('packages/osv-offline/src/lib/download.unit', () => {
       await fs.rm(path.join(OsvOfflineDb.rootDirectory, 'npm.nedb'), {
         force: true,
       });
+    });
+
+    async function writeZip(ageHours: number): Promise<void> {
+      const zipFilePath = path.join(
+        OsvOfflineDb.rootDirectory,
+        'osv-offline.zip'
+      );
+      await fs.ensureDir(OsvOfflineDb.rootDirectory);
+      await fs.writeFile(zipFilePath, Buffer.from([]));
+      const mtime = new Date(Date.now() - ageHours * 60 * 60 * 1000);
+      await fs.utimes(zipFilePath, mtime, mtime);
+    }
+
+    it('skips the download while younger than OSV_OFFLINE_MAX_AGE', async () => {
+      process.env.OSV_OFFLINE_MAX_AGE = '4h';
+      await writeZip(3);
+
+      const result = await tryDownloadDb();
+
+      expect(result.success).toBe(true);
+      expect(mockStream).not.toHaveBeenCalled();
+    });
+
+    it('downloads when older than OSV_OFFLINE_MAX_AGE', async () => {
+      process.env.OSV_OFFLINE_MAX_AGE = '4h';
+      await writeZip(5);
+      mockStream.mockImplementationOnce(() => {
+        throw new Error('intentional stream error');
+      });
+
+      await tryDownloadDb();
+
+      expect(mockStream).toHaveBeenCalledOnce();
+    });
+
+    it('uses one day for an invalid OSV_OFFLINE_MAX_AGE', async () => {
+      process.env.OSV_OFFLINE_MAX_AGE = 'invalid';
+      await writeZip(23);
+
+      const result = await tryDownloadDb();
+
+      expect(result.success).toBe(true);
+      expect(mockStream).not.toHaveBeenCalled();
+    });
+
+    it('downloads after one day by default', async () => {
+      await writeZip(25);
+      mockStream.mockImplementationOnce(() => {
+        throw new Error('intentional stream error');
+      });
+
+      await tryDownloadDb();
+
+      expect(mockStream).toHaveBeenCalledOnce();
     });
 
     it('replaces existing databases', async () => {
