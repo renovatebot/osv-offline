@@ -39,6 +39,7 @@ jobs:
         node-version:
           - 22
           - 24
+          - 26
 
     permissions:
       id-token: write # required for codecov OIDC
