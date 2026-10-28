@@ -1,8 +1,9 @@
 import { format } from 'util';
 
-import AdmZip from 'adm-zip';
+import { createWriteStream } from 'node:fs';
+import { pipeline } from 'node:stream/promises';
 import got from 'got';
-import type { Ecosystem, Osv } from '@renovatebot/osv-offline-db';
+import type { Ecosystem } from '@renovatebot/osv-offline-db';
 
 export class OsvDownloader {
   private static readonly downloadUrlFormat =
@@ -10,13 +11,11 @@ export class OsvDownloader {
 
   constructor(private readonly ecosystem: Ecosystem) {}
 
-  public async download(): Promise<Osv.Vulnerability[]> {
+  /**
+   * Downloads the `all.zip` of the ecosystem to `target`, without buffering it in memory.
+   */
+  public async download(target: string): Promise<void> {
     const downloadUrl = format(OsvDownloader.downloadUrlFormat, this.ecosystem);
-    const response = await got.get(downloadUrl, { responseType: 'buffer' });
-    return new AdmZip(Buffer.from(response.body))
-      .getEntries()
-      .map(
-        (entry) => JSON.parse(entry.getData().toString()) as Osv.Vulnerability
-      );
+    await pipeline(got.stream(downloadUrl), createWriteStream(target));
   }
 }
