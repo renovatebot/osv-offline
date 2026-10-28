@@ -3,9 +3,14 @@ import fs from 'fs-extra';
 import { createHash } from 'node:crypto';
 import os from 'node:os';
 import path from 'node:path';
-import { zstdDecompressSync } from 'node:zlib';
+import { zstdCompressSync, zstdDecompressSync } from 'node:zlib';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { compressFile, writeSplitFiles, writeSplitIndex } from './split.ts';
+import {
+  compressFile,
+  verifyCompressedFile,
+  writeSplitFiles,
+  writeSplitIndex,
+} from './split.ts';
 
 describe('packages/osv-offline-updater/src/lib/split.unit', () => {
   let directory: string;
@@ -36,6 +41,46 @@ describe('packages/osv-offline-updater/src/lib/split.unit', () => {
         uncompressedSize: Buffer.byteLength(content),
       });
     });
+
+    it('compresses an empty file', async () => {
+      const source = path.join(directory, 'pub.nedb');
+      await fs.writeFile(source, '');
+      const target = path.join(directory, 'pub-20261027120513.nedb.zst');
+
+      const file = await compressFile(source, target);
+
+      expect(zstdDecompressSync(await fs.readFile(target)).length).toBe(0);
+      expect(file.uncompressedSize).toBe(0);
+    });
+  });
+
+  describe('verifyCompressedFile', () => {
+    const content = Buffer.from('{"id":"GHSA-1"}\n');
+    const sha256 = createHash('sha256').update(content).digest('hex');
+    let file: string;
+
+    beforeEach(async () => {
+      file = path.join(directory, 'npm.nedb.zst');
+      await fs.writeFile(file, zstdCompressSync(content));
+    });
+
+    it('accepts a file which decompresses to the expected content', async () => {
+      await expect(
+        verifyCompressedFile(file, sha256, content.length)
+      ).resolves.toBeUndefined();
+    });
+
+    it.each([
+      ['checksum', '0'.repeat(64), content.length],
+      ['size', sha256, content.length + 1],
+    ] as const)(
+      'rejects a file with another %s',
+      async (_, expectedSha256, expectedSize) => {
+        await expect(
+          verifyCompressedFile(file, expectedSha256, expectedSize)
+        ).rejects.toThrow("npm.nedb.zst doesn't decompress to its source");
+      }
+    );
   });
 
   describe('writeSplitFiles', () => {

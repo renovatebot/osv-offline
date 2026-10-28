@@ -9,6 +9,8 @@ packages:
 allowBuilds:
   esbuild: false
   unrs-resolver: false
+  # downloads its prebuilt native binding
+  zstd-napi: true
 
 # in line with https://github.com/renovatebot/.github/blob/main/default.json,
 # all non-Renovate or non-Containerbase packages should only be installed after
