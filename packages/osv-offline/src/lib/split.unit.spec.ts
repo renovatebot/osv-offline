@@ -328,6 +328,7 @@ describe('packages/osv-offline/src/lib/split.unit', () => {
     const downloader = new SplitDownloader();
 
     void downloader.ensure('npm');
+    await vi.waitFor(() => expect(gotMock).toHaveBeenCalledOnce());
     vi.setSystemTime(Date.now() + 60 * 60 * 1000);
     await downloader.ensure('npm');
 
