@@ -21,6 +21,23 @@ With `OSV_OFFLINE_DATABASE_FORMAT=split`, the databases are downloaded from `htt
 
 To mirror the split format, copy `index.json` without its `baseUrl` and the files it lists into one directory, and set `OSV_OFFLINE_DATABASE_INDEX_URL` to the mirrored `index.json`. Files are resolved relative to the index then.
 
+### Without internet access
+
+These variables also apply to Renovate's `osvVulnerabilityAlerts`, which uses this package.
+
+To use an internal mirror, copy `osv-offline.zip` from the [latest release](https://github.com/renovatebot/osv-offline/releases/latest) to it and set `OSV_OFFLINE_DATABASE_URL` to the copy. The databases are downloaded from there again after `OSV_OFFLINE_MAX_AGE`.
+
+Without any downloads, extract the databases yourself and disable the download:
+
+```sh
+export OSV_OFFLINE_ROOT_DIR=/var/lib/osv-offline
+export OSV_OFFLINE_DISABLE_DOWNLOAD=true
+unzip -o osv-offline.zip -d "$OSV_OFFLINE_ROOT_DIR"
+```
+
+- `OSV_OFFLINE_ROOT_DIR` needs one `<ecosystem>.nedb` per ecosystem, e.g. `npm.nedb`; the `<ecosystem>.idx.json` next to it is optional and makes opening the database faster
+- to update while Renovate runs, extract a newer zip into a temporary directory on the same file system and move the files into `OSV_OFFLINE_ROOT_DIR`, the `.idx.json` files before the `.nedb` files, so no database is read while it's written
+
 ## License
 
 This package is licensed under [the MIT license](https://opensource.org/licenses/MIT).
