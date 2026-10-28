@@ -23,6 +23,9 @@ const logger = debug('osv-offline:split');
 const defaultIndexUrl =
   'https://renovatebot.github.io/osv-offline/v2/index.json';
 
+/** how long to wait before retrying a failed update, so an unreachable host isn't requested on every query */
+const retryDelay = 5 * 60 * 1000;
+
 /** the checksums of the files of an ecosystem which were downloaded last */
 type SplitState = Record<keyof SplitEcosystem, string>;
 
@@ -80,33 +83,42 @@ export class SplitDownloader {
     { value: SplitIndex; fetched: number; lastModified?: string } | undefined;
   private readonly checked = new Map<
     Ecosystem,
-    { promise: Promise<void>; started: number }
+    { promise: Promise<void>; expires: number }
   >();
 
   /**
    * Makes sure the files of `ecosystem` are up-to-date. Failures are logged and existing files are kept; without an
-   * existing database, failures are thrown. A failed update is retried on the next call.
+   * existing database, failures are thrown. A failed update is retried after a short delay.
    */
   ensure(ecosystem: Ecosystem): Promise<void> {
     if (process.env.OSV_OFFLINE_DISABLE_DOWNLOAD?.toLowerCase() === 'true') {
       return Promise.resolve();
     }
     const checked = this.checked.get(ecosystem);
-    if (checked && Date.now() - checked.started < this.maxAge) {
+    if (checked && Date.now() < checked.expires) {
       return checked.promise;
     }
-    const promise = this.update(ecosystem).catch(async (err: unknown) => {
-      this.checked.delete(ecosystem);
-      if (!(await this.hasDatabase(ecosystem))) {
-        throw err;
+    // concurrent calls share the update until it's done
+    const entry = { promise: Promise.resolve(), expires: Infinity };
+    entry.promise = (async () => {
+      try {
+        entry.expires = (await this.update(ecosystem)) + this.maxAge;
+      } catch (err) {
+        entry.expires = Date.now() + Math.min(retryDelay, this.maxAge);
+        if (!(await this.hasDatabase(ecosystem))) {
+          throw err;
+        }
+        logger(`Updating ecosystem '${ecosystem}' failed: ${String(err)}`);
       }
-      logger(`Updating ecosystem '${ecosystem}' failed: ${String(err)}`);
-    });
-    this.checked.set(ecosystem, { promise, started: Date.now() });
-    return promise;
+    })();
+    this.checked.set(ecosystem, entry);
+    return entry.promise;
   }
 
-  private async update(ecosystem: Ecosystem): Promise<void> {
+  /**
+   * Updates the files of `ecosystem` when needed, and returns when they were last checked against the index.
+   */
+  private async update(ecosystem: Ecosystem): Promise<number> {
     const statePath = this.getStatePath(ecosystem);
     const stateStat = await fs.stat(statePath).catch(() => null);
     if (
@@ -115,7 +127,7 @@ export class SplitDownloader {
       (await this.hasDatabase(ecosystem))
     ) {
       logger(`Ecosystem '${ecosystem}' is up-to-date.`);
-      return;
+      return stateStat.mtimeMs;
     }
 
     try {
@@ -128,6 +140,7 @@ export class SplitDownloader {
       logger(`File of ecosystem '${ecosystem}' not found, retrying ...`);
       await this.updateFromIndex(ecosystem, true);
     }
+    return Date.now();
   }
 
   private async updateFromIndex(

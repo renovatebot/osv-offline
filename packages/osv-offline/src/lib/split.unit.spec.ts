@@ -95,6 +95,7 @@ describe('packages/osv-offline/src/lib/split.unit', () => {
   });
 
   afterEach(async () => {
+    vi.useRealTimers();
     await fs.remove(rootDir);
   });
 
@@ -280,7 +281,8 @@ describe('packages/osv-offline/src/lib/split.unit', () => {
     expect(gotMock.stream).not.toHaveBeenCalled();
   });
 
-  it('fails without existing files and retries on the next call', async () => {
+  it('fails without existing files and retries after a delay', async () => {
+    vi.useFakeTimers({ toFake: ['Date'], now: Date.now() });
     gotMock
       .mockRejectedValueOnce(new Error('offline'))
       .mockResolvedValue(indexResponse(splitIndex()));
@@ -288,11 +290,52 @@ describe('packages/osv-offline/src/lib/split.unit', () => {
     const downloader = new SplitDownloader();
 
     await expect(downloader.ensure('npm')).rejects.toThrow('offline');
+    await expect(downloader.ensure('npm')).rejects.toThrow('offline');
+    expect(gotMock).toHaveBeenCalledOnce();
+
+    vi.setSystemTime(Date.now() + 5 * 60 * 1000);
     await downloader.ensure('npm');
 
+    expect(gotMock).toHaveBeenCalledTimes(2);
     await expect(
       fs.readFile(path.join(rootDir, 'npm.nedb'), 'utf8')
     ).resolves.toBe(database);
+  });
+
+  it('keeps the existing database and retries after a delay', async () => {
+    vi.useFakeTimers({ toFake: ['Date'], now: Date.now() });
+    await writeExistingFiles(['npm.nedb']);
+    gotMock.mockRejectedValue(new Error('offline'));
+    const downloader = new SplitDownloader();
+
+    await downloader.ensure('npm');
+    await downloader.ensure('npm');
+    expect(gotMock).toHaveBeenCalledOnce();
+
+    vi.setSystemTime(Date.now() + 5 * 60 * 1000);
+    await downloader.ensure('npm');
+
+    expect(gotMock).toHaveBeenCalledTimes(2);
+  });
+
+  it('checks again once the recorded files reach the maximum age', async () => {
+    vi.useFakeTimers({ toFake: ['Date'], now: Date.now() });
+    process.env.OSV_OFFLINE_MAX_AGE = '1h';
+    await writeExistingFiles();
+    await fs.writeJson(statePath, { database: db.sha256, index: idx.sha256 });
+    const recorded = new Date(Date.now() - 50 * 60 * 1000);
+    await fs.utimes(statePath, recorded, recorded);
+    gotMock.mockResolvedValue(indexResponse(splitIndex()));
+    const downloader = new SplitDownloader();
+
+    await downloader.ensure('npm');
+    expect(gotMock).not.toHaveBeenCalled();
+
+    // the files are now older than an hour, although the first check was less than an hour ago
+    vi.setSystemTime(Date.now() + 11 * 60 * 1000);
+    await downloader.ensure('npm');
+
+    expect(gotMock).toHaveBeenCalledOnce();
   });
 
   it('fetches the index once for several ecosystems', async () => {
