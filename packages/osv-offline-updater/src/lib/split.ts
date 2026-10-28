@@ -1,10 +1,12 @@
 import fs from 'fs-extra';
 import { createHash } from 'node:crypto';
 import { createReadStream, createWriteStream } from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
-import { Transform, type TransformCallback } from 'node:stream';
+import { Transform, type TransformCallback, Writable } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
-import { constants, createZstdCompress } from 'node:zlib';
+import { createZstdDecompress } from 'node:zlib';
+import { CompressStream } from 'zstd-napi';
 import {
   type Ecosystem,
   type SplitEcosystem,
@@ -16,12 +18,14 @@ import {
 
 /**
  * zstd level 19 with long-distance matching. A window of 2^27 bytes is the largest decoders accept without extra options.
+ * Uses all cores, as `node:zlib` can't compress with several threads.
  */
-const zstdParams = {
-  [constants.ZSTD_c_compressionLevel]: 19,
-  [constants.ZSTD_c_checksumFlag]: 1,
-  [constants.ZSTD_c_enableLongDistanceMatching]: 1,
-  [constants.ZSTD_c_windowLog]: 27,
+const zstdParameters = {
+  compressionLevel: 19,
+  checksumFlag: true,
+  enableLongDistanceMatching: true,
+  windowLog: 27,
+  nbWorkers: os.availableParallelism(),
 };
 
 /**
@@ -47,26 +51,49 @@ class Digest extends Transform {
 }
 
 /**
- * Compresses `source` with zstd into `target`.
+ * Compresses `source` with zstd into `target`, and checks that `node:zlib` decompresses it to the source again.
  */
 export async function compressFile(
   source: string,
   target: string
 ): Promise<SplitFile> {
-  const { size: uncompressedSize } = await fs.stat(source);
+  const sourceDigest = new Digest();
   const digest = new Digest();
   await pipeline(
     createReadStream(source),
-    createZstdCompress({ params: zstdParams }),
+    sourceDigest,
+    new CompressStream(zstdParameters),
     digest,
     createWriteStream(target)
   );
+  const uncompressedSha256 = sourceDigest.digest();
+  await verifyCompressedFile(target, uncompressedSha256, sourceDigest.size);
   return {
     file: path.basename(target),
     sha256: digest.digest(),
     size: digest.size,
-    uncompressedSize,
+    uncompressedSize: sourceDigest.size,
   };
+}
+
+/**
+ * Decompresses `file` with `node:zlib`, which clients use, and fails when it doesn't match the expected content.
+ */
+export async function verifyCompressedFile(
+  file: string,
+  sha256: string,
+  size: number
+): Promise<void> {
+  const digest = new Digest();
+  await pipeline(
+    createReadStream(file),
+    createZstdDecompress(),
+    digest,
+    new Writable({ write: (_chunk, _encoding, callback) => callback() })
+  );
+  if (digest.digest() !== sha256 || digest.size !== size) {
+    throw new Error(`${path.basename(file)} doesn't decompress to its source`);
+  }
 }
 
 /**

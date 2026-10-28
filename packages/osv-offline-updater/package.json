@@ -20,7 +20,8 @@
     "got": "15.1.0",
     "luxon": "3.7.2",
     "signale": "1.4.0",
-    "yauzl": "3.4.0"
+    "yauzl": "3.4.0",
+    "zstd-napi": "0.0.13"
   },
   "devDependencies": {
     "@tsconfig/strictest": "2.0.8",
