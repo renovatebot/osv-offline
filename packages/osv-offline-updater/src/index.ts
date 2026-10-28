@@ -60,7 +60,7 @@ const splitBaseUrl =
     );
   }
 
-  await writeSplitIndex(
+  const splitIndex = await writeSplitIndex(
     path.join(pagesDir, 'v2', 'index.json'),
     splitEcosystems,
     generated,
@@ -73,6 +73,8 @@ const splitBaseUrl =
     signale.info('Uploading databases');
     const gh = new GitHub();
     await gh.uploadDatabase(zipFile);
+    // the workflow deploys the index to GitHub Pages afterwards, once the files it lists are uploaded
+    await gh.uploadSplitFiles(splitDir, splitIndex);
   } else {
     signale.warn('Skipping upload of databases');
   }

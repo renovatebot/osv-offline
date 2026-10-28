@@ -1,4 +1,7 @@
 import { Octokit } from '@octokit/rest';
+import { type SplitIndex, parseSplitIndex } from '@renovatebot/osv-offline-db';
+import fs from 'fs-extra';
+import path from 'node:path';
 import signale from 'signale';
 import { DateTime } from 'luxon';
 
@@ -7,6 +10,19 @@ const databaseTagPrefix = '1-';
 
 /** how many database releases to keep, including the new one, as a fallback for a broken database */
 const keptDatabaseReleases = 2;
+
+/** tag of the release which holds the files of the split format */
+const splitReleaseTag = 'database';
+
+/** how long older files of the split format are kept: a day for proxies caching the index, plus one run */
+const splitRetention = { hours: 28 };
+
+/** e.g. `npm-20261027120513.nedb.zst`: the file without version (`npm`, `nedb`) and its version */
+const splitFileRegex = /^(?<name>.+)-(?<version>\d{14})\.(?<kind>.+)\.zst$/;
+
+/** the index of the split format currently deployed to GitHub Pages */
+const publishedSplitIndexUrl =
+  'https://renovatebot.github.io/osv-offline/v2/index.json';
 
 export class GitHub {
   private readonly octokit: Octokit;
@@ -33,6 +49,110 @@ export class GitHub {
     await this.publishRelease(release.data.id);
     signale.info(`Published release ${release.data.id}`);
     await this.deleteOldReleases();
+  }
+
+  /**
+   * Uploads the files of the split format listed in `index` from `directory` to the `database` release, then deletes
+   * files older than the retention, except the newest version of each file and the files listed by the published index.
+   */
+  async uploadSplitFiles(directory: string, index: SplitIndex) {
+    const release = await this.getSplitRelease();
+    const existing = new Set(
+      (await this.listReleaseAssets(release.id)).map(({ name }) => name)
+    );
+    for (const file of getSplitFiles(index).filter(
+      (file) => !existing.has(file)
+    )) {
+      const data = await fs.readFile(path.join(directory, file));
+      await this.octokit.repos.uploadReleaseAsset({
+        ...this.baseParameters,
+        release_id: release.id,
+        data: data as unknown as string,
+        headers: {
+          'content-type': 'application/zstd',
+          'content-length': data.length,
+        },
+        name: file,
+      });
+      signale.info(`Uploaded ${file}`);
+    }
+    // when a deployment of GitHub Pages failed, the published index still lists older files
+    const published = await getPublishedSplitIndex();
+    if (!published) {
+      signale.warn('Skipping deletion of old split files');
+      return;
+    }
+    await this.deleteOldSplitFiles(
+      release.id,
+      new Set(getSplitFiles(published))
+    );
+  }
+
+  /**
+   * Returns the release of the split format, creating it when missing. It's never the latest release, which clients of
+   * the zip format download from.
+   */
+  private async getSplitRelease() {
+    try {
+      const { data } = await this.octokit.repos.getReleaseByTag({
+        ...this.baseParameters,
+        tag: splitReleaseTag,
+      });
+      return data;
+    } catch (err) {
+      if ((err as { status?: number }).status !== 404) {
+        throw err;
+      }
+      const { data } = await this.octokit.repos.createRelease({
+        ...this.baseParameters,
+        tag_name: splitReleaseTag,
+        name: 'Database',
+        body: 'Databases in the split format, listed by https://renovatebot.github.io/osv-offline/v2/index.json',
+        make_latest: 'false',
+      });
+      signale.info(`Created release ${splitReleaseTag}`);
+      return data;
+    }
+  }
+
+  private async listReleaseAssets(releaseId: number) {
+    return await this.octokit.paginate(this.octokit.repos.listReleaseAssets, {
+      ...this.baseParameters,
+      release_id: releaseId,
+      per_page: 100,
+    });
+  }
+
+  private async deleteOldSplitFiles(releaseId: number, kept: Set<string>) {
+    const cutoff = DateTime.utc().minus(splitRetention);
+    const versions = (await this.listReleaseAssets(releaseId))
+      .map((asset) => ({ asset, match: splitFileRegex.exec(asset.name) }))
+      .filter(({ match }) => match?.groups)
+      .map(({ asset, match }) => ({
+        asset,
+        file: `${match!.groups!.name}.${match!.groups!.kind}`,
+        version: match!.groups!.version,
+      }))
+      .sort((a, b) => b.version.localeCompare(a.version));
+    const newest = new Map<string, string>();
+    for (const { file, version } of versions) {
+      if (!newest.has(file)) {
+        newest.set(file, version);
+      }
+    }
+    const old = versions.filter(
+      ({ asset, file, version }) =>
+        newest.get(file) !== version &&
+        !kept.has(asset.name) &&
+        DateTime.fromFormat(version, 'yyyyMMddHHmmss', { zone: 'utc' }) < cutoff
+    );
+    for (const { asset } of old) {
+      await this.octokit.repos.deleteReleaseAsset({
+        ...this.baseParameters,
+        asset_id: asset.id,
+      });
+      signale.info(`Deleted ${asset.name}`);
+    }
   }
 
   /**
@@ -113,5 +233,30 @@ export class GitHub {
       },
       name: 'osv-offline.zip',
     });
+  }
+}
+
+function getSplitFiles(index: SplitIndex): string[] {
+  return Object.values(index.ecosystems).flatMap(({ database, index }) => [
+    database.file,
+    index.file,
+  ]);
+}
+
+/**
+ * Returns the index deployed to GitHub Pages, or `null` when it can't be fetched.
+ */
+async function getPublishedSplitIndex(): Promise<SplitIndex | null> {
+  try {
+    const response = await fetch(publishedSplitIndexUrl, {
+      headers: { 'cache-control': 'no-cache' },
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+    return parseSplitIndex(await response.text());
+  } catch (err) {
+    signale.warn(`Failed to fetch ${publishedSplitIndexUrl}: ${String(err)}`);
+    return null;
   }
 }
