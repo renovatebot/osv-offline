@@ -1,11 +1,22 @@
 import { Ecosystem, Osv, OsvOfflineDb } from '@renovatebot/osv-offline-db';
 import { tryDownloadDb } from './download.ts';
+import { SplitDownloader } from './split.ts';
 import debug from 'debug';
 
 const logger = debug('osv-offline:download');
 
+/**
+ * Whether the databases are downloaded in the split format, one ecosystem at a time, instead of as one zip.
+ */
+function useSplitFormat(): boolean {
+  return process.env.OSV_OFFLINE_DATABASE_FORMAT?.toLowerCase() === 'split';
+}
+
 export class OsvOffline {
   private osvOfflineDb: OsvOfflineDb;
+  private readonly splitDownloader = useSplitFormat()
+    ? new SplitDownloader()
+    : undefined;
 
   protected constructor() {
     logger('Initializing databases ...');
@@ -17,6 +28,10 @@ export class OsvOffline {
    * Asynchronous code required as part of class instantiation
    */
   private static async initialize(): Promise<void> {
+    // the split format downloads each ecosystem on its first query
+    if (useSplitFormat()) {
+      return;
+    }
     const result = await tryDownloadDb();
     if (!result.success) {
       throw result.error;
@@ -43,6 +58,7 @@ export class OsvOffline {
     ecosystem: Ecosystem,
     packageName: string
   ): Promise<Osv.Vulnerability[]> {
+    await this.splitDownloader?.ensure(ecosystem);
     return this.osvOfflineDb.query(ecosystem, packageName);
   }
 
