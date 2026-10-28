@@ -6,8 +6,7 @@
       "request": "launch",
       "name": "Run updater",
       "preLaunchTask": "build",
-      "runtimeExecutable": "tsx",
-      "args": ["${workspaceFolder}/packages/osv-offline-updater/src/index.ts"],
+      "program": "${workspaceFolder}/packages/osv-offline-updater/src/index.ts",
       "console": "integratedTerminal",
       "envFile": "${workspaceFolder}/.env"
     },

@@ -14,7 +14,7 @@
     "prepare": "husky",
     "prettier": "prettier --cache -c -u \"**/*.*\"",
     "prettier-fix": "prettier --cache -w -u \"**/*.*\"",
-    "start": "tsx ./packages/osv-offline-updater/src/index.ts",
+    "start": "node ./packages/osv-offline-updater/src/index.ts",
     "test": "run-s eslint test:unit test:integration",
     "test:unit": "vitest run unit.spec.ts --coverage.reportsDirectory=coverage/unit --outputFile.junit=.coverage/unit.junit.xml",
     "test:integration": "vitest run int.spec.ts --maxWorkers=1 --coverage.reportsDirectory=coverage/integration --outputFile.junit=.coverage/integration.junit.xml"
@@ -40,8 +40,6 @@
     "npm-run-all2": "8.0.4",
     "prettier": "3.9.10",
     "semantic-release": "25.0.9",
-    "ts-node": "10.9.2",
-    "tsx": "4.23.15",
     "typescript": "6.0.3",
     "typescript-eslint": "8.72.0",
     "vitest": "4.1.12"

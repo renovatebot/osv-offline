@@ -2,7 +2,10 @@
   "extends": "../../tsconfig.packages.json",
   "compilerOptions": {
     "rootDir": "src",
-    "outDir": "dist"
+    "outDir": "dist",
+    // only syntax which node can strip, as it runs the updater directly
+    "erasableSyntaxOnly": true,
+    "verbatimModuleSyntax": true
   },
   "references": [
     {

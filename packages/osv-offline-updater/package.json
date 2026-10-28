@@ -4,13 +4,13 @@
   "main": "src/index.ts",
   "license": "MIT",
   "private": true,
-  "type": "commonjs",
+  "type": "module",
   "repository": {
     "type": "git",
     "url": "https://github.com/renovatebot/osv-offline.git"
   },
   "scripts": {
-    "start": "tsx ./src/index.ts"
+    "start": "node ./src/index.ts"
   },
   "dependencies": {
     "@octokit/rest": "22.0.1",

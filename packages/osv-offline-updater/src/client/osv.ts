@@ -9,7 +9,11 @@ export class OsvDownloader {
   private static readonly downloadUrlFormat =
     'https://osv-vulnerabilities.storage.googleapis.com/%s/all.zip';
 
-  constructor(private readonly ecosystem: Ecosystem) {}
+  private readonly ecosystem: Ecosystem;
+
+  constructor(ecosystem: Ecosystem) {
+    this.ecosystem = ecosystem;
+  }
 
   /**
    * Downloads the `all.zip` of the ecosystem to `target`, without buffering it in memory.
