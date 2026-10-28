@@ -2,6 +2,7 @@ import type { Osv } from '@renovatebot/osv-offline-db';
 import fs from 'fs-extra';
 import os from 'node:os';
 import path from 'node:path';
+import { Readable } from 'node:stream';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { writeDatabase } from './database.ts';
 
@@ -110,6 +111,27 @@ describe('packages/osv-offline-updater/src/lib/database.unit', () => {
       ) as IndexFile;
       expect(lines).toHaveLength(2000);
       expect(index.packages.foo).toHaveLength(2000);
+    });
+
+    it('writes the records of an async iterable as they are read', async () => {
+      const [databasePath, indexPath] = await writeDatabase(
+        directory,
+        'npm',
+        Readable.from([
+          vulnerability('VULN-1', 'foo'),
+          vulnerability('VULN-2', 'bar'),
+        ])
+      );
+
+      const lines = (await fs.readFile(databasePath, 'utf8'))
+        .split('\n')
+        .filter(Boolean)
+        .map((line) => JSON.parse(line) as Osv.Vulnerability);
+      const index = JSON.parse(
+        await fs.readFile(indexPath, 'utf8')
+      ) as IndexFile;
+      expect(lines.map(({ id }) => id)).toEqual(['VULN-1', 'VULN-2']);
+      expect(Object.keys(index.packages)).toEqual(['foo', 'bar']);
     });
 
     it('replaces existing files', async () => {

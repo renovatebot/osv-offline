@@ -11,6 +11,7 @@ import signale from 'signale';
 import { OsvDownloader } from './client/osv.ts';
 import AdmZip from 'adm-zip';
 import { writeDatabase } from './lib/database.ts';
+import { readVulnerabilities } from './lib/osv-zip.ts';
 import { writeSplitFiles, writeSplitIndex } from './lib/split.ts';
 
 /** where the files of the split format are downloaded from */
@@ -36,19 +37,19 @@ const splitBaseUrl =
   const zip = new AdmZip();
   const splitEcosystems: SplitIndex['ecosystems'] = {};
 
+  const osvZip = path.join(OsvOfflineDb.rootDirectory, 'osv-all.zip');
+
   for (const ecosystem of ecosystems) {
     signale.info(`Processing ecosystem ${ecosystem}`);
-    const osv = new OsvDownloader(ecosystem);
-    const vulnerabilities = await osv.download();
-    signale.info(
-      `Downloaded ${vulnerabilities.length} vulnerabilities for ecosystem ${ecosystem}`
-    );
+    await new OsvDownloader(ecosystem).download(osvZip);
+    signale.info(`Downloaded vulnerabilities for ecosystem ${ecosystem}`);
 
     const files = await writeDatabase(
       OsvOfflineDb.rootDirectory,
       ecosystem,
-      vulnerabilities
+      readVulnerabilities(osvZip)
     );
+    await fs.remove(osvZip);
     for (const file of files) {
       zip.addLocalFile(file);
     }

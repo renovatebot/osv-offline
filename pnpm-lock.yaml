@@ -182,6 +182,9 @@ importers:
       signale:
         specifier: 1.4.0
         version: 1.4.0
+      yauzl:
+        specifier: 3.4.0
+        version: 3.4.0
     devDependencies:
       '@tsconfig/strictest':
         specifier: 2.0.8
@@ -201,6 +204,9 @@ importers:
       '@types/signale':
         specifier: 1.4.7
         version: 1.4.7
+      '@types/yauzl':
+        specifier: 3.4.0
+        version: 3.4.0
 
 packages:
 
