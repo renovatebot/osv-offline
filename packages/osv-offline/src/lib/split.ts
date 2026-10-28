@@ -98,8 +98,11 @@ export class SplitDownloader {
     if (checked && Date.now() < checked.expires) {
       return checked.promise;
     }
-    // concurrent calls share the update until it's done
-    const entry = { promise: Promise.resolve(), expires: Infinity };
+    // concurrent calls share the update; one which never settles is replaced after the maximum age
+    const entry = {
+      promise: Promise.resolve(),
+      expires: Date.now() + this.maxAge,
+    };
     entry.promise = (async () => {
       try {
         entry.expires = (await this.update(ecosystem)) + this.maxAge;
@@ -121,9 +124,13 @@ export class SplitDownloader {
   private async update(ecosystem: Ecosystem): Promise<number> {
     const statePath = this.getStatePath(ecosystem);
     const stateStat = await fs.stat(statePath).catch(() => null);
+    const age = stateStat ? Date.now() - stateStat.mtimeMs : Infinity;
+    // an mtime in the future, e.g. from clock skew, counts as outdated, so it can't extend the maximum age; a second
+    // of tolerance, as file times are more precise than Date.now()
     if (
       stateStat &&
-      Date.now() - stateStat.mtimeMs < this.maxAge &&
+      age > -1000 &&
+      age < this.maxAge &&
       (await this.hasDatabase(ecosystem))
     ) {
       logger(`Ecosystem '${ecosystem}' is up-to-date.`);
@@ -131,27 +138,29 @@ export class SplitDownloader {
     }
 
     try {
-      await this.updateFromIndex(ecosystem, false);
+      return await this.updateFromIndex(ecosystem, false);
     } catch (err) {
       if (!isNotFound(err)) {
         throw err;
       }
       // the index may be outdated, e.g. served by a caching proxy
       logger(`File of ecosystem '${ecosystem}' not found, retrying ...`);
-      await this.updateFromIndex(ecosystem, true);
+      return await this.updateFromIndex(ecosystem, true);
     }
-    return Date.now();
   }
 
+  /**
+   * Downloads the files of `ecosystem` when they differ from the index, and returns when the index was fetched.
+   */
   private async updateFromIndex(
     ecosystem: Ecosystem,
     refresh: boolean
-  ): Promise<void> {
-    const index = await this.getIndex(refresh);
+  ): Promise<number> {
+    const { value: index, fetched } = await this.getIndex(refresh);
     const files = index.ecosystems[ecosystem];
     if (!files) {
       logger(`No files for ecosystem '${ecosystem}' in the index.`);
-      return;
+      return fetched;
     }
 
     const statePath = this.getStatePath(ecosystem);
@@ -164,9 +173,9 @@ export class SplitDownloader {
       (await this.hasDatabase(ecosystem))
     ) {
       logger(`Ecosystem '${ecosystem}' is unchanged.`);
-      const now = new Date();
-      await fs.utimes(statePath, now, now);
-      return;
+      // the files are as fresh as the index they were checked against
+      await fs.utimes(statePath, new Date(fetched), new Date(fetched));
+      return fetched;
     }
 
     logger(`Downloading ecosystem '${ecosystem}' ...`);
@@ -200,7 +209,9 @@ export class SplitDownloader {
         index: files.index.sha256,
       };
       await fs.writeJson(statePath, newState);
+      await fs.utimes(statePath, new Date(fetched), new Date(fetched));
       logger(`Downloading ecosystem '${ecosystem}' done.`);
+      return fetched;
     } finally {
       await fs.remove(tmpDir);
     }
@@ -209,13 +220,15 @@ export class SplitDownloader {
   /**
    * Returns the index, fetching it when it's missing, older than the maximum age, or `refresh` is set.
    */
-  private async getIndex(refresh: boolean): Promise<SplitIndex> {
+  private async getIndex(
+    refresh: boolean
+  ): Promise<{ value: SplitIndex; fetched: number }> {
     if (
       this.index &&
       !refresh &&
       Date.now() - this.index.fetched < this.maxAge
     ) {
-      return this.index.value;
+      return this.index;
     }
     const url = new URL(this.indexUrl);
     const headers: Record<string, string> = {};
@@ -229,7 +242,7 @@ export class SplitDownloader {
     const response = await got(url, { headers });
     if (response.statusCode === 304 && this.index) {
       this.index.fetched = Date.now();
-      return this.index.value;
+      return this.index;
     }
     const index = parseSplitIndex(response.body);
     if (!index) {
@@ -240,7 +253,7 @@ export class SplitDownloader {
       fetched: Date.now(),
       lastModified: response.headers['last-modified'],
     };
-    return index;
+    return this.index;
   }
 
   /**

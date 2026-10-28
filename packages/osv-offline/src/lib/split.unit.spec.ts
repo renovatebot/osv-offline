@@ -318,6 +318,55 @@ describe('packages/osv-offline/src/lib/split.unit', () => {
     expect(gotMock).toHaveBeenCalledTimes(2);
   });
 
+  it('replaces an update which never settles after the maximum age', async () => {
+    vi.useFakeTimers({ toFake: ['Date'], now: Date.now() });
+    process.env.OSV_OFFLINE_MAX_AGE = '1h';
+    gotMock
+      .mockReturnValueOnce(new Promise(() => undefined))
+      .mockResolvedValue(indexResponse(splitIndex()));
+    serveFiles();
+    const downloader = new SplitDownloader();
+
+    void downloader.ensure('npm');
+    vi.setSystemTime(Date.now() + 60 * 60 * 1000);
+    await downloader.ensure('npm');
+
+    expect(gotMock).toHaveBeenCalledTimes(2);
+  });
+
+  it('checks files recorded with a time in the future', async () => {
+    await writeExistingFiles();
+    await fs.writeJson(statePath, { database: db.sha256, index: idx.sha256 });
+    const future = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    await fs.utimes(statePath, future, future);
+    gotMock.mockResolvedValue(indexResponse(splitIndex()));
+
+    await new SplitDownloader().ensure('npm');
+
+    expect(gotMock).toHaveBeenCalledOnce();
+    expect((await fs.stat(statePath)).mtimeMs).toBeLessThan(future.getTime());
+  });
+
+  it('records the time of the index the files were checked against', async () => {
+    vi.useFakeTimers({ toFake: ['Date'], now: Date.now() });
+    process.env.OSV_OFFLINE_MAX_AGE = '1h';
+    gotMock.mockResolvedValue(indexResponse(splitIndex()));
+    serveFiles();
+    const downloader = new SplitDownloader();
+    const fetched = Date.now();
+
+    // fetches the index, which has no files for PyPI
+    await downloader.ensure('PyPI');
+    // npm is downloaded later, from the same index
+    vi.setSystemTime(fetched + 30 * 60 * 1000);
+    await downloader.ensure('npm');
+
+    expect(gotMock).toHaveBeenCalledOnce();
+    expect(Math.round((await fs.stat(statePath)).mtimeMs / 1000)).toBe(
+      Math.round(fetched / 1000)
+    );
+  });
+
   it('checks again once the recorded files reach the maximum age', async () => {
     vi.useFakeTimers({ toFake: ['Date'], now: Date.now() });
     process.env.OSV_OFFLINE_MAX_AGE = '1h';
