@@ -37,7 +37,7 @@ export OSV_OFFLINE_DISABLE_DOWNLOAD=true
 unzip -o osv-offline.zip -d "$OSV_OFFLINE_ROOT_DIR"
 ```
 
-- `OSV_OFFLINE_ROOT_DIR` needs one `<ecosystem>.nedb` per ecosystem, e.g. `npm.nedb`; the `<ecosystem>.idx.json` next to it is optional but recommended, as it makes opening the database much faster (npm: about 100 ms instead of 1 s)
+- `OSV_OFFLINE_ROOT_DIR` needs one `<ecosystem>.nedb` per ecosystem, e.g. `npm.nedb`; the `<ecosystem>.idx.json` next to it is optional but recommended, as it makes opening the database about four times faster
 - to update while Renovate runs, extract a newer zip into a temporary directory on the same file system and move the files into `OSV_OFFLINE_ROOT_DIR`, the `.idx.json` files before the `.nedb` files, so no database is read while it's written
 
 ## License
