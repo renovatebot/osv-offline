@@ -44,9 +44,11 @@ export async function* readVulnerabilities(
  */
 class Crc32Verifier extends Transform {
   private crc = 0;
+  private readonly entry: Entry;
 
-  constructor(private readonly entry: Entry) {
+  constructor(entry: Entry) {
     super();
+    this.entry = entry;
   }
 
   override _transform(
