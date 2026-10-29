@@ -5,7 +5,7 @@ import path from 'node:path';
 import signale from 'signale';
 import { DateTime } from 'luxon';
 
-/** prefix of the tags of database releases, e.g. `1-2021020819` */
+/** prefix of the tags of database releases, e.g. `1-20210208190513` */
 const databaseTagPrefix = '1-';
 
 /** how many database releases to keep at least, including the new one, as a fallback for a broken database */
@@ -26,10 +26,10 @@ const publishedSplitIndexUrl =
   'https://renovatebot.github.io/osv-offline/v2/index.json';
 
 /**
- * Returns the tag of the database release of a run, e.g. `1-2021020819`.
+ * Returns the tag of the database release of a run, e.g. `1-20210208190513`.
  */
 export function getDatabaseTag(date: Date): string {
-  return `${databaseTagPrefix}${DateTime.fromJSDate(date, { zone: 'utc' }).toFormat('yyyyMMddHH')}`;
+  return `${databaseTagPrefix}${DateTime.fromJSDate(date, { zone: 'utc' }).toFormat('yyyyMMddHHmmss')}`;
 }
 
 /**

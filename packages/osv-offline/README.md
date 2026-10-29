@@ -17,7 +17,7 @@
 
 ### Split format
 
-With `OSV_OFFLINE_DATABASE_FORMAT=split`, the databases are downloaded from the release of the latest database update (`https://github.com/renovatebot/osv-offline/releases/download/1-<yyyyMMddHH>/`), as listed by the index on `https://renovatebot.github.io/osv-offline/`. When outgoing traffic is restricted, allow `github.com`, `release-assets.githubusercontent.com` (where the downloads redirect to) and `renovatebot.github.io`.
+With `OSV_OFFLINE_DATABASE_FORMAT=split`, the databases are downloaded from the release of the latest database update (`https://github.com/renovatebot/osv-offline/releases/download/1-<yyyyMMddHHmmss>/`), as listed by the index on `https://renovatebot.github.io/osv-offline/`. When outgoing traffic is restricted, allow `github.com`, `release-assets.githubusercontent.com` (where the downloads redirect to) and `renovatebot.github.io`.
 
 To mirror the split format, copy `index.json` without its `baseUrl` and the files it lists into one directory, and set `OSV_OFFLINE_DATABASE_INDEX_URL` to the mirrored `index.json`. Files are resolved relative to the index then.
 
