@@ -6,17 +6,13 @@ import {
   ecosystems,
 } from '@renovatebot/osv-offline-db';
 import { DateTime } from 'luxon';
-import { GitHub } from './client/github.ts';
+import { GitHub, getDatabaseTag, getSplitBaseUrl } from './client/github.ts';
 import signale from 'signale';
 import { OsvDownloader } from './client/osv.ts';
 import AdmZip from 'adm-zip';
 import { writeDatabase } from './lib/database.ts';
 import { readVulnerabilities } from './lib/osv-zip.ts';
 import { writeSplitFiles, writeSplitIndex } from './lib/split.ts';
-
-/** where the files of the split format are downloaded from */
-const splitBaseUrl =
-  'https://github.com/renovatebot/osv-offline/releases/download/database/';
 
 // eslint-disable-next-line @typescript-eslint/no-floating-promises
 (async () => {
@@ -25,7 +21,9 @@ const splitBaseUrl =
   }
 
   const generated = new Date();
-  // e.g. 20261027120513: unique per run, as files with the same name aren't uploaded again
+  // the release of the run holds the zip and the files of the split format
+  const tag = getDatabaseTag(generated);
+  // e.g. 20261027120513: the version of the split files
   const version = DateTime.fromJSDate(generated, { zone: 'utc' }).toFormat(
     'yyyyMMddHHmmss'
   );
@@ -65,7 +63,7 @@ const splitBaseUrl =
     path.join(pagesDir, 'v2', 'index.json'),
     splitEcosystems,
     generated,
-    splitBaseUrl
+    getSplitBaseUrl(tag)
   );
 
   const zipFile = zip.toBuffer();
@@ -73,9 +71,8 @@ const splitBaseUrl =
   if (process.env.GITHUB_TOKEN) {
     signale.info('Uploading databases');
     const gh = new GitHub();
-    await gh.uploadDatabase(zipFile);
-    // the workflow deploys the index to GitHub Pages afterwards, once the files it lists are uploaded
-    await gh.uploadSplitFiles(splitDir, splitIndex);
+    // the workflow deploys the index to GitHub Pages afterwards, once the files it lists are published
+    await gh.uploadDatabase(tag, zipFile, splitDir, splitIndex);
   } else {
     signale.warn('Skipping upload of databases');
   }
