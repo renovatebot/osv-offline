@@ -73,15 +73,15 @@ function splitIndex(tag: string): SplitIndex {
 }
 
 describe('packages/osv-offline-updater/src/client/github.unit', () => {
-  it('names the database release of a run by its hour', () => {
+  it('names the database release of a run by its time to the second', () => {
     expect(getDatabaseTag(new Date('2026-10-27T12:34:56Z'))).toBe(
-      '1-2026102712'
+      '1-20261027123456'
     );
   });
 
   it('downloads the split files from the assets of a release', () => {
-    expect(getSplitBaseUrl('1-2026102712')).toBe(
-      'https://github.com/renovatebot/osv-offline/releases/download/1-2026102712/'
+    expect(getSplitBaseUrl('1-20261027123456')).toBe(
+      'https://github.com/renovatebot/osv-offline/releases/download/1-20261027123456/'
     );
   });
 
