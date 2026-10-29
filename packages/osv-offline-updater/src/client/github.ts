@@ -8,21 +8,36 @@ import { DateTime } from 'luxon';
 /** prefix of the tags of database releases, e.g. `1-2021020819` */
 const databaseTagPrefix = '1-';
 
-/** how many database releases to keep, including the new one, as a fallback for a broken database */
+/** how many database releases to keep at least, including the new one, as a fallback for a broken database */
 const keptDatabaseReleases = 2;
 
-/** tag of the release which holds the files of the split format */
-const splitReleaseTag = 'database';
+/** how long older database releases are kept: a day for proxies caching the index, plus one run */
+const databaseRetention = { hours: 28 };
 
-/** how long older files of the split format are kept: a day for proxies caching the index, plus one run */
-const splitRetention = { hours: 28 };
+/** tag of the release which held the files of the split format before they moved to the database releases */
+const legacySplitReleaseTag = 'database';
 
-/** e.g. `npm-20261027120513.nedb.zst`: the file without version (`npm`, `nedb`) and its version */
-const splitFileRegex = /^(?<name>.+)-(?<version>\d{14})\.(?<kind>.+)\.zst$/;
+/** where the assets of a release are downloaded from, followed by its tag */
+const releaseDownloadUrl =
+  'https://github.com/renovatebot/osv-offline/releases/download/';
 
 /** the index of the split format currently deployed to GitHub Pages */
 const publishedSplitIndexUrl =
   'https://renovatebot.github.io/osv-offline/v2/index.json';
+
+/**
+ * Returns the tag of the database release of a run, e.g. `1-2021020819`.
+ */
+export function getDatabaseTag(date: Date): string {
+  return `${databaseTagPrefix}${DateTime.fromJSDate(date, { zone: 'utc' }).toFormat('yyyyMMddHH')}`;
+}
+
+/**
+ * Returns the URL the files of the split format are downloaded from: the assets of the database release `tag`.
+ */
+export function getSplitBaseUrl(tag: string): string {
+  return `${releaseDownloadUrl}${tag}/`;
+}
 
 export class GitHub {
   private readonly octokit: Octokit;
@@ -37,129 +52,57 @@ export class GitHub {
     });
   }
 
-  async uploadDatabase(zipFile: Buffer) {
+  /**
+   * Publishes the database release `tag` with the zip and the files of the split format listed in `index` from
+   * `splitDir`, then deletes old database releases. The release is a draft until all files are uploaded, so the latest
+   * release always has them, and it works with immutable releases.
+   */
+  async uploadDatabase(
+    tag: string,
+    zipFile: Buffer,
+    splitDir: string,
+    index: SplitIndex
+  ) {
     const latestCommit = await this.getLatestCommit();
     signale.info(`Latest commit is ${latestCommit}`);
-    const tag = await this.createTag(latestCommit);
-    signale.info(`Created tag ${tag.data.tag}`);
-    // a draft until the database is uploaded, so the latest release always has one
-    const release = await this.createRelease(tag.data.tag);
+    await this.createTag(tag, latestCommit);
+    signale.info(`Created tag ${tag}`);
+    const release = await this.createRelease(tag);
     signale.info(`Created draft release ${release.data.id}`);
-    await this.createReleaseAsset(release.data.id, zipFile);
+    await this.uploadReleaseAsset(
+      release.data.id,
+      'osv-offline.zip',
+      zipFile,
+      'application/octet-stream'
+    );
+    for (const file of getSplitFiles(index)) {
+      await this.uploadReleaseAsset(
+        release.data.id,
+        file,
+        await fs.readFile(path.join(splitDir, file)),
+        'application/zstd'
+      );
+      signale.info(`Uploaded ${file}`);
+    }
     await this.publishRelease(release.data.id);
     signale.info(`Published release ${release.data.id}`);
     await this.deleteOldReleases();
   }
 
   /**
-   * Uploads the files of the split format listed in `index` from `directory` to the `database` release, then deletes
-   * files older than the retention, except the newest version of each file and the files listed by the published index.
-   */
-  async uploadSplitFiles(directory: string, index: SplitIndex) {
-    const release = await this.getSplitRelease();
-    const existing = new Set(
-      (await this.listReleaseAssets(release.id)).map(({ name }) => name)
-    );
-    for (const file of getSplitFiles(index).filter(
-      (file) => !existing.has(file)
-    )) {
-      const data = await fs.readFile(path.join(directory, file));
-      await this.octokit.repos.uploadReleaseAsset({
-        ...this.baseParameters,
-        release_id: release.id,
-        data: data as unknown as string,
-        headers: {
-          'content-type': 'application/zstd',
-          'content-length': data.length,
-        },
-        name: file,
-      });
-      signale.info(`Uploaded ${file}`);
-    }
-    // when a deployment of GitHub Pages failed, the published index still lists older files
-    const published = await getPublishedSplitIndex();
-    if (!published) {
-      signale.warn('Skipping deletion of old split files');
-      return;
-    }
-    await this.deleteOldSplitFiles(
-      release.id,
-      new Set(getSplitFiles(published))
-    );
-  }
-
-  /**
-   * Returns the release of the split format, creating it when missing. It's never the latest release, which clients of
-   * the zip format download from.
-   */
-  private async getSplitRelease() {
-    try {
-      const { data } = await this.octokit.repos.getReleaseByTag({
-        ...this.baseParameters,
-        tag: splitReleaseTag,
-      });
-      return data;
-    } catch (err) {
-      if ((err as { status?: number }).status !== 404) {
-        throw err;
-      }
-      const { data } = await this.octokit.repos.createRelease({
-        ...this.baseParameters,
-        tag_name: splitReleaseTag,
-        name: 'Database',
-        body: 'Databases in the split format, listed by https://renovatebot.github.io/osv-offline/v2/index.json',
-        make_latest: 'false',
-      });
-      signale.info(`Created release ${splitReleaseTag}`);
-      return data;
-    }
-  }
-
-  private async listReleaseAssets(releaseId: number) {
-    return await this.octokit.paginate(this.octokit.repos.listReleaseAssets, {
-      ...this.baseParameters,
-      release_id: releaseId,
-      per_page: 100,
-    });
-  }
-
-  private async deleteOldSplitFiles(releaseId: number, kept: Set<string>) {
-    const cutoff = DateTime.utc().minus(splitRetention);
-    const versions = (await this.listReleaseAssets(releaseId))
-      .map((asset) => ({ asset, match: splitFileRegex.exec(asset.name) }))
-      .filter(({ match }) => match?.groups)
-      .map(({ asset, match }) => ({
-        asset,
-        file: `${match!.groups!.name}.${match!.groups!.kind}`,
-        version: match!.groups!.version,
-      }))
-      .sort((a, b) => b.version.localeCompare(a.version));
-    const newest = new Map<string, string>();
-    for (const { file, version } of versions) {
-      if (!newest.has(file)) {
-        newest.set(file, version);
-      }
-    }
-    const old = versions.filter(
-      ({ asset, file, version }) =>
-        newest.get(file) !== version &&
-        !kept.has(asset.name) &&
-        DateTime.fromFormat(version, 'yyyyMMddHHmmss', { zone: 'utc' }) < cutoff
-    );
-    for (const { asset } of old) {
-      await this.octokit.repos.deleteReleaseAsset({
-        ...this.baseParameters,
-        asset_id: asset.id,
-      });
-      signale.info(`Deleted ${asset.name}`);
-    }
-  }
-
-  /**
-   * Deletes the database releases and their tags, except the newest ones. Other releases, e.g. of the packages, are kept.
+   * Deletes database releases and their tags which are older than the retention, except the newest ones and the release
+   * of the published index. Deletes the former release of the split format once the published index doesn't use it.
+   * Other releases, e.g. of the packages, are kept.
    */
   private async deleteOldReleases() {
-    signale.info('Deleting old database releases');
+    // when a deployment of GitHub Pages failed, the published index still points to an older release
+    const published = await getPublishedSplitIndex();
+    if (!published) {
+      signale.warn('Skipping deletion of old database releases');
+      return;
+    }
+    const publishedTag = getReleaseTag(published.baseUrl);
+    const cutoff = DateTime.utc().minus(databaseRetention);
     const releases = await this.octokit.paginate(
       this.octokit.repos.listReleases,
       { ...this.baseParameters, per_page: 100 }
@@ -170,7 +113,19 @@ export class GitHub {
           release.tag_name.startsWith(databaseTagPrefix) && !release.draft
       )
       .sort((a, b) => b.created_at.localeCompare(a.created_at))
-      .slice(keptDatabaseReleases);
+      .slice(keptDatabaseReleases)
+      .filter(
+        (release) =>
+          release.tag_name !== publishedTag &&
+          DateTime.fromISO(release.created_at) < cutoff
+      );
+    if (publishedTag !== legacySplitReleaseTag) {
+      oldReleases.push(
+        ...releases.filter(
+          (release) => release.tag_name === legacySplitReleaseTag
+        )
+      );
+    }
     signale.info(`Found ${oldReleases.length} old database releases`);
     for (const release of oldReleases) {
       // deleting a release deletes its assets, but not its tag
@@ -181,6 +136,7 @@ export class GitHub {
       await this.octokit.git
         .deleteRef({ ...this.baseParameters, ref: `tags/${release.tag_name}` })
         .catch(() => signale.warn(`Tag ${release.tag_name} not found`));
+      signale.info(`Deleted release ${release.tag_name}`);
     }
   }
 
@@ -192,13 +148,11 @@ export class GitHub {
     return branch.data.commit.sha;
   }
 
-  private async createTag(sha: string) {
-    // 1-2021020819
-    const name = `${databaseTagPrefix}${DateTime.utc().toFormat('yyyyMMddHH')}`;
+  private async createTag(tag: string, sha: string) {
     return await this.octokit.git.createTag({
       ...this.baseParameters,
-      tag: name,
-      message: name,
+      tag,
+      message: tag,
       object: sha,
       type: 'commit',
     });
@@ -213,7 +167,7 @@ export class GitHub {
   }
 
   private async publishRelease(releaseId: number) {
-    // clients download the database from the latest release
+    // clients of the zip format download the database from the latest release
     await this.octokit.repos.updateRelease({
       ...this.baseParameters,
       release_id: releaseId,
@@ -222,16 +176,21 @@ export class GitHub {
     });
   }
 
-  private async createReleaseAsset(releaseId: number, zipFile: Buffer) {
+  private async uploadReleaseAsset(
+    releaseId: number,
+    name: string,
+    data: Buffer,
+    contentType: string
+  ) {
     await this.octokit.repos.uploadReleaseAsset({
       ...this.baseParameters,
       release_id: releaseId,
-      data: zipFile as unknown as string,
+      data: data as unknown as string,
       headers: {
-        'content-type': 'application/octet-stream',
-        'content-length': zipFile.length,
+        'content-type': contentType,
+        'content-length': data.length,
       },
-      name: 'osv-offline.zip',
+      name,
     });
   }
 }
@@ -241,6 +200,15 @@ function getSplitFiles(index: SplitIndex): string[] {
     database.file,
     index.file,
   ]);
+}
+
+/**
+ * Returns the tag of the release a `baseUrl` of the split format points to, if any.
+ */
+function getReleaseTag(baseUrl: string | undefined): string | undefined {
+  return baseUrl?.startsWith(releaseDownloadUrl)
+    ? baseUrl.slice(releaseDownloadUrl.length).replace(/\/$/, '')
+    : undefined;
 }
 
 /**

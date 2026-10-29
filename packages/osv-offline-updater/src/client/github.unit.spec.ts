@@ -3,7 +3,7 @@ import fs from 'fs-extra';
 import os from 'node:os';
 import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { GitHub } from './github.ts';
+import { GitHub, getDatabaseTag, getSplitBaseUrl } from './github.ts';
 
 const octokit = vi.hoisted(() => ({
   paginate: vi.fn(),
@@ -13,14 +13,11 @@ const octokit = vi.hoisted(() => ({
   },
   repos: {
     getBranch: vi.fn(),
-    getReleaseByTag: vi.fn(),
     listReleases: vi.fn(),
-    listReleaseAssets: vi.fn(),
     createRelease: vi.fn(),
     updateRelease: vi.fn(),
     deleteRelease: vi.fn(),
     uploadReleaseAsset: vi.fn(),
-    deleteReleaseAsset: vi.fn(),
   },
 }));
 
@@ -40,27 +37,79 @@ function release(id: number, tag: string, createdAt: string, draft = false) {
   return { id, tag_name: tag, created_at: createdAt, draft };
 }
 
+function file(name: string) {
+  return {
+    file: name,
+    sha256: 'a'.repeat(64),
+    size: 3,
+    uncompressedSize: 3,
+  };
+}
+
+function splitIndex(tag: string): SplitIndex {
+  return {
+    schema: 2,
+    generated: '2026-10-27T12:00:00Z',
+    baseUrl: getSplitBaseUrl(tag),
+    ecosystems: {
+      npm: {
+        database: file('npm-20261027120000.nedb.zst'),
+        index: file('npm-20261027120000.idx.json.zst'),
+      },
+    },
+  };
+}
+
 describe('packages/osv-offline-updater/src/client/github.unit', () => {
+  it('names the database release of a run by its hour', () => {
+    expect(getDatabaseTag(new Date('2026-10-27T12:34:56Z'))).toBe(
+      '1-2026102712'
+    );
+  });
+
+  it('downloads the split files from the assets of a release', () => {
+    expect(getSplitBaseUrl('1-2026102712')).toBe(
+      'https://github.com/renovatebot/osv-offline/releases/download/1-2026102712/'
+    );
+  });
+
   describe('uploadDatabase', () => {
     const calls: string[] = [];
+    const index = splitIndex('1-2026102712');
+    const fetch = vi.fn();
+    let directory: string;
 
-    beforeEach(() => {
-      vi.clearAllMocks();
+    function upload() {
+      return new GitHub().uploadDatabase(
+        '1-2026102712',
+        Buffer.from('zip'),
+        directory,
+        index
+      );
+    }
+
+    beforeEach(async () => {
+      vi.resetAllMocks();
+      vi.useFakeTimers({ now: new Date('2026-10-27T12:00:00Z') });
+      vi.stubGlobal('fetch', fetch);
       calls.length = 0;
+      fetch.mockResolvedValue(
+        new Response(JSON.stringify(splitIndex('1-2026102708')))
+      );
       octokit.repos.getBranch.mockResolvedValue({
         data: { commit: { sha: 'abc' } },
       });
-      octokit.git.createTag.mockResolvedValue({
-        data: { tag: '1-2026102712' },
-      });
+      octokit.git.createTag.mockResolvedValue({ data: {} });
       octokit.repos.createRelease.mockImplementation(() => {
         calls.push('create');
         return Promise.resolve({ data: { id: 10 } });
       });
-      octokit.repos.uploadReleaseAsset.mockImplementation(() => {
-        calls.push('upload');
-        return Promise.resolve();
-      });
+      octokit.repos.uploadReleaseAsset.mockImplementation(
+        ({ name }: { name: string }) => {
+          calls.push(`upload ${name}`);
+          return Promise.resolve();
+        }
+      );
       octokit.repos.updateRelease.mockImplementation(() => {
         calls.push('publish');
         return Promise.resolve();
@@ -73,111 +122,6 @@ describe('packages/osv-offline-updater/src/client/github.unit', () => {
       );
       octokit.git.deleteRef.mockResolvedValue(undefined);
       octokit.paginate.mockResolvedValue([]);
-    });
-
-    it('publishes the release as latest only after uploading the database', async () => {
-      await new GitHub().uploadDatabase(Buffer.from('zip'));
-
-      expect(octokit.repos.createRelease).toHaveBeenCalledWith(
-        expect.objectContaining({ tag_name: '1-2026102712', draft: true })
-      );
-      expect(octokit.repos.updateRelease).toHaveBeenCalledWith(
-        expect.objectContaining({
-          release_id: 10,
-          draft: false,
-          make_latest: 'true',
-        })
-      );
-      expect(calls).toEqual(['create', 'upload', 'publish']);
-    });
-
-    it('deletes only old database releases and their tags, after publishing', async () => {
-      octokit.paginate.mockResolvedValue([
-        release(10, '1-2026102712', '2026-10-27T12:00:00Z'),
-        release(9, '4.1.0', '2026-10-27T11:09:00Z'),
-        release(8, '1-2026102708', '2026-10-27T08:00:00Z'),
-        release(7, '1-2026102704', '2026-10-27T04:00:00Z'),
-        release(6, '1-2026102700', '2026-10-27T00:00:00Z'),
-        release(5, '1-2026102620', '2026-10-26T20:00:00Z', true),
-      ]);
-
-      await new GitHub().uploadDatabase(Buffer.from('zip'));
-
-      expect(calls).toEqual([
-        'create',
-        'upload',
-        'publish',
-        'delete 7',
-        'delete 6',
-      ]);
-      expect(octokit.git.deleteRef.mock.calls).toEqual([
-        [expect.objectContaining({ ref: 'tags/1-2026102704' })],
-        [expect.objectContaining({ ref: 'tags/1-2026102700' })],
-      ]);
-    });
-
-    it('ignores tags which are already gone', async () => {
-      octokit.paginate.mockResolvedValue([
-        release(10, '1-2026102712', '2026-10-27T12:00:00Z'),
-        release(8, '1-2026102708', '2026-10-27T08:00:00Z'),
-        release(7, '1-2026102704', '2026-10-27T04:00:00Z'),
-      ]);
-      octokit.git.deleteRef.mockRejectedValue(new Error('Not Found'));
-
-      await expect(
-        new GitHub().uploadDatabase(Buffer.from('zip'))
-      ).resolves.toBeUndefined();
-      expect(calls).toContain('delete 7');
-    });
-
-    it('keeps everything when the upload fails', async () => {
-      octokit.repos.uploadReleaseAsset.mockRejectedValue(new Error('failed'));
-
-      await expect(
-        new GitHub().uploadDatabase(Buffer.from('zip'))
-      ).rejects.toThrow('failed');
-      expect(octokit.repos.updateRelease).not.toHaveBeenCalled();
-      expect(octokit.paginate).not.toHaveBeenCalled();
-      expect(octokit.repos.deleteRelease).not.toHaveBeenCalled();
-    });
-  });
-
-  describe('uploadSplitFiles', () => {
-    let directory: string;
-
-    function file(name: string) {
-      return {
-        file: name,
-        sha256: 'a'.repeat(64),
-        size: 3,
-        uncompressedSize: 3,
-      };
-    }
-
-    const index: SplitIndex = {
-      schema: 2,
-      generated: '2026-10-27T12:00:00Z',
-      ecosystems: {
-        npm: {
-          database: file('npm-20261027120000.nedb.zst'),
-          index: file('npm-20261027120000.idx.json.zst'),
-        },
-      },
-    };
-
-    function asset(id: number, name: string) {
-      return { id, name };
-    }
-
-    const fetch = vi.fn();
-
-    beforeEach(async () => {
-      vi.resetAllMocks();
-      vi.useFakeTimers({ now: new Date('2026-10-27T12:00:00Z') });
-      vi.stubGlobal('fetch', fetch);
-      fetch.mockResolvedValue(new Response(JSON.stringify(index)));
-      octokit.repos.uploadReleaseAsset.mockResolvedValue(undefined);
-      octokit.repos.deleteReleaseAsset.mockResolvedValue(undefined);
       directory = await fs.mkdtemp(path.join(os.tmpdir(), 'osv-offline-gh-'));
       await fs.writeFile(
         path.join(directory, 'npm-20261027120000.nedb.zst'),
@@ -187,8 +131,6 @@ describe('packages/osv-offline-updater/src/client/github.unit', () => {
         path.join(directory, 'npm-20261027120000.idx.json.zst'),
         'idx'
       );
-      octokit.repos.getReleaseByTag.mockResolvedValue({ data: { id: 20 } });
-      octokit.paginate.mockResolvedValue([]);
     });
 
     afterEach(async () => {
@@ -197,102 +139,141 @@ describe('packages/osv-offline-updater/src/client/github.unit', () => {
       await fs.remove(directory);
     });
 
-    it('creates the release when missing, never as latest', async () => {
-      octokit.repos.getReleaseByTag.mockRejectedValue({ status: 404 });
-      octokit.repos.createRelease.mockResolvedValue({ data: { id: 21 } });
+    it('publishes the release as latest only after uploading all files', async () => {
+      await upload();
 
-      await new GitHub().uploadSplitFiles(directory, index);
-
+      expect(octokit.git.createTag).toHaveBeenCalledWith(
+        expect.objectContaining({ tag: '1-2026102712', object: 'abc' })
+      );
       expect(octokit.repos.createRelease).toHaveBeenCalledWith(
-        expect.objectContaining({ tag_name: 'database', make_latest: 'false' })
+        expect.objectContaining({ tag_name: '1-2026102712', draft: true })
       );
       expect(octokit.repos.uploadReleaseAsset).toHaveBeenCalledWith(
-        expect.objectContaining({ release_id: 21 })
-      );
-    });
-
-    it('fails on other errors than a missing release', async () => {
-      octokit.repos.getReleaseByTag.mockRejectedValue({ status: 500 });
-
-      await expect(
-        new GitHub().uploadSplitFiles(directory, index)
-      ).rejects.toEqual({ status: 500 });
-      expect(octokit.repos.createRelease).not.toHaveBeenCalled();
-    });
-
-    it('uploads only the files which are missing', async () => {
-      octokit.paginate.mockResolvedValue([
-        asset(1, 'npm-20261027120000.nedb.zst'),
-      ]);
-
-      await new GitHub().uploadSplitFiles(directory, index);
-
-      expect(octokit.repos.uploadReleaseAsset).toHaveBeenCalledExactlyOnceWith(
         expect.objectContaining({
-          release_id: 20,
+          release_id: 10,
           name: 'npm-20261027120000.idx.json.zst',
-          headers: expect.objectContaining({
+          headers: {
             'content-type': 'application/zstd',
             'content-length': 3,
-          }) as unknown,
+          },
         })
       );
+      expect(octokit.repos.updateRelease).toHaveBeenCalledWith(
+        expect.objectContaining({
+          release_id: 10,
+          draft: false,
+          make_latest: 'true',
+        })
+      );
+      expect(calls).toEqual([
+        'create',
+        'upload osv-offline.zip',
+        'upload npm-20261027120000.nedb.zst',
+        'upload npm-20261027120000.idx.json.zst',
+        'publish',
+      ]);
     });
 
-    it('deletes files older than the retention, except the newest version of each file', async () => {
+    it('deletes database releases older than the retention and their tags, after publishing', async () => {
       octokit.paginate.mockResolvedValue([
-        asset(1, 'npm-20261027120000.nedb.zst'),
-        asset(7, 'npm-20261027120000.idx.json.zst'),
+        release(10, '1-2026102712', '2026-10-27T12:00:00Z'),
+        release(9, '4.1.0', '2026-10-27T11:09:00Z'),
+        release(8, '1-2026102708', '2026-10-27T08:00:00Z'),
         // exactly 28 hours old
-        asset(2, 'npm-20261026080000.nedb.zst'),
+        release(7, '1-2026102608', '2026-10-26T08:00:00Z'),
         // older than 28 hours
-        asset(3, 'npm-20261026075959.nedb.zst'),
-        asset(4, 'npm-20261026075959.idx.json.zst'),
-        // the newest version of this file, so it's kept although it's old
-        asset(5, 'pypi-20261020000000.nedb.zst'),
-        // not a file of the split format
-        asset(6, 'notes.txt'),
+        release(6, '1-2026102604', '2026-10-26T04:00:00Z'),
+        release(5, '1-2026102600', '2026-10-26T00:00:00Z', true),
+        release(4, '1-2026102520', '2026-10-25T20:00:00Z'),
       ]);
 
-      await new GitHub().uploadSplitFiles(directory, index);
+      await upload();
 
-      expect(octokit.repos.deleteReleaseAsset.mock.calls).toEqual([
-        [expect.objectContaining({ asset_id: 3 })],
-        [expect.objectContaining({ asset_id: 4 })],
+      expect(calls.slice(-2)).toEqual(['delete 6', 'delete 4']);
+      expect(octokit.git.deleteRef.mock.calls).toEqual([
+        [expect.objectContaining({ ref: 'tags/1-2026102604' })],
+        [expect.objectContaining({ ref: 'tags/1-2026102520' })],
       ]);
-      expect(fetch).toHaveBeenCalledExactlyOnceWith(
-        'https://renovatebot.github.io/osv-offline/v2/index.json',
-        { headers: { 'cache-control': 'no-cache' } }
+    });
+
+    it('keeps the newest database releases and the one of the published index', async () => {
+      fetch.mockResolvedValue(
+        new Response(JSON.stringify(splitIndex('1-2026102500')))
+      );
+      octokit.paginate.mockResolvedValue([
+        release(10, '1-2026102712', '2026-10-27T12:00:00Z'),
+        // older than the retention, but one of the two newest
+        release(9, '1-2026102504', '2026-10-25T04:00:00Z'),
+        release(8, '1-2026102500', '2026-10-25T00:00:00Z'),
+        release(7, '1-2026102420', '2026-10-24T20:00:00Z'),
+      ]);
+
+      await upload();
+
+      expect(octokit.repos.deleteRelease).toHaveBeenCalledExactlyOnceWith(
+        expect.objectContaining({ release_id: 7 })
       );
     });
 
-    it('keeps the files listed by the published index', async () => {
+    it('deletes the former split release once the published index uses another one', async () => {
+      octokit.paginate.mockResolvedValue([
+        release(10, '1-2026102712', '2026-10-27T12:00:00Z'),
+        release(3, 'database', '2026-10-20T00:00:00Z'),
+      ]);
+
+      await upload();
+
+      expect(octokit.repos.deleteRelease).toHaveBeenCalledExactlyOnceWith(
+        expect.objectContaining({ release_id: 3 })
+      );
+      expect(octokit.git.deleteRef).toHaveBeenCalledExactlyOnceWith(
+        expect.objectContaining({ ref: 'tags/database' })
+      );
+    });
+
+    it('keeps no release for a published index without a release URL', async () => {
       fetch.mockResolvedValue(
         new Response(
-          JSON.stringify({
-            ...index,
-            ecosystems: {
-              npm: {
-                database: file('npm-20261026000000.nedb.zst'),
-                index: file('npm-20261026000000.idx.json.zst'),
-              },
-            },
-          })
+          JSON.stringify({ ...splitIndex('1-2026102500'), baseUrl: undefined })
         )
       );
       octokit.paginate.mockResolvedValue([
-        asset(1, 'npm-20261027120000.nedb.zst'),
-        asset(2, 'npm-20261027120000.idx.json.zst'),
-        asset(3, 'npm-20261026000000.nedb.zst'),
-        asset(4, 'npm-20261026000000.idx.json.zst'),
-        asset(5, 'npm-20261025000000.nedb.zst'),
+        release(10, '1-2026102712', '2026-10-27T12:00:00Z'),
+        release(9, '1-2026102504', '2026-10-25T04:00:00Z'),
+        release(8, '1-2026102500', '2026-10-25T00:00:00Z'),
       ]);
 
-      await new GitHub().uploadSplitFiles(directory, index);
+      await upload();
 
-      expect(octokit.repos.deleteReleaseAsset).toHaveBeenCalledExactlyOnceWith(
-        expect.objectContaining({ asset_id: 5 })
+      expect(octokit.repos.deleteRelease).toHaveBeenCalledExactlyOnceWith(
+        expect.objectContaining({ release_id: 8 })
       );
+    });
+
+    it('keeps the former split release while the published index uses it', async () => {
+      fetch.mockResolvedValue(
+        new Response(JSON.stringify(splitIndex('database')))
+      );
+      octokit.paginate.mockResolvedValue([
+        release(10, '1-2026102712', '2026-10-27T12:00:00Z'),
+        release(3, 'database', '2026-10-20T00:00:00Z'),
+      ]);
+
+      await upload();
+
+      expect(octokit.repos.deleteRelease).not.toHaveBeenCalled();
+    });
+
+    it('ignores tags which are already gone', async () => {
+      octokit.paginate.mockResolvedValue([
+        release(10, '1-2026102712', '2026-10-27T12:00:00Z'),
+        release(8, '1-2026102708', '2026-10-27T08:00:00Z'),
+        release(7, '1-2026102504', '2026-10-25T04:00:00Z'),
+      ]);
+      octokit.git.deleteRef.mockRejectedValue(new Error('Not Found'));
+
+      await expect(upload()).resolves.toBeUndefined();
+      expect(calls).toContain('delete 7');
     });
 
     it.each([
@@ -303,15 +284,25 @@ describe('packages/osv-offline-updater/src/client/github.unit', () => {
       'deletes nothing when the published index %s',
       async (_, response) => {
         fetch.mockImplementation(response);
-        octokit.paginate.mockResolvedValue([
-          asset(1, 'npm-20261027120000.nedb.zst'),
-          asset(3, 'npm-20261025000000.nedb.zst'),
-        ]);
 
-        await new GitHub().uploadSplitFiles(directory, index);
+        await upload();
 
-        expect(octokit.repos.deleteReleaseAsset).not.toHaveBeenCalled();
+        expect(octokit.paginate).not.toHaveBeenCalled();
+        expect(octokit.repos.deleteRelease).not.toHaveBeenCalled();
+        expect(fetch).toHaveBeenCalledExactlyOnceWith(
+          'https://renovatebot.github.io/osv-offline/v2/index.json',
+          { headers: { 'cache-control': 'no-cache' } }
+        );
       }
     );
+
+    it('keeps everything when an upload fails', async () => {
+      octokit.repos.uploadReleaseAsset.mockRejectedValue(new Error('failed'));
+
+      await expect(upload()).rejects.toThrow('failed');
+      expect(octokit.repos.updateRelease).not.toHaveBeenCalled();
+      expect(octokit.paginate).not.toHaveBeenCalled();
+      expect(octokit.repos.deleteRelease).not.toHaveBeenCalled();
+    });
   });
 });
