@@ -33,8 +33,20 @@ vi.mock('signale', () => ({
   default: { info: vi.fn(), warn: vi.fn() },
 }));
 
-function release(id: number, tag: string, createdAt: string, draft = false) {
-  return { id, tag_name: tag, created_at: createdAt, draft };
+function release(
+  id: number,
+  tag: string,
+  createdAt: string,
+  draft = false,
+  assetsCreatedAt: string[] = []
+) {
+  return {
+    id,
+    tag_name: tag,
+    created_at: createdAt,
+    draft,
+    assets: assetsCreatedAt.map((created_at) => ({ created_at })),
+  };
 }
 
 function file(name: string) {
@@ -215,10 +227,13 @@ describe('packages/osv-offline-updater/src/client/github.unit', () => {
       );
     });
 
-    it('deletes the former split release once the published index uses another one', async () => {
+    it('deletes the former split release once unused and its files are older than the retention', async () => {
       octokit.paginate.mockResolvedValue([
         release(10, '1-2026102712', '2026-10-27T12:00:00Z'),
-        release(3, 'database', '2026-10-20T00:00:00Z'),
+        release(3, 'database', '2026-10-20T00:00:00Z', false, [
+          '2026-10-26T04:00:00Z',
+          '2026-10-26T07:59:59Z',
+        ]),
       ]);
 
       await upload();
@@ -229,6 +244,21 @@ describe('packages/osv-offline-updater/src/client/github.unit', () => {
       expect(octokit.git.deleteRef).toHaveBeenCalledExactlyOnceWith(
         expect.objectContaining({ ref: 'tags/database' })
       );
+    });
+
+    it('keeps the former split release for the retention after its last upload', async () => {
+      octokit.paginate.mockResolvedValue([
+        release(10, '1-2026102712', '2026-10-27T12:00:00Z'),
+        release(3, 'database', '2026-10-20T00:00:00Z', false, [
+          '2026-10-26T04:00:00Z',
+          // exactly 28 hours old
+          '2026-10-26T08:00:00Z',
+        ]),
+      ]);
+
+      await upload();
+
+      expect(octokit.repos.deleteRelease).not.toHaveBeenCalled();
     });
 
     it('keeps no release for a published index without a release URL', async () => {

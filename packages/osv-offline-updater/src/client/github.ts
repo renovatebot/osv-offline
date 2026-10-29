@@ -91,7 +91,8 @@ export class GitHub {
 
   /**
    * Deletes database releases and their tags which are older than the retention, except the newest ones and the release
-   * of the published index. Deletes the former release of the split format once the published index doesn't use it.
+   * of the published index. Deletes the former release of the split format once the published index doesn't use it and
+   * its files are older than the retention.
    * Other releases, e.g. of the packages, are kept.
    */
   private async deleteOldReleases() {
@@ -119,13 +120,17 @@ export class GitHub {
           release.tag_name !== publishedTag &&
           DateTime.fromISO(release.created_at) < cutoff
       );
-    if (publishedTag !== legacySplitReleaseTag) {
-      oldReleases.push(
-        ...releases.filter(
-          (release) => release.tag_name === legacySplitReleaseTag
-        )
-      );
-    }
+    // like its files before, kept for the retention after the last upload, as caching proxies may serve an older index
+    oldReleases.push(
+      ...releases.filter(
+        (release) =>
+          release.tag_name === legacySplitReleaseTag &&
+          publishedTag !== legacySplitReleaseTag &&
+          release.assets.every(
+            (asset) => DateTime.fromISO(asset.created_at) < cutoff
+          )
+      )
+    );
     signale.info(`Found ${oldReleases.length} old database releases`);
     for (const release of oldReleases) {
       // deleting a release deletes its assets, but not its tag
