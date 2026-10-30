@@ -22,6 +22,7 @@ permissions:
 jobs:
   lint:
     runs-on: ubuntu-24.04
+    timeout-minutes: 15
 
     steps:
       - uses: containerbase/internal-tools/setup@2082203142ae62859ac4a86919258077c6460403 # v5.3.12
@@ -39,6 +40,7 @@ jobs:
 
   test:
     runs-on: ubuntu-24.04
+    timeout-minutes: 30
 
     strategy:
       fail-fast: false
@@ -97,8 +99,10 @@ jobs:
       id-token: write
 
     steps:
+      # full checkout for semantic-release, which pushes with its own token
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
+          persist-credentials: false
           fetch-depth: 0 # zero stands for full checkout, which is required for semantic-release
           filter: blob:none # we don't need all blobs, only the full tree
           show-progress: false
@@ -112,8 +116,9 @@ jobs:
 
       - run: pnpm build
 
-      - run: pnpm semantic-release --dry-run ${{ env.DRY_RUN }} --ci ${{ env.DRY_RUN != 'true' }}
+      - run: pnpm semantic-release --dry-run "${DRY_RUN}" --ci "${CI_MODE}"
         env:
+          CI_MODE: ${{ env.DRY_RUN != 'true' }}
           GITHUB_TOKEN: ${{ github.token }}
 
       # clients download the database from the latest release, so a package release must not become the latest one
