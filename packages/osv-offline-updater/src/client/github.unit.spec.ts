@@ -36,14 +36,16 @@ vi.mock('signale', () => ({
 function release(
   id: number,
   tag: string,
-  createdAt: string,
+  publishedAt: string,
   draft = false,
   assetsCreatedAt: string[] = []
 ) {
   return {
     id,
     tag_name: tag,
-    created_at: createdAt,
+    // the date of the tagged commit, which can be much older than the release
+    created_at: '2026-10-01T00:00:00Z',
+    published_at: draft ? null : publishedAt,
     draft,
     assets: assetsCreatedAt.map((created_at) => ({ created_at })),
   };
