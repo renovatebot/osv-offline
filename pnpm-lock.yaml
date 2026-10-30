@@ -60,9 +60,6 @@ importers:
       '@renovatebot/osv-offline-db':
         specifier: workspace:*
         version: link:../osv-offline-db
-      debug:
-        specifier: ^4.4.3
-        version: 4.4.3(supports-color@7.2.0)
       fs-extra:
         specifier: ^11.4.1
         version: 11.4.1
@@ -82,9 +79,6 @@ importers:
       '@types/adm-zip':
         specifier: 0.6.0
         version: 0.6.0
-      '@types/debug':
-        specifier: 4.1.13
-        version: 4.1.13
       '@types/fs-extra':
         specifier: 11.0.4
         version: 11.0.4
@@ -109,6 +103,9 @@ importers:
 
   packages/osv-offline-db:
     dependencies:
+      '@containerbase/base':
+        specifier: ^14.58.0
+        version: 14.58.0
       debug:
         specifier: ^4.4.3
         version: 4.4.3(supports-color@7.2.0)
@@ -232,6 +229,15 @@ packages:
   '@colors/colors@1.5.0':
     resolution: {integrity: sha512-ooWCrlZP11i8GImSjTHYHLkvFDP48nS4+204nGb1RiX/WXYHmJA2III9/e2DWVabCESdW7hBAEzHRqUn9OUVvQ==}
     engines: {node: '>=0.1.90'}
+
+  '@containerbase/base@14.58.0':
+    resolution: {integrity: sha512-cTcGiHv0y0lTtFNgpTRyNB5yXdlASm22ya0mjTh/7EjOVBHWO332BO8suk3LC9adZClERT698ioCZRGMz2Himg==}
+    engines: {node: '>=24.10.0'}
+    peerDependencies:
+      zod: ^4.0.0
+    peerDependenciesMeta:
+      zod:
+        optional: true
 
   '@containerbase/oxlint-plugin@1.0.3':
     resolution: {integrity: sha512-eYi0Yh1oN+GkUKVEa7mobsTojitqC51gDfJmkDe07PZxcPfRcSVPoYi+xD4S/rdqvpTyPtwkWiNLT5gUTH21lg==}
@@ -2669,6 +2675,10 @@ snapshots:
 
   '@colors/colors@1.5.0':
     optional: true
+
+  '@containerbase/base@14.58.0':
+    dependencies:
+      semver: 7.8.5
 
   '@containerbase/oxlint-plugin@1.0.3(oxlint@1.89.0)':
     dependencies:

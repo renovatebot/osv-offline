@@ -4,7 +4,6 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import readline from 'node:readline';
 import { promisify } from 'node:util';
-import debug from 'debug';
 import {
   DatabaseIndexBuilder,
   type DatabaseRecord,
@@ -14,10 +13,11 @@ import {
   parseIndex,
 } from './db-index.ts';
 import { Ecosystem } from './ecosystem.ts';
+import { createLogger } from './logger.ts';
 import type { Vulnerability } from './osv.ts';
 import { packageToPurl } from './purl-helper.ts';
 
-const logger = debug('osv-offline:db');
+const logger = createLogger('osv-offline:db');
 const readAsync = promisify(fsRead);
 
 interface EcosystemData {
@@ -40,7 +40,7 @@ export class OsvOfflineDb {
     if (this.disposed) {
       return;
     }
-    logger('Databases are not disposed! Please explicitly dispose.');
+    logger.warn('Databases are not disposed! Please explicitly dispose.');
     this[Symbol.dispose]();
   };
 
@@ -60,7 +60,7 @@ export class OsvOfflineDb {
       }
 
       if (fileStat?.mtimeMs !== cached.mtime) {
-        logger(
+        logger.debug(
           fileStat
             ? `File changed for ecosystem '${ecosystem}', reloading ...`
             : `File removed for ecosystem '${ecosystem}', unloading ...`,
@@ -76,7 +76,7 @@ export class OsvOfflineDb {
   }
 
   private async _init(ecosystem: Ecosystem): Promise<EcosystemData | null> {
-    logger(`Initializing ecosystem '${ecosystem}' ...`);
+    logger.trace(`Initializing ecosystem '${ecosystem}' ...`);
     const ac = new AbortController();
     this._pendingAcs.add(ac);
 
@@ -85,7 +85,7 @@ export class OsvOfflineDb {
 
       const fileStat = await stat(filePath).catch(() => null);
       if (!fileStat) {
-        logger(`Missing data for ecosystem '${ecosystem}'`);
+        logger.debug(`Missing data for ecosystem '${ecosystem}'`);
         delete this._db[ecosystem];
         return null;
       }
@@ -99,21 +99,21 @@ export class OsvOfflineDb {
 
       const index = await this._loadIndex(ecosystem, data, fileStat.size);
       if (index) {
-        logger(`Using precomputed index for ecosystem '${ecosystem}'`);
+        logger.trace(`Using precomputed index for ecosystem '${ecosystem}'`);
         data.index = index;
       } else {
         await this._buildIndex(ac, data);
       }
 
       if (ac.signal.aborted) {
-        logger(`Initializing ecosystem '${ecosystem}' aborted.`);
+        logger.debug(`Initializing ecosystem '${ecosystem}' aborted.`);
         delete this._db[ecosystem];
         this._unload(data);
         return null;
       }
 
       this._data[ecosystem] = data;
-      logger(`Initializing ecosystem '${ecosystem}' done.`);
+      logger.trace(`Initializing ecosystem '${ecosystem}' done.`);
 
       return data;
     } finally {
@@ -138,7 +138,7 @@ export class OsvOfflineDb {
     }
     const parsed = parseIndex(content, size);
     if (!parsed || !(await this._isLastRecord(data, parsed.last))) {
-      logger(`Ignoring outdated index for ecosystem '${ecosystem}'`);
+      logger.debug(`Ignoring outdated index for ecosystem '${ecosystem}'`);
       return null;
     }
     return parsed.index;
@@ -232,7 +232,7 @@ export class OsvOfflineDb {
     if (this.disposed) {
       return;
     }
-    logger(`Disposing databases ...`);
+    logger.trace(`Disposing databases ...`);
     this.disposed = true;
     process.off('exit', this._exitHandler);
 

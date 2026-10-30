@@ -1,3 +1,4 @@
+import type * as OsvOfflineDbModule from '@renovatebot/osv-offline-db';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
@@ -12,7 +13,8 @@ vi.mock('./split.ts', () => ({
     ensure = mocks.ensure;
   },
 }));
-vi.mock('@renovatebot/osv-offline-db', () => ({
+vi.mock('@renovatebot/osv-offline-db', async (importOriginal) => ({
+  createLogger: (await importOriginal<typeof OsvOfflineDbModule>()).createLogger,
   OsvOfflineDb: {
     create: () => ({ query: mocks.query, [Symbol.dispose]: vi.fn() }),
   },

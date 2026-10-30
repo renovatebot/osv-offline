@@ -12,6 +12,7 @@
     "access": "public"
   },
   "dependencies": {
+    "@containerbase/base": "^14.58.0",
     "debug": "^4.4.3"
   },
   "devDependencies": {

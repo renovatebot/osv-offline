@@ -10,15 +10,15 @@ import {
   type SplitEcosystem,
   type SplitFile,
   type SplitIndex,
+  createLogger,
   getIndexFileName,
   parseSplitIndex,
 } from '@renovatebot/osv-offline-db';
-import debug from 'debug';
 import fs from 'fs-extra';
 import got from 'got';
 import { getMaxAge } from './download.ts';
 
-const logger = debug('osv-offline:split');
+const logger = createLogger('osv-offline:split');
 
 const defaultIndexUrl = 'https://renovatebot.github.io/osv-offline/v2/index.json';
 
@@ -99,7 +99,7 @@ export class SplitDownloader {
         if (!(await this.hasDatabase(ecosystem))) {
           throw err;
         }
-        logger(`Updating ecosystem '${ecosystem}' failed: ${String(err)}`);
+        logger.warn(`Updating ecosystem '${ecosystem}' failed: ${String(err)}`);
       }
     })();
     this.checked.set(ecosystem, entry);
@@ -116,7 +116,7 @@ export class SplitDownloader {
     // an mtime in the future, e.g. from clock skew, counts as outdated, so it can't extend the maximum age; a second
     // of tolerance, as file times are more precise than Date.now()
     if (stateStat && age > -1000 && age < this.maxAge && (await this.hasDatabase(ecosystem))) {
-      logger(`Ecosystem '${ecosystem}' is up-to-date.`);
+      logger.trace(`Ecosystem '${ecosystem}' is up-to-date.`);
       return stateStat.mtimeMs;
     }
 
@@ -127,7 +127,7 @@ export class SplitDownloader {
         throw err;
       }
       // the index may be outdated, e.g. served by a caching proxy
-      logger(`File of ecosystem '${ecosystem}' not found, retrying ...`);
+      logger.debug(`File of ecosystem '${ecosystem}' not found, retrying ...`);
       return await this.updateFromIndex(ecosystem, true);
     }
   }
@@ -139,7 +139,7 @@ export class SplitDownloader {
     const { value: index, fetched } = await this.getIndex(refresh);
     const files = index.ecosystems[ecosystem];
     if (!files) {
-      logger(`No files for ecosystem '${ecosystem}' in the index.`);
+      logger.debug(`No files for ecosystem '${ecosystem}' in the index.`);
       return fetched;
     }
 
@@ -150,13 +150,13 @@ export class SplitDownloader {
       state.index === files.index.sha256 &&
       (await this.hasDatabase(ecosystem))
     ) {
-      logger(`Ecosystem '${ecosystem}' is unchanged.`);
+      logger.trace(`Ecosystem '${ecosystem}' is unchanged.`);
       // the files are as fresh as the index they were checked against
       await fs.utimes(statePath, new Date(fetched), new Date(fetched));
       return fetched;
     }
 
-    logger(`Downloading ecosystem '${ecosystem}' ...`);
+    logger.trace(`Downloading ecosystem '${ecosystem}' ...`);
     await fs.ensureDir(OsvOfflineDb.rootDirectory);
     const tmpDir = await fs.mkdtemp(path.join(OsvOfflineDb.rootDirectory, '.download-'));
     try {
@@ -175,7 +175,7 @@ export class SplitDownloader {
       };
       await fs.writeJson(statePath, newState);
       await fs.utimes(statePath, new Date(fetched), new Date(fetched));
-      logger(`Downloading ecosystem '${ecosystem}' done.`);
+      logger.trace(`Downloading ecosystem '${ecosystem}' done.`);
       return fetched;
     } finally {
       await fs.remove(tmpDir);

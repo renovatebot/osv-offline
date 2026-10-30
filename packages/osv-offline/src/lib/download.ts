@@ -1,7 +1,6 @@
 import { pipeline } from 'node:stream/promises';
 import path from 'path';
-import { OsvOfflineDb } from '@renovatebot/osv-offline-db';
-import debug from 'debug';
+import { OsvOfflineDb, createLogger } from '@renovatebot/osv-offline-db';
 import fs from 'fs-extra';
 import got from 'got';
 import { DateTime } from 'luxon';
@@ -9,7 +8,7 @@ import ms from 'ms';
 import { Result, failure, success } from './types.ts';
 import { extractZip } from './unzip.ts';
 
-const logger = debug('osv-offline:download');
+const logger = createLogger('osv-offline:download');
 
 const defaultMaxAge = '1d';
 
@@ -24,7 +23,7 @@ export function getMaxAge(): number {
   // returns `undefined` for an invalid value, despite the type
   const maxAge: number | undefined = ms(value as ms.StringValue);
   if (maxAge === undefined) {
-    logger(`Invalid OSV_OFFLINE_MAX_AGE '${value}', using ${defaultMaxAge}.`);
+    logger.warn(`Invalid OSV_OFFLINE_MAX_AGE '${value}', using ${defaultMaxAge}.`);
     return ms(defaultMaxAge);
   }
   return maxAge;
@@ -34,7 +33,7 @@ export async function tryDownloadDb(): Promise<Result> {
   await fs.ensureDir(OsvOfflineDb.rootDirectory);
 
   if (process.env.OSV_OFFLINE_DISABLE_DOWNLOAD?.toLowerCase() === 'true') {
-    logger('Skipping database download.');
+    logger.debug('Skipping database download.');
     return success();
   }
 
@@ -49,7 +48,7 @@ export async function tryDownloadDb(): Promise<Result> {
     stats !== undefined &&
     DateTime.utc().diff(DateTime.fromJSDate(stats.mtime)).toMillis() < getMaxAge()
   ) {
-    logger('Skipping download, databases are up-to-date.');
+    logger.debug('Skipping download, databases are up-to-date.');
     return success();
   }
 
@@ -57,7 +56,7 @@ export async function tryDownloadDb(): Promise<Result> {
   // download and extract into a temporary directory first, so a failed attempt leaves the current databases untouched
   const tmpDir = await fs.mkdtemp(path.join(OsvOfflineDb.rootDirectory, '.download-'));
   try {
-    logger('Downloading databases ...');
+    logger.trace('Downloading databases ...');
     const databaseUrl =
       process.env.OSV_OFFLINE_DATABASE_URL ??
       'https://github.com/renovatebot/osv-offline/releases/latest/download/osv-offline.zip';
@@ -65,8 +64,8 @@ export async function tryDownloadDb(): Promise<Result> {
     const tmpZipPath = path.join(tmpDir, 'osv-offline.zip');
     const writeStream = fs.createWriteStream(tmpZipPath);
     await pipeline(stream, writeStream);
-    logger('Downloading databases done.');
-    logger('Extracting databases ...');
+    logger.trace('Downloading databases done.');
+    logger.trace('Extracting databases ...');
     const extractDir = path.join(tmpDir, 'extracted');
     await fs.ensureDir(extractDir);
     const files = await extractZip(tmpZipPath, extractDir);
@@ -76,7 +75,7 @@ export async function tryDownloadDb(): Promise<Result> {
     }
     // the zip's modification time marks the databases as up-to-date, so it's moved last
     await fs.rename(tmpZipPath, path.join(OsvOfflineDb.rootDirectory, 'osv-offline.zip'));
-    logger('Extracting databases done.');
+    logger.trace('Extracting databases done.');
   } catch (err) {
     return failure(err as Error);
   } finally {
