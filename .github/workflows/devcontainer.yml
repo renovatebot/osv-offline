@@ -17,14 +17,23 @@ on:
       - reopened
       - ready_for_review
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
 jobs:
   devcontainer-test:
     runs-on: ubuntu-24.04
+    timeout-minutes: 30
     if: github.event_name != 'pull_request' || (github.repository_owner != github.event.pull_request.head.repo.owner.login && github.event.pull_request.draft != true)
     steps:
       - name: Checkout
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
+          persist-credentials: false
           show-progress: false
 
       - name: Build and run dev container task
