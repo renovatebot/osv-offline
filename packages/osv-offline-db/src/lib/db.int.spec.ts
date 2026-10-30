@@ -338,6 +338,17 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
       return db.query(ecosystem, packageName);
     }
 
+    /**
+     * Replaces the file like a download does, so a concurrent reload reads the old or the new content, never a
+     * partially written file.
+     */
+    async function replaceFile(filePath: string, content: unknown, mtime: Date): Promise<void> {
+      const tmpPath = `${filePath}.tmp`;
+      await fs.writeFile(tmpPath, JSON.stringify(content), 'utf8');
+      await fs.utimes(tmpPath, mtime, mtime);
+      await fs.rename(tmpPath, filePath);
+    }
+
     it('picks up new file content on next query when file changes', async () => {
       const filePath = path.join(rootDir, 'npm.nedb');
 
@@ -349,12 +360,12 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
       expect(result1[0].id).toBe('GHSA-7jfh-2xc9-ccv7');
 
       // Overwrite file with a different vulnerability
-      const updatedVuln = { ...sampleVuln, id: 'GHSA-UPDATED' };
-      await fs.writeFile(filePath, JSON.stringify(updatedVuln), 'utf8');
-
       // Force mtime to differ (file system mtime resolution can be 1s)
-      const future = new Date(Date.now() + 5000);
-      await fs.utimes(filePath, future, future);
+      await replaceFile(
+        filePath,
+        { ...sampleVuln, id: 'GHSA-UPDATED' },
+        new Date(Date.now() + 5000),
+      );
 
       // Next query should eventually return the updated data
       const result2 = await queryUntil(
@@ -417,10 +428,7 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
       expect(npmResult1).toHaveLength(1);
       expect(mavenResult1).toHaveLength(1);
 
-      const updatedVuln = { ...sampleVuln, id: 'NPM-UPDATED' };
-      await fs.writeFile(npmPath, JSON.stringify(updatedVuln), 'utf8');
-      const future = new Date(Date.now() + 5000);
-      await fs.utimes(npmPath, future, future);
+      await replaceFile(npmPath, { ...sampleVuln, id: 'NPM-UPDATED' }, new Date(Date.now() + 5000));
 
       // npm should eventually reflect the update
       const npmResult2 = await queryUntil(
@@ -444,20 +452,22 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
       await db.query('npm', 'public');
 
       // Change file
-      const updatedVuln = { ...sampleVuln, id: 'RACE-UPDATED' };
-      await fs.writeFile(filePath, JSON.stringify(updatedVuln), 'utf8');
-      const future = new Date(Date.now() + 5000);
-      await fs.utimes(filePath, future, future);
+      await replaceFile(
+        filePath,
+        { ...sampleVuln, id: 'RACE-UPDATED' },
+        new Date(Date.now() + 5000),
+      );
 
       // Fire many concurrent queries — some will hit mid-reload
       const results = await Promise.all([
         db.query('npm', 'public'),
         db.query('npm', 'public'),
         (async () => {
-          const secondUpdate = { ...sampleVuln, id: 'RACE-UPDATED-2' };
-          await fs.writeFile(filePath, JSON.stringify(secondUpdate), 'utf8');
-          const future2 = new Date(Date.now() + 10000);
-          await fs.utimes(filePath, future2, future2);
+          await replaceFile(
+            filePath,
+            { ...sampleVuln, id: 'RACE-UPDATED-2' },
+            new Date(Date.now() + 10000),
+          );
           return db.query('npm', 'public');
         })(),
         db.query('npm', 'public'),
@@ -477,10 +487,11 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
       await db.query('npm', 'public');
 
       // Change file to trigger reload
-      const updatedVuln = { ...sampleVuln, id: 'DISPOSE-RACE' };
-      await fs.writeFile(filePath, JSON.stringify(updatedVuln), 'utf8');
-      const future = new Date(Date.now() + 5000);
-      await fs.utimes(filePath, future, future);
+      await replaceFile(
+        filePath,
+        { ...sampleVuln, id: 'DISPOSE-RACE' },
+        new Date(Date.now() + 5000),
+      );
 
       // Start a query that will detect the file change, then dispose immediately. Reload completes on the disposed
       // instance but query returns [] because the post-read disposed check catches it.
@@ -497,11 +508,8 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
       await db.query('npm', 'public');
 
       // Two rapid overwrites
-      await fs.writeFile(filePath, JSON.stringify({ ...sampleVuln, id: 'V1' }), 'utf8');
-      await fs.utimes(filePath, new Date(Date.now() + 5000), new Date(Date.now() + 5000));
-
-      await fs.writeFile(filePath, JSON.stringify({ ...sampleVuln, id: 'V2' }), 'utf8');
-      await fs.utimes(filePath, new Date(Date.now() + 10000), new Date(Date.now() + 10000));
+      await replaceFile(filePath, { ...sampleVuln, id: 'V1' }, new Date(Date.now() + 5000));
+      await replaceFile(filePath, { ...sampleVuln, id: 'V2' }, new Date(Date.now() + 10000));
 
       const result = await queryUntil(
         db,
