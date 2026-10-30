@@ -1,10 +1,7 @@
-import { OsvOfflineDb } from './db.ts';
-import { DatabaseIndexBuilder, type DatabaseRecord } from './db-index.ts';
-import fs from 'fs-extra';
 import readline from 'node:readline';
 import path from 'path';
 import { setTimeout } from 'timers/promises';
-import type { Vulnerability } from './osv.ts';
+import fs from 'fs-extra';
 import {
   afterAll,
   afterEach,
@@ -14,6 +11,9 @@ import {
   it,
   vi,
 } from 'vitest';
+import { DatabaseIndexBuilder, type DatabaseRecord } from './db-index.ts';
+import { OsvOfflineDb } from './db.ts';
+import type { Vulnerability } from './osv.ts';
 
 describe('packages/osv-offline-db/src/lib/db.int', () => {
   const rootDir = OsvOfflineDb.rootDirectory;
@@ -368,7 +368,9 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
       const deadline = Date.now() + timeoutMs;
       while (Date.now() < deadline) {
         const results = await db.query(ecosystem, packageName);
-        if (predicate(results)) return results;
+        if (predicate(results)) {
+          return results;
+        }
         await setTimeout(intervalMs);
       }
 

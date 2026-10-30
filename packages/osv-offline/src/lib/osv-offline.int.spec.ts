@@ -1,7 +1,7 @@
-import { OsvOffline } from './osv-offline.ts';
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import fs from 'fs-extra';
 import { OsvOfflineDb } from '@renovatebot/osv-offline-db';
+import fs from 'fs-extra';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { OsvOffline } from './osv-offline.ts';
 
 describe('packages/osv-offline/src/lib/osv-offline.int', () => {
   let osvOffline: OsvOffline;

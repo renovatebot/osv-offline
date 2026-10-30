@@ -1,4 +1,3 @@
-import fs from 'fs-extra';
 import { createHash } from 'node:crypto';
 import { createReadStream, createWriteStream } from 'node:fs';
 import os from 'node:os';
@@ -6,7 +5,6 @@ import path from 'node:path';
 import { Transform, type TransformCallback, Writable } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
 import { createZstdDecompress } from 'node:zlib';
-import { CompressStream } from 'zstd-napi';
 import {
   type Ecosystem,
   type SplitEcosystem,
@@ -15,6 +13,8 @@ import {
   getSplitFileName,
   splitIndexSchema,
 } from '@renovatebot/osv-offline-db';
+import fs from 'fs-extra';
+import { CompressStream } from 'zstd-napi';
 
 /**
  * zstd level 19 with long-distance matching. A window of 2^27 bytes is the largest decoders accept without extra options.

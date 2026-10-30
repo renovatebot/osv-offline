@@ -1,7 +1,7 @@
-import AdmZip from 'adm-zip';
-import fs from 'fs-extra';
 import os from 'node:os';
 import path from 'node:path';
+import AdmZip from 'adm-zip';
+import fs from 'fs-extra';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { readVulnerabilities } from './osv-zip.ts';
 
@@ -28,7 +28,10 @@ describe('packages/osv-offline-updater/src/lib/osv-zip.unit', () => {
       const zip = new AdmZip();
       for (const [name, content] of Object.entries(files)) {
         zip.addFile(name, Buffer.from(content));
-        zip.getEntry(name)!.header.method = method;
+        const entry = zip.getEntry(name);
+        if (entry) {
+          entry.header.method = method;
+        }
       }
       const buffer = zip.toBuffer();
       await fs.writeFile(zipPath, buffer);

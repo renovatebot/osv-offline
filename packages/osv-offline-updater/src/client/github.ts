@@ -1,9 +1,9 @@
+import path from 'node:path';
 import { Octokit } from '@octokit/rest';
 import { type SplitIndex, parseSplitIndex } from '@renovatebot/osv-offline-db';
 import fs from 'fs-extra';
-import path from 'node:path';
-import signale from 'signale';
 import { DateTime } from 'luxon';
+import signale from 'signale';
 
 /** prefix of the tags of database releases, e.g. `1-20210208190513` */
 const databaseTagPrefix = '1-';
@@ -106,7 +106,10 @@ export class GitHub {
     const cutoff = DateTime.utc().minus(databaseRetention);
     const releases = await this.octokit.paginate(
       this.octokit.repos.listReleases,
-      { ...this.baseParameters, per_page: 100 }
+      {
+        ...this.baseParameters,
+        per_page: 100,
+      }
     );
     const oldReleases = releases
       .filter(

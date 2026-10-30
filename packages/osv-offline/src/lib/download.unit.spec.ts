@@ -1,8 +1,8 @@
+import { Readable } from 'node:stream';
+import path from 'path';
 import { OsvOfflineDb } from '@renovatebot/osv-offline-db';
 import AdmZip from 'adm-zip';
 import fs from 'fs-extra';
-import { Readable } from 'node:stream';
-import path from 'path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { tryDownloadDb } from './download.ts';
 

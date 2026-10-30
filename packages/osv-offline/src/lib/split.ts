@@ -1,3 +1,9 @@
+import { createHash } from 'node:crypto';
+import { createWriteStream } from 'node:fs';
+import path from 'node:path';
+import { Transform, type TransformCallback } from 'node:stream';
+import { pipeline } from 'node:stream/promises';
+import { createZstdDecompress } from 'node:zlib';
 import {
   type Ecosystem,
   OsvOfflineDb,
@@ -10,12 +16,6 @@ import {
 import debug from 'debug';
 import fs from 'fs-extra';
 import got from 'got';
-import { createHash } from 'node:crypto';
-import { createWriteStream } from 'node:fs';
-import path from 'node:path';
-import { Transform, type TransformCallback } from 'node:stream';
-import { pipeline } from 'node:stream/promises';
-import { createZstdDecompress } from 'node:zlib';
 import { getMaxAge } from './download.ts';
 
 const logger = debug('osv-offline:split');
@@ -80,7 +80,8 @@ export class SplitDownloader {
     process.env.OSV_OFFLINE_DATABASE_INDEX_URL ?? defaultIndexUrl;
   private readonly maxAge = getMaxAge();
   private index:
-    { value: SplitIndex; fetched: number; lastModified?: string } | undefined;
+    | { value: SplitIndex; fetched: number; lastModified?: string }
+    | undefined;
   private readonly checked = new Map<
     Ecosystem,
     { promise: Promise<void>; expires: number }

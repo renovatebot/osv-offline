@@ -1,7 +1,7 @@
-import type { SplitIndex } from '@renovatebot/osv-offline-db';
-import fs from 'fs-extra';
 import os from 'node:os';
 import path from 'node:path';
+import type { SplitIndex } from '@renovatebot/osv-offline-db';
+import fs from 'fs-extra';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { GitHub, getDatabaseTag, getSplitBaseUrl } from './github.ts';
 
