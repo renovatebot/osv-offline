@@ -101,14 +101,20 @@ export class GitHub {
       ...this.baseParameters,
       per_page: 100,
     });
+    // `created_at` is the date of the tagged commit, so the age is taken from `published_at`, which drafts don't have
     const oldReleases = releases
-      .filter((release) => release.tag_name.startsWith(databaseTagPrefix) && !release.draft)
-      .sort((a, b) => b.created_at.localeCompare(a.created_at))
+      .flatMap((release) =>
+        release.tag_name.startsWith(databaseTagPrefix) && release.published_at
+          ? [{ release, publishedAt: release.published_at }]
+          : [],
+      )
+      .sort((a, b) => b.publishedAt.localeCompare(a.publishedAt))
       .slice(keptDatabaseReleases)
       .filter(
-        (release) =>
-          release.tag_name !== publishedTag && DateTime.fromISO(release.created_at) < cutoff,
-      );
+        ({ release, publishedAt }) =>
+          release.tag_name !== publishedTag && DateTime.fromISO(publishedAt) < cutoff,
+      )
+      .map(({ release }) => release);
     // like its files before, kept for the retention after the last upload, as caching proxies may serve an older index
     oldReleases.push(
       ...releases.filter(
