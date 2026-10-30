@@ -22,6 +22,7 @@ minimumReleaseAgeExclude:
   - '@renovatebot/pep440'
   - '@renovatebot/pgp'
   - '@renovatebot/ruby-semver'
+  - '@containerbase/base'
   - '@containerbase/oxlint-plugin'
   - '@containerbase/istanbul-reports-html'
   - '@containerbase/semantic-release-pnpm'

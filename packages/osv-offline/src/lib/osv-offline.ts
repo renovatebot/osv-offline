@@ -1,9 +1,8 @@
-import { Ecosystem, Osv, OsvOfflineDb } from '@renovatebot/osv-offline-db';
-import debug from 'debug';
+import { Ecosystem, Osv, OsvOfflineDb, createLogger } from '@renovatebot/osv-offline-db';
 import { tryDownloadDb } from './download.ts';
 import { SplitDownloader } from './split.ts';
 
-const logger = debug('osv-offline:download');
+const logger = createLogger('osv-offline:download');
 
 /**
  * Whether the databases are downloaded in the split format, one ecosystem at a time, instead of as one zip.
@@ -17,9 +16,9 @@ export class OsvOffline {
   private readonly splitDownloader = useSplitFormat() ? new SplitDownloader() : undefined;
 
   protected constructor() {
-    logger('Initializing databases ...');
+    logger.trace('Initializing databases ...');
     this.osvOfflineDb = OsvOfflineDb.create();
-    logger('Initializing databases done.');
+    logger.trace('Initializing databases done.');
   }
 
   /**

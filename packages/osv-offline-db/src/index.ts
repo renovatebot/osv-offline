@@ -1,6 +1,7 @@
 export { OsvOfflineDb } from './lib/db.ts';
 export { DatabaseIndexBuilder, type DatabaseRecord, getIndexFileName } from './lib/db-index.ts';
 export { Ecosystem, ecosystems } from './lib/ecosystem.ts';
+export { createLogger } from './lib/logger.ts';
 export {
   type SplitEcosystem,
   type SplitFile,
