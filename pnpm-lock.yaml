@@ -10,8 +10,8 @@ importers:
   .:
     devDependencies:
       '@containerbase/oxlint-plugin':
-        specifier: 1.0.3
-        version: 1.0.3(oxlint@1.89.0)
+        specifier: 1.0.5
+        version: 1.0.5(oxlint@1.89.0)
       '@containerbase/semantic-release-pnpm':
         specifier: 1.4.3
         version: 1.4.3(semantic-release@25.0.9)
@@ -239,8 +239,8 @@ packages:
       zod:
         optional: true
 
-  '@containerbase/oxlint-plugin@1.0.3':
-    resolution: {integrity: sha512-eYi0Yh1oN+GkUKVEa7mobsTojitqC51gDfJmkDe07PZxcPfRcSVPoYi+xD4S/rdqvpTyPtwkWiNLT5gUTH21lg==}
+  '@containerbase/oxlint-plugin@1.0.5':
+    resolution: {integrity: sha512-kMMFWkl0R+iNSuytI6grl+mwlzO/VIENbaYjbMjkGiLDrb3k/0K6j9A0xuXJ1P7vLZS2hfj5sU07ca5YO4CYOA==}
     engines: {node: '>=24.10.0', pnpm: '>=11.0.0'}
     peerDependencies:
       oxlint: '>=1.86.0'
@@ -2680,7 +2680,7 @@ snapshots:
     dependencies:
       semver: 7.8.5
 
-  '@containerbase/oxlint-plugin@1.0.3(oxlint@1.89.0)':
+  '@containerbase/oxlint-plugin@1.0.5(oxlint@1.89.0)':
     dependencies:
       '@oxlint/plugins': 1.89.0
       oxlint: 1.89.0(oxlint-tsgolint@7.0.2005)
