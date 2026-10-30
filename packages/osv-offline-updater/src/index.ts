@@ -1,9 +1,5 @@
 import path from 'node:path';
-import {
-  OsvOfflineDb,
-  type SplitIndex,
-  ecosystems,
-} from '@renovatebot/osv-offline-db';
+import { OsvOfflineDb, type SplitIndex, ecosystems } from '@renovatebot/osv-offline-db';
 import AdmZip from 'adm-zip';
 import fs from 'fs-extra';
 import { DateTime } from 'luxon';
@@ -22,13 +18,10 @@ const generated = new Date();
 // the release of the run holds the zip and the files of the split format
 const tag = getDatabaseTag(generated);
 // e.g. 20261027120513: the version of the split files
-const version = DateTime.fromJSDate(generated, { zone: 'utc' }).toFormat(
-  'yyyyMMddHHmmss'
-);
+const version = DateTime.fromJSDate(generated, { zone: 'utc' }).toFormat('yyyyMMddHHmmss');
 const splitDir = path.join(OsvOfflineDb.rootDirectory, 'split');
 const pagesDir =
-  process.env.OSV_OFFLINE_PAGES_DIR ??
-  path.join(OsvOfflineDb.rootDirectory, 'pages');
+  process.env.OSV_OFFLINE_PAGES_DIR ?? path.join(OsvOfflineDb.rootDirectory, 'pages');
 
 const zip = new AdmZip();
 const splitEcosystems: SplitIndex['ecosystems'] = {};
@@ -43,25 +36,20 @@ for (const ecosystem of ecosystems) {
   const files = await writeDatabase(
     OsvOfflineDb.rootDirectory,
     ecosystem,
-    readVulnerabilities(osvZip)
+    readVulnerabilities(osvZip),
   );
   await fs.remove(osvZip);
   for (const file of files) {
     zip.addLocalFile(file);
   }
-  splitEcosystems[ecosystem] = await writeSplitFiles(
-    splitDir,
-    ecosystem,
-    version,
-    files
-  );
+  splitEcosystems[ecosystem] = await writeSplitFiles(splitDir, ecosystem, version, files);
 }
 
 const splitIndex = await writeSplitIndex(
   path.join(pagesDir, 'v2', 'index.json'),
   splitEcosystems,
   generated,
-  getSplitBaseUrl(tag)
+  getSplitBaseUrl(tag),
 );
 
 const zipFile = zip.toBuffer();

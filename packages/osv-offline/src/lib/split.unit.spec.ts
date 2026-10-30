@@ -59,10 +59,7 @@ function splitIndex(dbSha = db.sha256): SplitIndex {
   };
 }
 
-function indexResponse(
-  index: SplitIndex,
-  lastModified = 'Tue, 27 Oct 2026 12:00:00 GMT'
-) {
+function indexResponse(index: SplitIndex, lastModified = 'Tue, 27 Oct 2026 12:00:00 GMT') {
   return {
     statusCode: 200,
     body: JSON.stringify(index),
@@ -72,7 +69,7 @@ function indexResponse(
 
 function serveFiles() {
   gotMock.stream.mockImplementation((url: URL) =>
-    Readable.from([url.pathname.endsWith('.nedb.zst') ? db.data : idx.data])
+    Readable.from([url.pathname.endsWith('.nedb.zst') ? db.data : idx.data]),
   );
 }
 
@@ -107,39 +104,32 @@ describe('packages/osv-offline/src/lib/split.unit', () => {
 
     expect(gotMock).toHaveBeenCalledExactlyOnceWith(
       new URL('https://renovatebot.github.io/osv-offline/v2/index.json'),
-      { headers: {} }
+      { headers: {} },
     );
     expect(gotMock.stream.mock.calls.map(([url]) => String(url))).toEqual([
       'https://example.com/files/npm-20261027120000.idx.json.zst',
       'https://example.com/files/npm-20261027120000.nedb.zst',
     ]);
-    await expect(
-      fs.readFile(path.join(rootDir, 'npm.nedb'), 'utf8')
-    ).resolves.toBe(database);
-    await expect(
-      fs.readFile(path.join(rootDir, 'npm.idx.json'), 'utf8')
-    ).resolves.toBe(databaseIndex);
+    await expect(fs.readFile(path.join(rootDir, 'npm.nedb'), 'utf8')).resolves.toBe(database);
+    await expect(fs.readFile(path.join(rootDir, 'npm.idx.json'), 'utf8')).resolves.toBe(
+      databaseIndex,
+    );
     await expect(fs.readJson(statePath)).resolves.toEqual({
       database: db.sha256,
       index: idx.sha256,
     });
-    expect(
-      (await fs.readdir(rootDir)).filter((f) => f.startsWith('.download-'))
-    ).toEqual([]);
+    expect((await fs.readdir(rootDir)).filter((f) => f.startsWith('.download-'))).toEqual([]);
   });
 
   it('resolves files relative to the index without base URL', async () => {
-    process.env.OSV_OFFLINE_DATABASE_INDEX_URL =
-      'https://mirror.example.com/osv/index.json';
-    gotMock.mockResolvedValue(
-      indexResponse({ ...splitIndex(), baseUrl: undefined })
-    );
+    process.env.OSV_OFFLINE_DATABASE_INDEX_URL = 'https://mirror.example.com/osv/index.json';
+    gotMock.mockResolvedValue(indexResponse({ ...splitIndex(), baseUrl: undefined }));
     serveFiles();
 
     await new SplitDownloader().ensure('npm');
 
     expect(String(gotMock.stream.mock.calls[0]?.[0])).toBe(
-      'https://mirror.example.com/osv/npm-20261027120000.idx.json.zst'
+      'https://mirror.example.com/osv/npm-20261027120000.idx.json.zst',
     );
   });
 
@@ -166,7 +156,7 @@ describe('packages/osv-offline/src/lib/split.unit', () => {
       await new SplitDownloader().ensure('npm');
 
       expect(gotMock).not.toHaveBeenCalled();
-    }
+    },
   );
 
   it('downloads again when the recorded database is missing', async () => {
@@ -177,9 +167,7 @@ describe('packages/osv-offline/src/lib/split.unit', () => {
 
     await new SplitDownloader().ensure('npm');
 
-    await expect(
-      fs.readFile(path.join(rootDir, 'npm.nedb'), 'utf8')
-    ).resolves.toBe(database);
+    await expect(fs.readFile(path.join(rootDir, 'npm.nedb'), 'utf8')).resolves.toBe(database);
   });
 
   it('only touches the state when the checksums are unchanged', async () => {
@@ -224,28 +212,23 @@ describe('packages/osv-offline/src/lib/split.unit', () => {
             this.destroy(
               Object.assign(new Error('Not Found'), {
                 response: { statusCode: 404 },
-              })
+              }),
             );
           },
         });
         return stream;
       })
       .mockImplementation((url: URL) =>
-        Readable.from([url.pathname.endsWith('.nedb.zst') ? db.data : idx.data])
+        Readable.from([url.pathname.endsWith('.nedb.zst') ? db.data : idx.data]),
       );
 
     await new SplitDownloader().ensure('npm');
 
     expect(gotMock).toHaveBeenCalledTimes(2);
-    const [url, options] = gotMock.mock.calls[1] as [
-      URL,
-      { headers: Record<string, string> },
-    ];
+    const [url, options] = gotMock.mock.calls[1] as [URL, { headers: Record<string, string> }];
     expect(url.searchParams.has('t')).toBe(true);
     expect(options.headers).toEqual({ 'cache-control': 'no-cache' });
-    await expect(
-      fs.readFile(path.join(rootDir, 'npm.nedb'), 'utf8')
-    ).resolves.toBe(database);
+    await expect(fs.readFile(path.join(rootDir, 'npm.nedb'), 'utf8')).resolves.toBe(database);
   });
 
   it.each`
@@ -253,21 +236,16 @@ describe('packages/osv-offline/src/lib/split.unit', () => {
     ${'the checksum differs'}     | ${() => splitIndex('0'.repeat(64))}
     ${'the file is too large'}    | ${() => ({ ...splitIndex(), ecosystems: { npm: { ...splitIndex().ecosystems.npm, database: { ...splitIndex().ecosystems.npm?.database, size: 1 } } } })}
     ${'the content is too large'} | ${() => ({ ...splitIndex(), ecosystems: { npm: { ...splitIndex().ecosystems.npm, database: { ...splitIndex().ecosystems.npm?.database, uncompressedSize: 1 } } } })}
-  `(
-    'keeps the existing files when $reason',
-    async ({ index }: { index: () => SplitIndex }) => {
-      await writeExistingFiles();
-      gotMock.mockResolvedValue(indexResponse(index()));
-      serveFiles();
+  `('keeps the existing files when $reason', async ({ index }: { index: () => SplitIndex }) => {
+    await writeExistingFiles();
+    gotMock.mockResolvedValue(indexResponse(index()));
+    serveFiles();
 
-      await new SplitDownloader().ensure('npm');
+    await new SplitDownloader().ensure('npm');
 
-      await expect(
-        fs.readFile(path.join(rootDir, 'npm.nedb'), 'utf8')
-      ).resolves.toBe('old');
-      await expect(fs.pathExists(statePath)).resolves.toBe(false);
-    }
-  );
+    await expect(fs.readFile(path.join(rootDir, 'npm.nedb'), 'utf8')).resolves.toBe('old');
+    await expect(fs.pathExists(statePath)).resolves.toBe(false);
+  });
 
   it('keeps an existing database without its index file when index.json is invalid', async () => {
     await writeExistingFiles(['npm.nedb']);
@@ -297,9 +275,7 @@ describe('packages/osv-offline/src/lib/split.unit', () => {
     await downloader.ensure('npm');
 
     expect(gotMock).toHaveBeenCalledTimes(2);
-    await expect(
-      fs.readFile(path.join(rootDir, 'npm.nedb'), 'utf8')
-    ).resolves.toBe(database);
+    await expect(fs.readFile(path.join(rootDir, 'npm.nedb'), 'utf8')).resolves.toBe(database);
   });
 
   it('keeps the existing database and retries after a delay', async () => {
@@ -363,9 +339,7 @@ describe('packages/osv-offline/src/lib/split.unit', () => {
     await downloader.ensure('npm');
 
     expect(gotMock).toHaveBeenCalledOnce();
-    expect(Math.round((await fs.stat(statePath)).mtimeMs / 1000)).toBe(
-      Math.round(fetched / 1000)
-    );
+    expect(Math.round((await fs.stat(statePath)).mtimeMs / 1000)).toBe(Math.round(fetched / 1000));
   });
 
   it('checks again once the recorded files reach the maximum age', async () => {

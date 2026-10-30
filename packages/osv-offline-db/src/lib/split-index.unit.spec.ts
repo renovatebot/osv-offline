@@ -1,17 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import {
-  type SplitIndex,
-  getSplitFileName,
-  parseSplitIndex,
-} from './split-index.ts';
+import { type SplitIndex, getSplitFileName, parseSplitIndex } from './split-index.ts';
 
 const sha256 = 'a'.repeat(64);
 
 const index: SplitIndex = {
   schema: 2,
   generated: '2026-10-27T12:00:00Z',
-  baseUrl:
-    'https://github.com/renovatebot/osv-offline/releases/download/database/',
+  baseUrl: 'https://github.com/renovatebot/osv-offline/releases/download/database/',
   ecosystems: {
     npm: {
       database: {
@@ -37,9 +32,7 @@ describe('packages/osv-offline-db/src/lib/split-index.unit', () => {
       ['PyPI', 'index', 'pypi-20261027120513.idx.json.zst'],
       ['crates.io', 'database', 'crates.io-20261027120513.nedb.zst'],
     ] as const)('returns the name of %s %s', (ecosystem, kind, expected) => {
-      expect(getSplitFileName(ecosystem, kind, '20261027120513')).toBe(
-        expected
-      );
+      expect(getSplitFileName(ecosystem, kind, '20261027120513')).toBe(expected);
     });
   });
 
@@ -51,9 +44,7 @@ describe('packages/osv-offline-db/src/lib/split-index.unit', () => {
     it('parses an index without base URL', () => {
       const withoutBaseUrl = { ...index, baseUrl: undefined };
 
-      expect(parseSplitIndex(JSON.stringify(withoutBaseUrl))).toEqual(
-        withoutBaseUrl
-      );
+      expect(parseSplitIndex(JSON.stringify(withoutBaseUrl))).toEqual(withoutBaseUrl);
     });
 
     it.each`

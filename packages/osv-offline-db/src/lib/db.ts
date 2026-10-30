@@ -63,7 +63,7 @@ export class OsvOfflineDb {
         logger(
           fileStat
             ? `File changed for ecosystem '${ecosystem}', reloading ...`
-            : `File removed for ecosystem '${ecosystem}', unloading ...`
+            : `File removed for ecosystem '${ecosystem}', unloading ...`,
         );
         // Delete references before unloading to prevent concurrent callers from picking up stale data
         delete this._data[ecosystem];
@@ -81,10 +81,7 @@ export class OsvOfflineDb {
     this._pendingAcs.add(ac);
 
     try {
-      const filePath = path.join(
-        OsvOfflineDb.rootDirectory,
-        `${ecosystem.toLowerCase()}.nedb`
-      );
+      const filePath = path.join(OsvOfflineDb.rootDirectory, `${ecosystem.toLowerCase()}.nedb`);
 
       const fileStat = await stat(filePath).catch(() => null);
       if (!fileStat) {
@@ -130,11 +127,11 @@ export class OsvOfflineDb {
   private async _loadIndex(
     ecosystem: Ecosystem,
     data: EcosystemData,
-    size: number
+    size: number,
   ): Promise<EcosystemIndex | null> {
     const content = await readFile(
       path.join(OsvOfflineDb.rootDirectory, getIndexFileName(ecosystem)),
-      'utf8'
+      'utf8',
     ).catch(() => null);
     if (content === null) {
       return null;
@@ -150,10 +147,7 @@ export class OsvOfflineDb {
   /**
    * Checks that the database holds the last record the index was built with.
    */
-  private async _isLastRecord(
-    data: EcosystemData,
-    last: IndexCheck | undefined
-  ): Promise<boolean> {
+  private async _isLastRecord(data: EcosystemData, last: IndexCheck | undefined): Promise<boolean> {
     if (!last) {
       return true;
     }
@@ -163,17 +157,14 @@ export class OsvOfflineDb {
 
   private async _readRecord(
     data: EcosystemData,
-    { offset, length }: { offset: number; length: number }
+    { offset, length }: { offset: number; length: number },
   ): Promise<DatabaseRecord> {
     const buffer = Buffer.allocUnsafe(length);
     const { bytesRead } = await readAsync(data.fd, buffer, 0, length, offset);
     return JSON.parse(buffer.toString('utf8', 0, bytesRead)) as DatabaseRecord;
   }
 
-  private async _buildIndex(
-    ac: AbortController,
-    data: EcosystemData
-  ): Promise<void> {
+  private async _buildIndex(ac: AbortController, data: EcosystemData): Promise<void> {
     const fileStream = createReadStream(data.filePath);
     const rl = readline.createInterface({
       input: fileStream,
@@ -202,10 +193,7 @@ export class OsvOfflineDb {
     return osvOfflineDb;
   }
 
-  async query(
-    ecosystem: Ecosystem,
-    packageName: string
-  ): Promise<Vulnerability[]> {
+  async query(ecosystem: Ecosystem, packageName: string): Promise<Vulnerability[]> {
     if (this.disposed) {
       throw new Error('Database disposed');
     }
@@ -222,7 +210,7 @@ export class OsvOfflineDb {
     }
 
     const advisories: Vulnerability[] = await Promise.all(
-      pointers.map((pointer) => this._readRecord(data, pointer))
+      pointers.map((pointer) => this._readRecord(data, pointer)),
     );
 
     if (this.disposed) {
@@ -234,10 +222,9 @@ export class OsvOfflineDb {
       vuln.affected?.some(
         (a) =>
           a.package?.name === packageName &&
-          (a.package.ecosystem === ecosystem ||
-            a.package.ecosystem.startsWith(`${ecosystem}:`)) &&
-          a.package.purl === targetPurl
-      )
+          (a.package.ecosystem === ecosystem || a.package.ecosystem.startsWith(`${ecosystem}:`)) &&
+          a.package.purl === targetPurl,
+      ),
     );
   }
 

@@ -12,10 +12,7 @@ import { type Entry, openPromise } from 'yauzl';
  *
  * @returns the names of the extracted files
  */
-export async function extractZip(
-  zipPath: string,
-  targetDir: string
-): Promise<string[]> {
+export async function extractZip(zipPath: string, targetDir: string): Promise<string[]> {
   const zipFile = await openPromise(zipPath, {
     lazyEntries: true,
     autoClose: false,
@@ -33,7 +30,7 @@ export async function extractZip(
       await pipeline(
         await zipFile.openReadStreamPromise(entry),
         new Crc32Verifier(entry),
-        createWriteStream(path.join(targetDir, entry.fileName))
+        createWriteStream(path.join(targetDir, entry.fileName)),
       );
       files.push(entry.fileName);
     }
@@ -57,11 +54,7 @@ class Crc32Verifier extends Transform {
     super();
   }
 
-  override _transform(
-    chunk: Buffer,
-    _encoding: BufferEncoding,
-    callback: TransformCallback
-  ): void {
+  override _transform(chunk: Buffer, _encoding: BufferEncoding, callback: TransformCallback): void {
     this.crc = crc32(chunk, this.crc);
     callback(null, chunk);
   }

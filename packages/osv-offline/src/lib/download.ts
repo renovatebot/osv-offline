@@ -41,16 +41,13 @@ export async function tryDownloadDb(): Promise<Result> {
   // if local database exists and is younger than the maximum age, don't do any network requests
   let stats: fs.Stats | undefined;
   try {
-    stats = await fs.stat(
-      path.join(OsvOfflineDb.rootDirectory, `osv-offline.zip`)
-    );
+    stats = await fs.stat(path.join(OsvOfflineDb.rootDirectory, `osv-offline.zip`));
   } catch {
     // ignored
   }
   if (
     stats !== undefined &&
-    DateTime.utc().diff(DateTime.fromJSDate(stats.mtime)).toMillis() <
-      getMaxAge()
+    DateTime.utc().diff(DateTime.fromJSDate(stats.mtime)).toMillis() < getMaxAge()
   ) {
     logger('Skipping download, databases are up-to-date.');
     return success();
@@ -58,9 +55,7 @@ export async function tryDownloadDb(): Promise<Result> {
 
   // only download databases if local databases are missing or remote is newer
   // download and extract into a temporary directory first, so a failed attempt leaves the current databases untouched
-  const tmpDir = await fs.mkdtemp(
-    path.join(OsvOfflineDb.rootDirectory, '.download-')
-  );
+  const tmpDir = await fs.mkdtemp(path.join(OsvOfflineDb.rootDirectory, '.download-'));
   try {
     logger('Downloading databases ...');
     const databaseUrl =
@@ -77,16 +72,10 @@ export async function tryDownloadDb(): Promise<Result> {
     const files = await extractZip(tmpZipPath, extractDir);
     // renaming replaces existing databases, while readers which already opened them keep reading the old files
     for (const file of files) {
-      await fs.rename(
-        path.join(extractDir, file),
-        path.join(OsvOfflineDb.rootDirectory, file)
-      );
+      await fs.rename(path.join(extractDir, file), path.join(OsvOfflineDb.rootDirectory, file));
     }
     // the zip's modification time marks the databases as up-to-date, so it's moved last
-    await fs.rename(
-      tmpZipPath,
-      path.join(OsvOfflineDb.rootDirectory, 'osv-offline.zip')
-    );
+    await fs.rename(tmpZipPath, path.join(OsvOfflineDb.rootDirectory, 'osv-offline.zip'));
     logger('Extracting databases done.');
   } catch (err) {
     return failure(err as Error);

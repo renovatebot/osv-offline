@@ -22,10 +22,7 @@ describe('packages/osv-offline/src/lib/download.unit', () => {
       delete process.env.OSV_OFFLINE_DISABLE_DOWNLOAD;
       delete process.env.OSV_OFFLINE_DATABASE_URL;
       delete process.env.OSV_OFFLINE_MAX_AGE;
-      const zipFilePath = path.join(
-        OsvOfflineDb.rootDirectory,
-        'osv-offline.zip'
-      );
+      const zipFilePath = path.join(OsvOfflineDb.rootDirectory, 'osv-offline.zip');
       await fs.rm(zipFilePath, { force: true });
       vi.clearAllMocks();
     });
@@ -37,10 +34,7 @@ describe('packages/osv-offline/src/lib/download.unit', () => {
     });
 
     async function writeZip(ageHours: number): Promise<void> {
-      const zipFilePath = path.join(
-        OsvOfflineDb.rootDirectory,
-        'osv-offline.zip'
-      );
+      const zipFilePath = path.join(OsvOfflineDb.rootDirectory, 'osv-offline.zip');
       await fs.ensureDir(OsvOfflineDb.rootDirectory);
       await fs.writeFile(zipFilePath, Buffer.from([]));
       const mtime = new Date(Date.now() - ageHours * 60 * 60 * 1000);
@@ -103,12 +97,12 @@ describe('packages/osv-offline/src/lib/download.unit', () => {
       expect(result.success).toBe(true);
       await expect(fs.readFile(dbPath, 'utf8')).resolves.toBe('new');
       await expect(
-        fs.pathExists(path.join(OsvOfflineDb.rootDirectory, 'osv-offline.zip'))
+        fs.pathExists(path.join(OsvOfflineDb.rootDirectory, 'osv-offline.zip')),
       ).resolves.toBe(true);
       expect(
         (await fs.readdir(OsvOfflineDb.rootDirectory)).filter((file) =>
-          file.startsWith('.download-')
-        )
+          file.startsWith('.download-'),
+        ),
       ).toEqual([]);
     });
 
@@ -121,7 +115,7 @@ describe('packages/osv-offline/src/lib/download.unit', () => {
           read() {
             this.destroy(new Error('intentional stream error'));
           },
-        })
+        }),
       );
 
       const result = await tryDownloadDb();
@@ -129,12 +123,12 @@ describe('packages/osv-offline/src/lib/download.unit', () => {
       expect(result.success).toBe(false);
       await expect(fs.readFile(dbPath, 'utf8')).resolves.toBe('old');
       await expect(
-        fs.pathExists(path.join(OsvOfflineDb.rootDirectory, 'osv-offline.zip'))
+        fs.pathExists(path.join(OsvOfflineDb.rootDirectory, 'osv-offline.zip')),
       ).resolves.toBe(false);
       expect(
         (await fs.readdir(OsvOfflineDb.rootDirectory)).filter((file) =>
-          file.startsWith('.download-')
-        )
+          file.startsWith('.download-'),
+        ),
       ).toEqual([]);
     });
 
@@ -147,7 +141,7 @@ describe('packages/osv-offline/src/lib/download.unit', () => {
 
       expect(result.success).toBe(false);
       expect(mockStream).toHaveBeenCalledWith(
-        'https://github.com/renovatebot/osv-offline/releases/latest/download/osv-offline.zip'
+        'https://github.com/renovatebot/osv-offline/releases/latest/download/osv-offline.zip',
       );
     });
 

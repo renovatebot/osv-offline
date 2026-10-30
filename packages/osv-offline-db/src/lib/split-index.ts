@@ -43,7 +43,7 @@ export interface SplitIndex {
 export function getSplitFileName(
   ecosystem: Ecosystem,
   kind: keyof SplitEcosystem,
-  version: string
+  version: string,
 ): string {
   const extension = kind === 'database' ? 'nedb' : 'idx.json';
   return `${ecosystem.toLowerCase()}-${version}.${extension}.zst`;
@@ -87,7 +87,7 @@ export function parseSplitIndex(content: string): SplitIndex | null {
     ([ecosystem, files]) =>
       (ecosystems as readonly string[]).includes(ecosystem) &&
       isSplitFile(files?.database) &&
-      isSplitFile(files.index)
+      isSplitFile(files.index),
   );
   return valid ? (index as SplitIndex) : null;
 }

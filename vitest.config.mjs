@@ -13,9 +13,7 @@ export default defineConfig({
     reporters: ci ? ['verbose', 'github-actions', 'junit'] : ['default'],
     coverage: {
       provider: 'v8',
-      reporter: ci
-        ? ['text-summary', 'json']
-        : ['text-summary', 'html', 'json'],
+      reporter: ci ? ['text-summary', 'json'] : ['text-summary', 'html', 'json'],
       enabled: ci ? true : undefined,
       reportOnFailure: true,
       exclude: [
