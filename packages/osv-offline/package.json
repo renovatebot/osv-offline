@@ -1,15 +1,15 @@
 {
   "name": "@renovatebot/osv-offline",
   "version": "0.0.0-semantic-release",
-  "main": "dist/index.js",
   "license": "MIT",
-  "type": "module",
-  "publishConfig": {
-    "access": "public"
-  },
   "repository": {
     "type": "git",
     "url": "https://github.com/renovatebot/osv-offline.git"
+  },
+  "type": "module",
+  "main": "dist/index.js",
+  "publishConfig": {
+    "access": "public"
   },
   "dependencies": {
     "@renovatebot/osv-offline-db": "workspace:*",
@@ -28,7 +28,8 @@
     "@types/ms": "2.1.0",
     "@types/node": "24.19.2",
     "@types/yauzl": "3.4.0",
-    "adm-zip": "0.6.1"
+    "adm-zip": "0.6.1",
+    "vitest": "4.1.12"
   },
   "engines": {
     "node": ">=24.11.0",

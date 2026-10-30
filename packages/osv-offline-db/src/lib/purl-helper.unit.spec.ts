@@ -1,6 +1,6 @@
-import { packageToPurl } from './purl-helper.ts';
-import type { Ecosystem } from './ecosystem.ts';
 import { describe, expect, test } from 'vitest';
+import type { Ecosystem } from './ecosystem.ts';
+import { packageToPurl } from './purl-helper.ts';
 
 describe('packages/osv-offline-db/src/lib/purl-helper.unit', () => {
   describe('test ecosystems', () => {

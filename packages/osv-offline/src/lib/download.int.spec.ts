@@ -1,8 +1,8 @@
+import path from 'path';
 import { OsvOfflineDb } from '@renovatebot/osv-offline-db';
 import fs from 'fs-extra';
-import path from 'path';
-import { tryDownloadDb } from './download.ts';
 import { afterAll, beforeEach, describe, expect, it } from 'vitest';
+import { tryDownloadDb } from './download.ts';
 
 describe('packages/osv-offline/src/lib/download.int', () => {
   describe('tryDownloadDb', () => {

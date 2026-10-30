@@ -1,7 +1,7 @@
-import type { Osv } from '@renovatebot/osv-offline-db';
 import { Transform, type TransformCallback } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
 import { crc32 } from 'node:zlib';
+import type { Osv } from '@renovatebot/osv-offline-db';
 import { type Entry, openPromise } from 'yauzl';
 
 /**

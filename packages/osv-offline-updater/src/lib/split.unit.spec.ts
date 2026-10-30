@@ -1,9 +1,9 @@
-import { parseSplitIndex } from '@renovatebot/osv-offline-db';
-import fs from 'fs-extra';
 import { createHash } from 'node:crypto';
 import os from 'node:os';
 import path from 'node:path';
 import { zstdCompressSync, zstdDecompressSync } from 'node:zlib';
+import { parseSplitIndex } from '@renovatebot/osv-offline-db';
+import fs from 'fs-extra';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import {
   compressFile,

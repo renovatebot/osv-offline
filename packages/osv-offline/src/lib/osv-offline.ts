@@ -1,7 +1,7 @@
 import { Ecosystem, Osv, OsvOfflineDb } from '@renovatebot/osv-offline-db';
+import debug from 'debug';
 import { tryDownloadDb } from './download.ts';
 import { SplitDownloader } from './split.ts';
-import debug from 'debug';
 
 const logger = debug('osv-offline:download');
 

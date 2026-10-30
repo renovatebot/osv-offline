@@ -1,14 +1,14 @@
 {
   "name": "@renovatebot/osv-offline-updater",
   "version": "0.0.0-semantic-release",
-  "main": "src/index.ts",
-  "license": "MIT",
   "private": true,
-  "type": "module",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/renovatebot/osv-offline.git"
   },
+  "type": "module",
+  "main": "src/index.ts",
   "scripts": {
     "start": "node ./src/index.ts"
   },
@@ -30,6 +30,7 @@
     "@types/luxon": "3.7.6",
     "@types/node": "24.19.2",
     "@types/signale": "1.4.7",
-    "@types/yauzl": "3.4.0"
+    "@types/yauzl": "3.4.0",
+    "vitest": "4.1.12"
   }
 }

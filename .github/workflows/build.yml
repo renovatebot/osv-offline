@@ -33,9 +33,9 @@ jobs:
 
       - run: pnpm build
 
-      - run: pnpm eslint -f gha
+      - run: pnpm oxlint --format github
 
-      - run: pnpm prettier
+      - run: pnpm oxfmt --check
 
   test:
     runs-on: ubuntu-24.04

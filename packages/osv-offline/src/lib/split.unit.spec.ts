@@ -1,9 +1,9 @@
-import type { SplitIndex } from '@renovatebot/osv-offline-db';
-import fs from 'fs-extra';
 import { createHash } from 'node:crypto';
 import path from 'node:path';
 import { Readable } from 'node:stream';
 import { zstdCompressSync } from 'node:zlib';
+import type { SplitIndex } from '@renovatebot/osv-offline-db';
+import fs from 'fs-extra';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 // a directory of its own, as the database directory is read when the module is loaded

@@ -1,13 +1,13 @@
+import { pipeline } from 'node:stream/promises';
+import path from 'path';
+import { OsvOfflineDb } from '@renovatebot/osv-offline-db';
+import debug from 'debug';
 import fs from 'fs-extra';
 import got from 'got';
-import { pipeline } from 'node:stream/promises';
-import { OsvOfflineDb } from '@renovatebot/osv-offline-db';
-import path from 'path';
 import { DateTime } from 'luxon';
 import ms from 'ms';
 import { Result, failure, success } from './types.ts';
 import { extractZip } from './unzip.ts';
-import debug from 'debug';
 
 const logger = debug('osv-offline:download');
 

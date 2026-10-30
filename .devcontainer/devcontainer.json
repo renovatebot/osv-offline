@@ -3,11 +3,7 @@
   "postStartCommand": "pnpm install",
   "customizations": {
     "vscode": {
-      "extensions": [
-        "vitest.explorer",
-        "dbaeumer.vscode-eslint",
-        "esbenp.prettier-vscode"
-      ]
+      "extensions": ["vitest.explorer", "oxc.oxc-vscode"]
     }
   }
 }

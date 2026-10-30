@@ -1,9 +1,10 @@
-import { readFile, stat } from 'node:fs/promises';
 import { closeSync, createReadStream, read as fsRead, openSync } from 'node:fs';
-import { promisify } from 'node:util';
-import path from 'node:path';
+import { readFile, stat } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
+import path from 'node:path';
 import readline from 'node:readline';
+import { promisify } from 'node:util';
+import debug from 'debug';
 import {
   DatabaseIndexBuilder,
   type DatabaseRecord,
@@ -15,7 +16,6 @@ import {
 import { Ecosystem } from './ecosystem.ts';
 import type { Vulnerability } from './osv.ts';
 import { packageToPurl } from './purl-helper.ts';
-import debug from 'debug';
 
 const logger = debug('osv-offline:db');
 const readAsync = promisify(fsRead);
@@ -225,7 +225,9 @@ export class OsvOfflineDb {
       pointers.map((pointer) => this._readRecord(data, pointer))
     );
 
-    if (this.disposed) return [];
+    if (this.disposed) {
+      return [];
+    }
 
     const targetPurl = packageToPurl(ecosystem, packageName);
     return advisories.filter((vuln) =>
