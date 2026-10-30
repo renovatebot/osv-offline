@@ -24,10 +24,7 @@ describe('packages/osv-offline/src/lib/unzip.unit', () => {
       await fs.remove(tmpDir);
     });
 
-    async function writeZip(
-      files: Record<string, string>,
-      method?: number
-    ): Promise<Buffer> {
+    async function writeZip(files: Record<string, string>, method?: number): Promise<Buffer> {
       const zip = new AdmZip();
       for (const [name, content] of Object.entries(files)) {
         zip.addFile(name, Buffer.from(content));
@@ -48,12 +45,8 @@ describe('packages/osv-offline/src/lib/unzip.unit', () => {
       const files = await extractZip(zipPath, targetDir);
 
       expect(files).toEqual(['npm.nedb', 'pypi.nedb']);
-      await expect(
-        fs.readFile(path.join(targetDir, 'npm.nedb'), 'utf8')
-      ).resolves.toBe(content);
-      await expect(
-        fs.readFile(path.join(targetDir, 'pypi.nedb'), 'utf8')
-      ).resolves.toBe('pypi');
+      await expect(fs.readFile(path.join(targetDir, 'npm.nedb'), 'utf8')).resolves.toBe(content);
+      await expect(fs.readFile(path.join(targetDir, 'pypi.nedb'), 'utf8')).resolves.toBe('pypi');
     });
 
     it('extracts stored and empty files', async () => {
@@ -62,12 +55,8 @@ describe('packages/osv-offline/src/lib/unzip.unit', () => {
       const files = await extractZip(zipPath, targetDir);
 
       expect(files).toEqual(['go.nedb', 'pub.nedb']);
-      await expect(
-        fs.readFile(path.join(targetDir, 'go.nedb'), 'utf8')
-      ).resolves.toBe('go');
-      await expect(
-        fs.readFile(path.join(targetDir, 'pub.nedb'), 'utf8')
-      ).resolves.toBe('');
+      await expect(fs.readFile(path.join(targetDir, 'go.nedb'), 'utf8')).resolves.toBe('go');
+      await expect(fs.readFile(path.join(targetDir, 'pub.nedb'), 'utf8')).resolves.toBe('');
     });
 
     it('skips directory entries', async () => {
@@ -82,7 +71,7 @@ describe('packages/osv-offline/src/lib/unzip.unit', () => {
       await writeZip({ 'dir/npm.nedb': 'npm' });
 
       await expect(extractZip(zipPath, targetDir)).rejects.toThrow(
-        'Unsupported zip entry name: dir/npm.nedb'
+        'Unsupported zip entry name: dir/npm.nedb',
       );
     });
 
@@ -99,9 +88,7 @@ describe('packages/osv-offline/src/lib/unzip.unit', () => {
       buffer.writeUInt32LE(0, header + 16);
       await fs.writeFile(zipPath, buffer);
 
-      await expect(extractZip(zipPath, targetDir)).rejects.toThrow(
-        'CRC-32 mismatch for npm.nedb'
-      );
+      await expect(extractZip(zipPath, targetDir)).rejects.toThrow('CRC-32 mismatch for npm.nedb');
     });
   });
 });

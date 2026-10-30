@@ -7,9 +7,7 @@ import { type Entry, openPromise } from 'yauzl';
 /**
  * Reads the vulnerabilities of an OSV `all.zip` one entry at a time, verifying the CRC-32 of each.
  */
-export async function* readVulnerabilities(
-  zipPath: string
-): AsyncGenerator<Osv.Vulnerability> {
+export async function* readVulnerabilities(zipPath: string): AsyncGenerator<Osv.Vulnerability> {
   const zipFile = await openPromise(zipPath, {
     lazyEntries: true,
     autoClose: false,
@@ -24,11 +22,9 @@ export async function* readVulnerabilities(
           for await (const chunk of source) {
             chunks.push(chunk);
           }
-        }
+        },
       );
-      yield JSON.parse(
-        Buffer.concat(chunks).toString('utf8')
-      ) as Osv.Vulnerability;
+      yield JSON.parse(Buffer.concat(chunks).toString('utf8')) as Osv.Vulnerability;
     }
   } finally {
     zipFile.close();
@@ -51,11 +47,7 @@ class Crc32Verifier extends Transform {
     this.entry = entry;
   }
 
-  override _transform(
-    chunk: Buffer,
-    _encoding: BufferEncoding,
-    callback: TransformCallback
-  ): void {
+  override _transform(chunk: Buffer, _encoding: BufferEncoding, callback: TransformCallback): void {
     this.crc = crc32(chunk, this.crc);
     callback(null, chunk);
   }

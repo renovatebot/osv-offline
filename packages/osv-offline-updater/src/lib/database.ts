@@ -24,9 +24,7 @@ function generateId(): string {
 export async function writeDatabase(
   directory: string,
   ecosystem: Ecosystem,
-  vulnerabilities:
-    | AsyncIterable<Osv.Vulnerability>
-    | Iterable<Osv.Vulnerability>
+  vulnerabilities: AsyncIterable<Osv.Vulnerability> | Iterable<Osv.Vulnerability>,
 ): Promise<[database: string, index: string]> {
   const databasePath = path.join(directory, `${ecosystem.toLowerCase()}.nedb`);
   const indexPath = path.join(directory, getIndexFileName(ecosystem));

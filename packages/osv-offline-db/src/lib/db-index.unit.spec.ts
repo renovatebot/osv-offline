@@ -43,7 +43,7 @@ describe('packages/osv-offline-db/src/lib/db-index.unit', () => {
             ],
           ],
           ['bar', [{ offset: 0, length: line1.length }]],
-        ])
+        ]),
       );
     });
 
@@ -55,9 +55,7 @@ describe('packages/osv-offline-db/src/lib/db-index.unit', () => {
       builder.add('{}', {} as DatabaseRecord);
       builder.add(line, JSON.parse(line) as DatabaseRecord);
 
-      expect(builder.index).toEqual(
-        new Map([['foo', [{ offset: 12, length: line.length }]]])
-      );
+      expect(builder.index).toEqual(new Map([['foo', [{ offset: 12, length: line.length }]]]));
     });
 
     it('counts bytes, not characters', () => {
