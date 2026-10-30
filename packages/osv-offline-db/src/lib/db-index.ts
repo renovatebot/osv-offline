@@ -52,7 +52,7 @@ export class DatabaseIndexBuilder {
     const names = new Set(
       (record?.affected ?? [])
         .map((affected) => affected.package?.name)
-        .filter((name): name is string => !!name)
+        .filter((name): name is string => !!name),
     );
     for (const name of names) {
       let pointers = this.index.get(name);
@@ -77,11 +77,8 @@ export class DatabaseIndexBuilder {
       packages: Object.fromEntries(
         Array.from(this.index, ([name, pointers]) => [
           name,
-          pointers.map(({ offset, length }): [number, number] => [
-            offset,
-            length,
-          ]),
-        ])
+          pointers.map(({ offset, length }): [number, number] => [offset, length]),
+        ]),
       ),
     };
     return JSON.stringify(file);
@@ -95,7 +92,7 @@ export class DatabaseIndexBuilder {
  */
 export function parseIndex(
   content: string,
-  size: number
+  size: number,
 ): { index: EcosystemIndex; last: IndexCheck | undefined } | null {
   let file: IndexFile;
   try {
@@ -103,18 +100,14 @@ export function parseIndex(
   } catch {
     return null;
   }
-  if (
-    file?.size !== size ||
-    typeof file.packages !== 'object' ||
-    file.packages === null
-  ) {
+  if (file?.size !== size || typeof file.packages !== 'object' || file.packages === null) {
     return null;
   }
   const index: EcosystemIndex = new Map(
     Object.entries(file.packages).map(([name, pointers]) => [
       name,
       pointers.map(([offset, length]) => ({ offset, length })),
-    ])
+    ]),
   );
   return { index, last: file.last };
 }

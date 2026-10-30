@@ -1,9 +1,9 @@
+import path from 'node:path';
 import { Octokit } from '@octokit/rest';
 import { type SplitIndex, parseSplitIndex } from '@renovatebot/osv-offline-db';
 import fs from 'fs-extra';
-import path from 'node:path';
-import signale from 'signale';
 import { DateTime } from 'luxon';
+import signale from 'signale';
 
 /** prefix of the tags of database releases, e.g. `1-20210208190513` */
 const databaseTagPrefix = '1-';
@@ -18,12 +18,10 @@ const databaseRetention = { hours: 28 };
 const legacySplitReleaseTag = 'database';
 
 /** where the assets of a release are downloaded from, followed by its tag */
-const releaseDownloadUrl =
-  'https://github.com/renovatebot/osv-offline/releases/download/';
+const releaseDownloadUrl = 'https://github.com/renovatebot/osv-offline/releases/download/';
 
 /** the index of the split format currently deployed to GitHub Pages */
-const publishedSplitIndexUrl =
-  'https://renovatebot.github.io/osv-offline/v2/index.json';
+const publishedSplitIndexUrl = 'https://renovatebot.github.io/osv-offline/v2/index.json';
 
 /**
  * Returns the tag of the database release of a run, e.g. `1-20210208190513`.
@@ -57,12 +55,7 @@ export class GitHub {
    * `splitDir`, then deletes old database releases. The release is a draft until all files are uploaded, so the latest
    * release always has them, and it works with immutable releases.
    */
-  async uploadDatabase(
-    tag: string,
-    zipFile: Buffer,
-    splitDir: string,
-    index: SplitIndex
-  ) {
+  async uploadDatabase(tag: string, zipFile: Buffer, splitDir: string, index: SplitIndex) {
     const latestCommit = await this.getLatestCommit();
     signale.info(`Latest commit is ${latestCommit}`);
     await this.createTag(tag, latestCommit);
@@ -73,14 +66,14 @@ export class GitHub {
       release.data.id,
       'osv-offline.zip',
       zipFile,
-      'application/octet-stream'
+      'application/octet-stream',
     );
     for (const file of getSplitFiles(index)) {
       await this.uploadReleaseAsset(
         release.data.id,
         file,
         await fs.readFile(path.join(splitDir, file)),
-        'application/zstd'
+        'application/zstd',
       );
       signale.info(`Uploaded ${file}`);
     }
@@ -104,23 +97,22 @@ export class GitHub {
     }
     const publishedTag = getReleaseTag(published.baseUrl);
     const cutoff = DateTime.utc().minus(databaseRetention);
-    const releases = await this.octokit.paginate(
-      this.octokit.repos.listReleases,
-      { ...this.baseParameters, per_page: 100 }
-    );
+    const releases = await this.octokit.paginate(this.octokit.repos.listReleases, {
+      ...this.baseParameters,
+      per_page: 100,
+    });
     // `created_at` is the date of the tagged commit, so the age is taken from `published_at`, which drafts don't have
     const oldReleases = releases
       .flatMap((release) =>
         release.tag_name.startsWith(databaseTagPrefix) && release.published_at
           ? [{ release, publishedAt: release.published_at }]
-          : []
+          : [],
       )
       .sort((a, b) => b.publishedAt.localeCompare(a.publishedAt))
       .slice(keptDatabaseReleases)
       .filter(
         ({ release, publishedAt }) =>
-          release.tag_name !== publishedTag &&
-          DateTime.fromISO(publishedAt) < cutoff
+          release.tag_name !== publishedTag && DateTime.fromISO(publishedAt) < cutoff,
       )
       .map(({ release }) => release);
     // like its files before, kept for the retention after the last upload, as caching proxies may serve an older index
@@ -129,10 +121,8 @@ export class GitHub {
         (release) =>
           release.tag_name === legacySplitReleaseTag &&
           publishedTag !== legacySplitReleaseTag &&
-          release.assets.every(
-            (asset) => DateTime.fromISO(asset.created_at) < cutoff
-          )
-      )
+          release.assets.every((asset) => DateTime.fromISO(asset.created_at) < cutoff),
+      ),
     );
     signale.info(`Found ${oldReleases.length} old database releases`);
     for (const release of oldReleases) {
@@ -188,7 +178,7 @@ export class GitHub {
     releaseId: number,
     name: string,
     data: Buffer,
-    contentType: string
+    contentType: string,
   ) {
     await this.octokit.repos.uploadReleaseAsset({
       ...this.baseParameters,

@@ -20,10 +20,7 @@ function urlEncode(packageName: string): string {
   return parts.map(encodeURIComponent).join('/');
 }
 
-export function packageToPurl(
-  ecosystem: Ecosystem,
-  packageName: string
-): string {
+export function packageToPurl(ecosystem: Ecosystem, packageName: string): string {
   let packageNamePurl = packageName;
   const purlType = PURL_ECOSYSTEMS[ecosystem];
 

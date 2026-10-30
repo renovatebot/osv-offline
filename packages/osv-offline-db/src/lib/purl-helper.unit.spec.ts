@@ -1,6 +1,6 @@
-import { packageToPurl } from './purl-helper.ts';
-import type { Ecosystem } from './ecosystem.ts';
 import { describe, expect, test } from 'vitest';
+import type { Ecosystem } from './ecosystem.ts';
+import { packageToPurl } from './purl-helper.ts';
 
 describe('packages/osv-offline-db/src/lib/purl-helper.unit', () => {
   describe('test ecosystems', () => {
@@ -18,9 +18,7 @@ describe('packages/osv-offline-db/src/lib/purl-helper.unit', () => {
       ${'PyPI'}      | ${'django'}                         | ${'pkg:pypi/django'}
       ${'RubyGems'}  | ${'rails-html-sanitizer'}           | ${'pkg:gem/rails-html-sanitizer'}
     `('$ecosystem | $packageName', ({ ecosystem, packageName, purl }) => {
-      expect(packageToPurl(ecosystem as Ecosystem, packageName as string)).toBe(
-        purl
-      );
+      expect(packageToPurl(ecosystem as Ecosystem, packageName as string)).toBe(purl);
     });
   });
 });

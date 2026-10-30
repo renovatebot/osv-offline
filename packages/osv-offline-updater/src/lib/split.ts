@@ -1,4 +1,3 @@
-import fs from 'fs-extra';
 import { createHash } from 'node:crypto';
 import { createReadStream, createWriteStream } from 'node:fs';
 import os from 'node:os';
@@ -6,7 +5,6 @@ import path from 'node:path';
 import { Transform, type TransformCallback, Writable } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
 import { createZstdDecompress } from 'node:zlib';
-import { CompressStream } from 'zstd-napi';
 import {
   type Ecosystem,
   type SplitEcosystem,
@@ -15,6 +13,8 @@ import {
   getSplitFileName,
   splitIndexSchema,
 } from '@renovatebot/osv-offline-db';
+import fs from 'fs-extra';
+import { CompressStream } from 'zstd-napi';
 
 /**
  * zstd level 19 with long-distance matching. A window of 2^27 bytes is the largest decoders accept without extra options.
@@ -35,11 +35,7 @@ class Digest extends Transform {
   private readonly hash = createHash('sha256');
   size = 0;
 
-  override _transform(
-    chunk: Buffer,
-    _encoding: BufferEncoding,
-    callback: TransformCallback
-  ): void {
+  override _transform(chunk: Buffer, _encoding: BufferEncoding, callback: TransformCallback): void {
     this.hash.update(chunk);
     this.size += chunk.length;
     callback(null, chunk);
@@ -53,10 +49,7 @@ class Digest extends Transform {
 /**
  * Compresses `source` with zstd into `target`, and checks that `node:zlib` decompresses it to the source again.
  */
-export async function compressFile(
-  source: string,
-  target: string
-): Promise<SplitFile> {
+export async function compressFile(source: string, target: string): Promise<SplitFile> {
   const sourceDigest = new Digest();
   const digest = new Digest();
   await pipeline(
@@ -64,7 +57,7 @@ export async function compressFile(
     sourceDigest,
     new CompressStream(zstdParameters),
     digest,
-    createWriteStream(target)
+    createWriteStream(target),
   );
   const uncompressedSha256 = sourceDigest.digest();
   await verifyCompressedFile(target, uncompressedSha256, sourceDigest.size);
@@ -82,14 +75,14 @@ export async function compressFile(
 export async function verifyCompressedFile(
   file: string,
   sha256: string,
-  size: number
+  size: number,
 ): Promise<void> {
   const digest = new Digest();
   await pipeline(
     createReadStream(file),
     createZstdDecompress(),
     digest,
-    new Writable({ write: (_chunk, _encoding, callback) => callback() })
+    new Writable({ write: (_chunk, _encoding, callback) => callback() }),
   );
   if (digest.digest() !== sha256 || digest.size !== size) {
     throw new Error(`${path.basename(file)} doesn't decompress to its source`);
@@ -103,17 +96,17 @@ export async function writeSplitFiles(
   directory: string,
   ecosystem: Ecosystem,
   version: string,
-  [databasePath, indexPath]: [database: string, index: string]
+  [databasePath, indexPath]: [database: string, index: string],
 ): Promise<SplitEcosystem> {
   await fs.ensureDir(directory);
   return {
     database: await compressFile(
       databasePath,
-      path.join(directory, getSplitFileName(ecosystem, 'database', version))
+      path.join(directory, getSplitFileName(ecosystem, 'database', version)),
     ),
     index: await compressFile(
       indexPath,
-      path.join(directory, getSplitFileName(ecosystem, 'index', version))
+      path.join(directory, getSplitFileName(ecosystem, 'index', version)),
     ),
   };
 }
@@ -125,7 +118,7 @@ export async function writeSplitIndex(
   indexPath: string,
   ecosystems: SplitIndex['ecosystems'],
   generated: Date,
-  baseUrl: string
+  baseUrl: string,
 ): Promise<SplitIndex> {
   const index: SplitIndex = {
     schema: splitIndexSchema,

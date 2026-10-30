@@ -1,9 +1,8 @@
-import { format } from 'util';
-
 import { createWriteStream } from 'node:fs';
 import { pipeline } from 'node:stream/promises';
-import got from 'got';
+import { format } from 'util';
 import type { Ecosystem } from '@renovatebot/osv-offline-db';
+import got from 'got';
 
 export class OsvDownloader {
   private static readonly downloadUrlFormat =

@@ -1,16 +1,11 @@
-import { parseSplitIndex } from '@renovatebot/osv-offline-db';
-import fs from 'fs-extra';
 import { createHash } from 'node:crypto';
 import os from 'node:os';
 import path from 'node:path';
 import { zstdCompressSync, zstdDecompressSync } from 'node:zlib';
+import { parseSplitIndex } from '@renovatebot/osv-offline-db';
+import fs from 'fs-extra';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import {
-  compressFile,
-  verifyCompressedFile,
-  writeSplitFiles,
-  writeSplitIndex,
-} from './split.ts';
+import { compressFile, verifyCompressedFile, writeSplitFiles, writeSplitIndex } from './split.ts';
 
 describe('packages/osv-offline-updater/src/lib/split.unit', () => {
   let directory: string;
@@ -65,22 +60,17 @@ describe('packages/osv-offline-updater/src/lib/split.unit', () => {
     });
 
     it('accepts a file which decompresses to the expected content', async () => {
-      await expect(
-        verifyCompressedFile(file, sha256, content.length)
-      ).resolves.toBeUndefined();
+      await expect(verifyCompressedFile(file, sha256, content.length)).resolves.toBeUndefined();
     });
 
     it.each([
       ['checksum', '0'.repeat(64), content.length],
       ['size', sha256, content.length + 1],
-    ] as const)(
-      'rejects a file with another %s',
-      async (_, expectedSha256, expectedSize) => {
-        await expect(
-          verifyCompressedFile(file, expectedSha256, expectedSize)
-        ).rejects.toThrow("npm.nedb.zst doesn't decompress to its source");
-      }
-    );
+    ] as const)('rejects a file with another %s', async (_, expectedSha256, expectedSize) => {
+      await expect(verifyCompressedFile(file, expectedSha256, expectedSize)).rejects.toThrow(
+        "npm.nedb.zst doesn't decompress to its source",
+      );
+    });
   });
 
   describe('writeSplitFiles', () => {
@@ -99,9 +89,9 @@ describe('packages/osv-offline-updater/src/lib/split.unit', () => {
       expect(files.database.file).toBe('pypi-20261027120513.nedb.zst');
       expect(files.index.file).toBe('pypi-20261027120513.idx.json.zst');
       expect(
-        zstdDecompressSync(
-          await fs.readFile(path.join(splitDir, files.index.file))
-        ).toString('utf8')
+        zstdDecompressSync(await fs.readFile(path.join(splitDir, files.index.file))).toString(
+          'utf8',
+        ),
       ).toBe('{"size":17,"packages":{}}');
     });
   });
@@ -110,17 +100,14 @@ describe('packages/osv-offline-updater/src/lib/split.unit', () => {
     it('writes a valid index', async () => {
       const source = path.join(directory, 'npm.nedb');
       await fs.writeFile(source, '{"id":"GHSA-1"}\n');
-      const file = await compressFile(
-        source,
-        path.join(directory, 'npm-20261027120513.nedb.zst')
-      );
+      const file = await compressFile(source, path.join(directory, 'npm-20261027120513.nedb.zst'));
       const indexPath = path.join(directory, 'pages', 'v2', 'index.json');
 
       const index = await writeSplitIndex(
         indexPath,
         { npm: { database: file, index: file } },
         new Date('2026-10-27T12:00:00Z'),
-        'https://example.com/files/'
+        'https://example.com/files/',
       );
 
       expect(index).toEqual({
@@ -129,9 +116,7 @@ describe('packages/osv-offline-updater/src/lib/split.unit', () => {
         baseUrl: 'https://example.com/files/',
         ecosystems: { npm: { database: file, index: file } },
       });
-      expect(parseSplitIndex(await fs.readFile(indexPath, 'utf8'))).toEqual(
-        index
-      );
+      expect(parseSplitIndex(await fs.readFile(indexPath, 'utf8'))).toEqual(index);
     });
   });
 });

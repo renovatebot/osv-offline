@@ -1,8 +1,8 @@
-import type { Osv } from '@renovatebot/osv-offline-db';
-import fs from 'fs-extra';
 import os from 'node:os';
 import path from 'node:path';
 import { Readable } from 'node:stream';
+import type { Osv } from '@renovatebot/osv-offline-db';
+import fs from 'fs-extra';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { writeDatabase } from './database.ts';
 
@@ -29,9 +29,7 @@ describe('packages/osv-offline-updater/src/lib/database.unit', () => {
     let directory: string;
 
     beforeEach(async () => {
-      directory = await fs.mkdtemp(
-        path.join(os.tmpdir(), 'osv-offline-updater-')
-      );
+      directory = await fs.mkdtemp(path.join(os.tmpdir(), 'osv-offline-updater-'));
     });
 
     afterEach(async () => {
@@ -39,16 +37,9 @@ describe('packages/osv-offline-updater/src/lib/database.unit', () => {
     });
 
     it('writes one record per line with an _id', async () => {
-      const vulnerabilities = [
-        vulnerability('VULN-1', 'foo'),
-        vulnerability('VULN-2', 'bar'),
-      ];
+      const vulnerabilities = [vulnerability('VULN-1', 'foo'), vulnerability('VULN-2', 'bar')];
 
-      const [databasePath, indexPath] = await writeDatabase(
-        directory,
-        'npm',
-        vulnerabilities
-      );
+      const [databasePath, indexPath] = await writeDatabase(directory, 'npm', vulnerabilities);
 
       expect(databasePath).toBe(path.join(directory, 'npm.nedb'));
       expect(indexPath).toBe(path.join(directory, 'npm.idx.json'));
@@ -70,12 +61,10 @@ describe('packages/osv-offline-updater/src/lib/database.unit', () => {
       ]);
 
       const database = await fs.readFile(databasePath);
-      const index = JSON.parse(
-        await fs.readFile(indexPath, 'utf8')
-      ) as IndexFile;
+      const index = JSON.parse(await fs.readFile(indexPath, 'utf8')) as IndexFile;
       const read = (offset: number, length: number) =>
         JSON.parse(
-          database.subarray(offset, offset + length).toString('utf8')
+          database.subarray(offset, offset + length).toString('utf8'),
         ) as Osv.Vulnerability & { _id: string };
 
       expect(index.size).toBe(database.length);
@@ -84,31 +73,21 @@ describe('packages/osv-offline-updater/src/lib/database.unit', () => {
           Object.entries(index.packages).map(([name, pointers]) => [
             name,
             pointers.map(([offset, length]) => read(offset, length).id),
-          ])
-        )
+          ]),
+        ),
       ).toEqual({ foo: ['VULN-1', 'VULN-2'], bar: ['VULN-1'] });
-      expect(read(index.last.offset, index.last.length)._id).toBe(
-        index.last.id
-      );
+      expect(read(index.last.offset, index.last.length)._id).toBe(index.last.id);
     });
 
     it('writes more records than fit into the write buffer', async () => {
       const vulnerabilities = Array.from({ length: 2000 }, (_, i) =>
-        vulnerability(`VULN-${i}`, 'foo')
+        vulnerability(`VULN-${i}`, 'foo'),
       );
 
-      const [databasePath, indexPath] = await writeDatabase(
-        directory,
-        'npm',
-        vulnerabilities
-      );
+      const [databasePath, indexPath] = await writeDatabase(directory, 'npm', vulnerabilities);
 
-      const lines = (await fs.readFile(databasePath, 'utf8'))
-        .split('\n')
-        .filter(Boolean);
-      const index = JSON.parse(
-        await fs.readFile(indexPath, 'utf8')
-      ) as IndexFile;
+      const lines = (await fs.readFile(databasePath, 'utf8')).split('\n').filter(Boolean);
+      const index = JSON.parse(await fs.readFile(indexPath, 'utf8')) as IndexFile;
       expect(lines).toHaveLength(2000);
       expect(index.packages.foo).toHaveLength(2000);
     });
@@ -117,19 +96,14 @@ describe('packages/osv-offline-updater/src/lib/database.unit', () => {
       const [databasePath, indexPath] = await writeDatabase(
         directory,
         'npm',
-        Readable.from([
-          vulnerability('VULN-1', 'foo'),
-          vulnerability('VULN-2', 'bar'),
-        ])
+        Readable.from([vulnerability('VULN-1', 'foo'), vulnerability('VULN-2', 'bar')]),
       );
 
       const lines = (await fs.readFile(databasePath, 'utf8'))
         .split('\n')
         .filter(Boolean)
         .map((line) => JSON.parse(line) as Osv.Vulnerability);
-      const index = JSON.parse(
-        await fs.readFile(indexPath, 'utf8')
-      ) as IndexFile;
+      const index = JSON.parse(await fs.readFile(indexPath, 'utf8')) as IndexFile;
       expect(lines.map(({ id }) => id)).toEqual(['VULN-1', 'VULN-2']);
       expect(Object.keys(index.packages)).toEqual(['foo', 'bar']);
     });
@@ -137,9 +111,7 @@ describe('packages/osv-offline-updater/src/lib/database.unit', () => {
     it('replaces existing files', async () => {
       await writeDatabase(directory, 'npm', [vulnerability('OLD', 'foo')]);
 
-      const [databasePath] = await writeDatabase(directory, 'npm', [
-        vulnerability('NEW', 'foo'),
-      ]);
+      const [databasePath] = await writeDatabase(directory, 'npm', [vulnerability('NEW', 'foo')]);
 
       const content = await fs.readFile(databasePath, 'utf8');
       expect(content).toContain('"id":"NEW"');

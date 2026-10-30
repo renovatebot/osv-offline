@@ -1,19 +1,11 @@
-import { OsvOfflineDb } from './db.ts';
-import { DatabaseIndexBuilder, type DatabaseRecord } from './db-index.ts';
-import fs from 'fs-extra';
 import readline from 'node:readline';
 import path from 'path';
 import { setTimeout } from 'timers/promises';
+import fs from 'fs-extra';
+import { afterAll, afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { DatabaseIndexBuilder, type DatabaseRecord } from './db-index.ts';
+import { OsvOfflineDb } from './db.ts';
 import type { Vulnerability } from './osv.ts';
-import {
-  afterAll,
-  afterEach,
-  beforeEach,
-  describe,
-  expect,
-  it,
-  vi,
-} from 'vitest';
 
 describe('packages/osv-offline-db/src/lib/db.int', () => {
   const rootDir = OsvOfflineDb.rootDirectory;
@@ -36,9 +28,7 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
     affected: [
       {
         package: { name: 'public', ecosystem: 'npm', purl: 'pkg:npm/public' },
-        ranges: [
-          { type: 'SEMVER', events: [{ introduced: '0' }, { fixed: '0.1.4' }] },
-        ],
+        ranges: [{ type: 'SEMVER', events: [{ introduced: '0' }, { fixed: '0.1.4' }] }],
         database_specific: {
           source:
             'https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2019/05/GHSA-7jfh-2xc9-ccv7/GHSA-7jfh-2xc9-ccv7.json',
@@ -88,7 +78,7 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
         JSON.stringify({
           ...sampleVuln,
           affected: undefined,
-        })
+        }),
       );
 
       const result = await osvOfflineDb.query('npm', 'public');
@@ -122,7 +112,7 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
         expect.arrayContaining([
           expect.objectContaining({ id: 'VULN-1' }),
           expect.objectContaining({ id: 'VULN-2' }),
-        ])
+        ]),
       );
     });
 
@@ -149,10 +139,7 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
         ],
       };
 
-      using osvOfflineDb = await createDbWithContent(
-        'npm.nedb',
-        JSON.stringify(multiRangeVuln)
-      );
+      using osvOfflineDb = await createDbWithContent('npm.nedb', JSON.stringify(multiRangeVuln));
 
       const result = await osvOfflineDb.query('npm', 'public');
       expect(result).toHaveLength(1);
@@ -160,10 +147,7 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
     });
 
     it('returns no results if disposed during the first query', async () => {
-      const db = await createDbWithContent(
-        'npm.nedb',
-        JSON.stringify(sampleVuln)
-      );
+      const db = await createDbWithContent('npm.nedb', JSON.stringify(sampleVuln));
 
       const queryPromise = db.query('npm', 'public');
       db[Symbol.dispose]();
@@ -177,7 +161,7 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
       using db = OsvOfflineDb.create();
       const closeHandlesSpy = vi.spyOn(db, Symbol.dispose);
       const exitCallback = processOnSpy.mock.calls.find(
-        ([event]) => event === 'exit'
+        ([event]) => event === 'exit',
       )?.[1] as () => void;
 
       exitCallback();
@@ -189,10 +173,7 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
     let osvOfflineDb: OsvOfflineDb;
 
     beforeEach(async () => {
-      osvOfflineDb = await createDbWithContent(
-        'npm.nedb',
-        JSON.stringify(sampleVuln)
-      );
+      osvOfflineDb = await createDbWithContent('npm.nedb', JSON.stringify(sampleVuln));
     });
 
     afterEach(() => {
@@ -205,10 +186,7 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
     });
 
     it('returns empty array for invalid package', async () => {
-      const result = await osvOfflineDb.query(
-        'npm',
-        'this-package-doesnt-exist'
-      );
+      const result = await osvOfflineDb.query('npm', 'this-package-doesnt-exist');
 
       expect(result).toEqual([]);
     });
@@ -234,13 +212,10 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
         _id: '7ONtcn2IGYE8U39z',
       };
 
-      osvOfflineDb = await createDbWithContent(
-        'packagist.nedb',
-        JSON.stringify(ecosystemVuln)
-      );
-      expect(
-        await osvOfflineDb.query('Packagist', 'drupal/openid_connect')
-      ).toStrictEqual([ecosystemVuln]);
+      osvOfflineDb = await createDbWithContent('packagist.nedb', JSON.stringify(ecosystemVuln));
+      expect(await osvOfflineDb.query('Packagist', 'drupal/openid_connect')).toStrictEqual([
+        ecosystemVuln,
+      ]);
     });
   });
 
@@ -261,7 +236,7 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
       await fs.writeFile(
         path.join(rootDir, 'npm.nedb'),
         records.map((record) => `${JSON.stringify(record)}\n`).join(''),
-        'utf8'
+        'utf8',
       );
       await fs.writeFile(path.join(rootDir, 'npm.idx.json'), index, 'utf8');
     }
@@ -285,10 +260,7 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
     it('uses an index without a last record', async () => {
       const withoutId1 = { ...vuln1, _id: undefined };
       const withoutId2 = { ...vuln2, _id: undefined };
-      await writeDb(
-        [withoutId1, withoutId2],
-        buildIndex([withoutId1, withoutId2])
-      );
+      await writeDb([withoutId1, withoutId2], buildIndex([withoutId1, withoutId2]));
       const scan = vi.spyOn(readline, 'createInterface');
 
       using db = OsvOfflineDb.create();
@@ -304,38 +276,27 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
       ${'was built from a database of other size'} | ${() => buildIndex([vuln1])}
       ${'was built with another last record'}      | ${() => buildIndex([vuln1, { ...vuln2, _id: 'UNIQUE_ID_3' }])}
       ${'points the last record elsewhere'}        | ${() => buildIndex([vuln1, vuln2]).replace('"last":{"offset":', '"last":{"offset":1')}
-    `(
-      'scans the database when the index $reason',
-      async ({ index }: { index: () => string }) => {
-        await writeDb([vuln1, vuln2], index());
-        const scan = vi.spyOn(readline, 'createInterface');
+    `('scans the database when the index $reason', async ({ index }: { index: () => string }) => {
+      await writeDb([vuln1, vuln2], index());
+      const scan = vi.spyOn(readline, 'createInterface');
 
-        using db = OsvOfflineDb.create();
-        const result = await db.query('npm', 'public');
+      using db = OsvOfflineDb.create();
+      const result = await db.query('npm', 'public');
 
-        expect(result.map(({ id }) => id)).toEqual(['VULN-1', 'VULN-2']);
-        expect(scan).toHaveBeenCalledOnce();
-      }
-    );
+      expect(result.map(({ id }) => id)).toEqual(['VULN-1', 'VULN-2']);
+      expect(scan).toHaveBeenCalledOnce();
+    });
   });
 
   describe('dispose', () => {
     it('throws on query after sync dispose', async () => {
-      using db = await createDbWithContent(
-        'npm.nedb',
-        JSON.stringify(sampleVuln)
-      );
+      using db = await createDbWithContent('npm.nedb', JSON.stringify(sampleVuln));
       db[Symbol.dispose]();
-      await expect(db.query('npm', 'public')).rejects.toThrow(
-        'Database disposed'
-      );
+      await expect(db.query('npm', 'public')).rejects.toThrow('Database disposed');
     });
 
     it('double dispose does not throw', async () => {
-      const db = await createDbWithContent(
-        'npm.nedb',
-        JSON.stringify(sampleVuln)
-      );
+      const db = await createDbWithContent('npm.nedb', JSON.stringify(sampleVuln));
       db[Symbol.dispose]();
       expect(() => db[Symbol.dispose]()).not.toThrow();
     });
@@ -346,7 +307,7 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
       const db = OsvOfflineDb.create();
       const disposeSpy = vi.spyOn(db, Symbol.dispose);
       const exitCallback = processOnSpy.mock.calls.find(
-        ([event]) => event === 'exit'
+        ([event]) => event === 'exit',
       )?.[1] as () => void;
 
       db[Symbol.dispose]();
@@ -363,12 +324,14 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
       packageName: string,
       predicate: (results: Vulnerability[]) => boolean,
       timeoutMs = 3000,
-      intervalMs = 50
+      intervalMs = 50,
     ): Promise<Vulnerability[]> {
       const deadline = Date.now() + timeoutMs;
       while (Date.now() < deadline) {
         const results = await db.query(ecosystem, packageName);
-        if (predicate(results)) return results;
+        if (predicate(results)) {
+          return results;
+        }
         await setTimeout(intervalMs);
       }
 
@@ -378,10 +341,7 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
     it('picks up new file content on next query when file changes', async () => {
       const filePath = path.join(rootDir, 'npm.nedb');
 
-      using db = await createDbWithContent(
-        'npm.nedb',
-        JSON.stringify(sampleVuln)
-      );
+      using db = await createDbWithContent('npm.nedb', JSON.stringify(sampleVuln));
 
       // First query returns original data
       const result1 = await db.query('npm', 'public');
@@ -401,7 +361,7 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
         db,
         'npm',
         'public',
-        (r) => r.length === 1 && r[0].id === 'GHSA-UPDATED'
+        (r) => r.length === 1 && r[0].id === 'GHSA-UPDATED',
       );
       expect(result2).toHaveLength(1);
       expect(result2[0].id).toBe('GHSA-UPDATED');
@@ -410,10 +370,7 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
     it('returns empty when file is deleted after initial load', async () => {
       const filePath = path.join(rootDir, 'npm.nedb');
 
-      using db = await createDbWithContent(
-        'npm.nedb',
-        JSON.stringify(sampleVuln)
-      );
+      using db = await createDbWithContent('npm.nedb', JSON.stringify(sampleVuln));
 
       // First query loads data
       const result1 = await db.query('npm', 'public');
@@ -422,12 +379,7 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
       await fs.remove(filePath);
 
       // Next query should eventually return empty
-      const result2 = await queryUntil(
-        db,
-        'npm',
-        'public',
-        (r) => r.length === 0
-      );
+      const result2 = await queryUntil(db, 'npm', 'public', (r) => r.length === 0);
       expect(result2).toEqual([]);
     });
 
@@ -456,11 +408,7 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
 
       await fs.ensureDir(rootDir);
       await fs.writeFile(npmPath, JSON.stringify(sampleVuln), 'utf8');
-      await fs.writeFile(
-        path.join(rootDir, 'maven.nedb'),
-        JSON.stringify(mavenVuln),
-        'utf8'
-      );
+      await fs.writeFile(path.join(rootDir, 'maven.nedb'), JSON.stringify(mavenVuln), 'utf8');
 
       using db = OsvOfflineDb.create();
 
@@ -479,7 +427,7 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
         db,
         'npm',
         'public',
-        (r) => r.length === 1 && r[0].id === 'NPM-UPDATED'
+        (r) => r.length === 1 && r[0].id === 'NPM-UPDATED',
       );
       expect(npmResult2).toHaveLength(1);
       expect(npmResult2[0].id).toBe('NPM-UPDATED');
@@ -492,10 +440,7 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
 
     it('concurrent queries during file change all resolve consistently', async () => {
       const filePath = path.join(rootDir, 'npm.nedb');
-      using db = await createDbWithContent(
-        'npm.nedb',
-        JSON.stringify(sampleVuln)
-      );
+      using db = await createDbWithContent('npm.nedb', JSON.stringify(sampleVuln));
       await db.query('npm', 'public');
 
       // Change file
@@ -522,20 +467,13 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
       // Each result should be either the old data or the new data, never empty or mixed
       for (const result of results) {
         expect(result).toHaveLength(1);
-        expect([
-          'GHSA-7jfh-2xc9-ccv7',
-          'RACE-UPDATED',
-          'RACE-UPDATED-2',
-        ]).toContain(result[0].id);
+        expect(['GHSA-7jfh-2xc9-ccv7', 'RACE-UPDATED', 'RACE-UPDATED-2']).toContain(result[0].id);
       }
     });
 
     it('returns empty when disposed during reload', async () => {
       const filePath = path.join(rootDir, 'npm.nedb');
-      const db = await createDbWithContent(
-        'npm.nedb',
-        JSON.stringify(sampleVuln)
-      );
+      const db = await createDbWithContent('npm.nedb', JSON.stringify(sampleVuln));
       await db.query('npm', 'public');
 
       // Change file to trigger reload
@@ -554,41 +492,22 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
 
     it('double file change converges to latest content', async () => {
       const filePath = path.join(rootDir, 'npm.nedb');
-      using db = await createDbWithContent(
-        'npm.nedb',
-        JSON.stringify(sampleVuln)
-      );
+      using db = await createDbWithContent('npm.nedb', JSON.stringify(sampleVuln));
 
       await db.query('npm', 'public');
 
       // Two rapid overwrites
-      await fs.writeFile(
-        filePath,
-        JSON.stringify({ ...sampleVuln, id: 'V1' }),
-        'utf8'
-      );
-      await fs.utimes(
-        filePath,
-        new Date(Date.now() + 5000),
-        new Date(Date.now() + 5000)
-      );
+      await fs.writeFile(filePath, JSON.stringify({ ...sampleVuln, id: 'V1' }), 'utf8');
+      await fs.utimes(filePath, new Date(Date.now() + 5000), new Date(Date.now() + 5000));
 
-      await fs.writeFile(
-        filePath,
-        JSON.stringify({ ...sampleVuln, id: 'V2' }),
-        'utf8'
-      );
-      await fs.utimes(
-        filePath,
-        new Date(Date.now() + 10000),
-        new Date(Date.now() + 10000)
-      );
+      await fs.writeFile(filePath, JSON.stringify({ ...sampleVuln, id: 'V2' }), 'utf8');
+      await fs.utimes(filePath, new Date(Date.now() + 10000), new Date(Date.now() + 10000));
 
       const result = await queryUntil(
         db,
         'npm',
         'public',
-        (r) => r.length === 1 && r[0].id === 'V2'
+        (r) => r.length === 1 && r[0].id === 'V2',
       );
       expect(result[0].id).toBe('V2');
     });

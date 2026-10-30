@@ -1,8 +1,7 @@
-import fs from 'fs-extra';
-import { createWriteStream } from 'node:fs';
 import { randomBytes } from 'node:crypto';
-import { finished } from 'node:stream/promises';
+import { createWriteStream } from 'node:fs';
 import path from 'node:path';
+import { finished } from 'node:stream/promises';
 import {
   DatabaseIndexBuilder,
   type DatabaseRecord,
@@ -10,6 +9,7 @@ import {
   type Osv,
   getIndexFileName,
 } from '@renovatebot/osv-offline-db';
+import fs from 'fs-extra';
 
 function generateId(): string {
   return randomBytes(12).toString('base64url').slice(0, 16);
@@ -24,8 +24,7 @@ function generateId(): string {
 export async function writeDatabase(
   directory: string,
   ecosystem: Ecosystem,
-  vulnerabilities:
-    AsyncIterable<Osv.Vulnerability> | Iterable<Osv.Vulnerability>
+  vulnerabilities: AsyncIterable<Osv.Vulnerability> | Iterable<Osv.Vulnerability>,
 ): Promise<[database: string, index: string]> {
   const databasePath = path.join(directory, `${ecosystem.toLowerCase()}.nedb`);
   const indexPath = path.join(directory, getIndexFileName(ecosystem));

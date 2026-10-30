@@ -1,7 +1,7 @@
-import AdmZip from 'adm-zip';
-import fs from 'fs-extra';
 import os from 'node:os';
 import path from 'node:path';
+import AdmZip from 'adm-zip';
+import fs from 'fs-extra';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { readVulnerabilities } from './osv-zip.ts';
 
@@ -21,14 +21,14 @@ describe('packages/osv-offline-updater/src/lib/osv-zip.unit', () => {
       await fs.remove(tmpDir);
     });
 
-    async function writeZip(
-      files: Record<string, string>,
-      method: number
-    ): Promise<Buffer> {
+    async function writeZip(files: Record<string, string>, method: number): Promise<Buffer> {
       const zip = new AdmZip();
       for (const [name, content] of Object.entries(files)) {
         zip.addFile(name, Buffer.from(content));
-        zip.getEntry(name)!.header.method = method;
+        const entry = zip.getEntry(name);
+        if (entry) {
+          entry.header.method = method;
+        }
       }
       const buffer = zip.toBuffer();
       await fs.writeFile(zipPath, buffer);
@@ -44,17 +44,12 @@ describe('packages/osv-offline-updater/src/lib/osv-zip.unit', () => {
           'GHSA-1.json': '{"id":"GHSA-1","summary":"ä"}',
           'GHSA-2.json': '{"id":"GHSA-2"}',
         },
-        method
+        method,
       );
 
-      const vulnerabilities = await Array.fromAsync(
-        readVulnerabilities(zipPath)
-      );
+      const vulnerabilities = await Array.fromAsync(readVulnerabilities(zipPath));
 
-      expect(vulnerabilities).toEqual([
-        { id: 'GHSA-1', summary: 'ä' },
-        { id: 'GHSA-2' },
-      ]);
+      expect(vulnerabilities).toEqual([{ id: 'GHSA-1', summary: 'ä' }, { id: 'GHSA-2' }]);
     });
 
     it('rejects entries with a wrong CRC-32', async () => {
@@ -64,17 +59,15 @@ describe('packages/osv-offline-updater/src/lib/osv-zip.unit', () => {
       buffer.writeUInt32LE(0, header + 16);
       await fs.writeFile(zipPath, buffer);
 
-      await expect(
-        Array.fromAsync(readVulnerabilities(zipPath))
-      ).rejects.toThrow('CRC-32 mismatch for GHSA-1.json');
+      await expect(Array.fromAsync(readVulnerabilities(zipPath))).rejects.toThrow(
+        'CRC-32 mismatch for GHSA-1.json',
+      );
     });
 
     it('rejects invalid archives', async () => {
       await fs.writeFile(zipPath, 'not a zip archive');
 
-      await expect(
-        Array.fromAsync(readVulnerabilities(zipPath))
-      ).rejects.toThrow();
+      await expect(Array.fromAsync(readVulnerabilities(zipPath))).rejects.toThrow();
     });
   });
 });

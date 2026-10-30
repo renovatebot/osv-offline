@@ -1,7 +1,7 @@
-import type { SplitIndex } from '@renovatebot/osv-offline-db';
-import fs from 'fs-extra';
 import os from 'node:os';
 import path from 'node:path';
+import type { SplitIndex } from '@renovatebot/osv-offline-db';
+import fs from 'fs-extra';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { GitHub, getDatabaseTag, getSplitBaseUrl } from './github.ts';
 
@@ -38,7 +38,7 @@ function release(
   tag: string,
   publishedAt: string,
   draft = false,
-  assetsCreatedAt: string[] = []
+  assetsCreatedAt: string[] = [],
 ) {
   return {
     id,
@@ -76,14 +76,12 @@ function splitIndex(tag: string): SplitIndex {
 
 describe('packages/osv-offline-updater/src/client/github.unit', () => {
   it('names the database release of a run by its time to the second', () => {
-    expect(getDatabaseTag(new Date('2026-10-27T12:34:56Z'))).toBe(
-      '1-20261027123456'
-    );
+    expect(getDatabaseTag(new Date('2026-10-27T12:34:56Z'))).toBe('1-20261027123456');
   });
 
   it('downloads the split files from the assets of a release', () => {
     expect(getSplitBaseUrl('1-20261027123456')).toBe(
-      'https://github.com/renovatebot/osv-offline/releases/download/1-20261027123456/'
+      'https://github.com/renovatebot/osv-offline/releases/download/1-20261027123456/',
     );
   });
 
@@ -94,12 +92,7 @@ describe('packages/osv-offline-updater/src/client/github.unit', () => {
     let directory: string;
 
     function upload() {
-      return new GitHub().uploadDatabase(
-        '1-2026102712',
-        Buffer.from('zip'),
-        directory,
-        index
-      );
+      return new GitHub().uploadDatabase('1-2026102712', Buffer.from('zip'), directory, index);
     }
 
     beforeEach(async () => {
@@ -107,9 +100,7 @@ describe('packages/osv-offline-updater/src/client/github.unit', () => {
       vi.useFakeTimers({ now: new Date('2026-10-27T12:00:00Z') });
       vi.stubGlobal('fetch', fetch);
       calls.length = 0;
-      fetch.mockResolvedValue(
-        new Response(JSON.stringify(splitIndex('1-2026102708')))
-      );
+      fetch.mockResolvedValue(new Response(JSON.stringify(splitIndex('1-2026102708'))));
       octokit.repos.getBranch.mockResolvedValue({
         data: { commit: { sha: 'abc' } },
       });
@@ -118,33 +109,23 @@ describe('packages/osv-offline-updater/src/client/github.unit', () => {
         calls.push('create');
         return Promise.resolve({ data: { id: 10 } });
       });
-      octokit.repos.uploadReleaseAsset.mockImplementation(
-        ({ name }: { name: string }) => {
-          calls.push(`upload ${name}`);
-          return Promise.resolve();
-        }
-      );
+      octokit.repos.uploadReleaseAsset.mockImplementation(({ name }: { name: string }) => {
+        calls.push(`upload ${name}`);
+        return Promise.resolve();
+      });
       octokit.repos.updateRelease.mockImplementation(() => {
         calls.push('publish');
         return Promise.resolve();
       });
-      octokit.repos.deleteRelease.mockImplementation(
-        ({ release_id }: { release_id: number }) => {
-          calls.push(`delete ${release_id}`);
-          return Promise.resolve();
-        }
-      );
+      octokit.repos.deleteRelease.mockImplementation(({ release_id }: { release_id: number }) => {
+        calls.push(`delete ${release_id}`);
+        return Promise.resolve();
+      });
       octokit.git.deleteRef.mockResolvedValue(undefined);
       octokit.paginate.mockResolvedValue([]);
       directory = await fs.mkdtemp(path.join(os.tmpdir(), 'osv-offline-gh-'));
-      await fs.writeFile(
-        path.join(directory, 'npm-20261027120000.nedb.zst'),
-        'db'
-      );
-      await fs.writeFile(
-        path.join(directory, 'npm-20261027120000.idx.json.zst'),
-        'idx'
-      );
+      await fs.writeFile(path.join(directory, 'npm-20261027120000.nedb.zst'), 'db');
+      await fs.writeFile(path.join(directory, 'npm-20261027120000.idx.json.zst'), 'idx');
     });
 
     afterEach(async () => {
@@ -157,10 +138,10 @@ describe('packages/osv-offline-updater/src/client/github.unit', () => {
       await upload();
 
       expect(octokit.git.createTag).toHaveBeenCalledWith(
-        expect.objectContaining({ tag: '1-2026102712', object: 'abc' })
+        expect.objectContaining({ tag: '1-2026102712', object: 'abc' }),
       );
       expect(octokit.repos.createRelease).toHaveBeenCalledWith(
-        expect.objectContaining({ tag_name: '1-2026102712', draft: true })
+        expect.objectContaining({ tag_name: '1-2026102712', draft: true }),
       );
       expect(octokit.repos.uploadReleaseAsset).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -170,14 +151,14 @@ describe('packages/osv-offline-updater/src/client/github.unit', () => {
             'content-type': 'application/zstd',
             'content-length': 3,
           },
-        })
+        }),
       );
       expect(octokit.repos.updateRelease).toHaveBeenCalledWith(
         expect.objectContaining({
           release_id: 10,
           draft: false,
           make_latest: 'true',
-        })
+        }),
       );
       expect(calls).toEqual([
         'create',
@@ -211,9 +192,7 @@ describe('packages/osv-offline-updater/src/client/github.unit', () => {
     });
 
     it('keeps the newest database releases and the one of the published index', async () => {
-      fetch.mockResolvedValue(
-        new Response(JSON.stringify(splitIndex('1-2026102500')))
-      );
+      fetch.mockResolvedValue(new Response(JSON.stringify(splitIndex('1-2026102500'))));
       octokit.paginate.mockResolvedValue([
         release(10, '1-2026102712', '2026-10-27T12:00:00Z'),
         // older than the retention, but one of the two newest
@@ -225,7 +204,7 @@ describe('packages/osv-offline-updater/src/client/github.unit', () => {
       await upload();
 
       expect(octokit.repos.deleteRelease).toHaveBeenCalledExactlyOnceWith(
-        expect.objectContaining({ release_id: 7 })
+        expect.objectContaining({ release_id: 7 }),
       );
     });
 
@@ -241,10 +220,10 @@ describe('packages/osv-offline-updater/src/client/github.unit', () => {
       await upload();
 
       expect(octokit.repos.deleteRelease).toHaveBeenCalledExactlyOnceWith(
-        expect.objectContaining({ release_id: 3 })
+        expect.objectContaining({ release_id: 3 }),
       );
       expect(octokit.git.deleteRef).toHaveBeenCalledExactlyOnceWith(
-        expect.objectContaining({ ref: 'tags/database' })
+        expect.objectContaining({ ref: 'tags/database' }),
       );
     });
 
@@ -265,9 +244,7 @@ describe('packages/osv-offline-updater/src/client/github.unit', () => {
 
     it('keeps no release for a published index without a release URL', async () => {
       fetch.mockResolvedValue(
-        new Response(
-          JSON.stringify({ ...splitIndex('1-2026102500'), baseUrl: undefined })
-        )
+        new Response(JSON.stringify({ ...splitIndex('1-2026102500'), baseUrl: undefined })),
       );
       octokit.paginate.mockResolvedValue([
         release(10, '1-2026102712', '2026-10-27T12:00:00Z'),
@@ -278,14 +255,12 @@ describe('packages/osv-offline-updater/src/client/github.unit', () => {
       await upload();
 
       expect(octokit.repos.deleteRelease).toHaveBeenCalledExactlyOnceWith(
-        expect.objectContaining({ release_id: 8 })
+        expect.objectContaining({ release_id: 8 }),
       );
     });
 
     it('keeps the former split release while the published index uses it', async () => {
-      fetch.mockResolvedValue(
-        new Response(JSON.stringify(splitIndex('database')))
-      );
+      fetch.mockResolvedValue(new Response(JSON.stringify(splitIndex('database'))));
       octokit.paginate.mockResolvedValue([
         release(10, '1-2026102712', '2026-10-27T12:00:00Z'),
         release(3, 'database', '2026-10-20T00:00:00Z'),
@@ -312,21 +287,18 @@ describe('packages/osv-offline-updater/src/client/github.unit', () => {
       ['is missing', () => Promise.resolve(new Response('', { status: 404 }))],
       ['is invalid', () => Promise.resolve(new Response('{}'))],
       ['fails', () => Promise.reject(new Error('network'))],
-    ] as const)(
-      'deletes nothing when the published index %s',
-      async (_, response) => {
-        fetch.mockImplementation(response);
+    ] as const)('deletes nothing when the published index %s', async (_, response) => {
+      fetch.mockImplementation(response);
 
-        await upload();
+      await upload();
 
-        expect(octokit.paginate).not.toHaveBeenCalled();
-        expect(octokit.repos.deleteRelease).not.toHaveBeenCalled();
-        expect(fetch).toHaveBeenCalledExactlyOnceWith(
-          'https://renovatebot.github.io/osv-offline/v2/index.json',
-          { headers: { 'cache-control': 'no-cache' } }
-        );
-      }
-    );
+      expect(octokit.paginate).not.toHaveBeenCalled();
+      expect(octokit.repos.deleteRelease).not.toHaveBeenCalled();
+      expect(fetch).toHaveBeenCalledExactlyOnceWith(
+        'https://renovatebot.github.io/osv-offline/v2/index.json',
+        { headers: { 'cache-control': 'no-cache' } },
+      );
+    });
 
     it('keeps everything when an upload fails', async () => {
       octokit.repos.uploadReleaseAsset.mockRejectedValue(new Error('failed'));
