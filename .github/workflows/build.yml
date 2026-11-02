@@ -29,7 +29,7 @@ jobs:
       MISE_EXEC_AUTO_INSTALL: 'false'
 
     steps:
-      - uses: containerbase/internal-tools/setup@32cf315841659d5247b8eefebdff571ec7cdbca4 # v5.3.13
+      - uses: containerbase/internal-tools/setup@ec6b0dfe9b98e216fc3d2dbfd0e35c3d69b79e95 # v5.3.14
         with:
           save-cache: true
           pnpm-cache: |
@@ -73,7 +73,7 @@ jobs:
       NODE_OPTIONS: --trace-warnings
 
     steps:
-      - uses: containerbase/internal-tools/setup@32cf315841659d5247b8eefebdff571ec7cdbca4 # v5.3.13
+      - uses: containerbase/internal-tools/setup@ec6b0dfe9b98e216fc3d2dbfd0e35c3d69b79e95 # v5.3.14
         with:
           save-cache: true
           node-version: ${{ matrix.node-version }}
@@ -124,7 +124,7 @@ jobs:
           filter: blob:none # we don't need all blobs, only the full tree
           show-progress: false
 
-      - uses: containerbase/internal-tools/setup@32cf315841659d5247b8eefebdff571ec7cdbca4 # v5.3.13
+      - uses: containerbase/internal-tools/setup@ec6b0dfe9b98e216fc3d2dbfd0e35c3d69b79e95 # v5.3.14
         with:
           checkout: false
           pnpm-cache: |
