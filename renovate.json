@@ -7,6 +7,11 @@
     {
       "matchDepTypes": ["dependencies"],
       "rangeStrategy": "bump"
+    },
+    {
+      "description": "Keep the range so consumers can share one copy with the version pinned by @renovatebot/base-image",
+      "matchPackageNames": ["@containerbase/base"],
+      "rangeStrategy": "update-lockfile"
     }
   ]
 }
