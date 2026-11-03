@@ -104,8 +104,8 @@ importers:
   packages/osv-offline-db:
     dependencies:
       '@containerbase/base':
-        specifier: ^14.61.0
-        version: 14.61.0
+        specifier: ^14.62.0
+        version: 14.62.0
       debug:
         specifier: ^4.4.3
         version: 4.4.3(supports-color@7.2.0)
@@ -230,8 +230,8 @@ packages:
     resolution: {integrity: sha512-ooWCrlZP11i8GImSjTHYHLkvFDP48nS4+204nGb1RiX/WXYHmJA2III9/e2DWVabCESdW7hBAEzHRqUn9OUVvQ==}
     engines: {node: '>=0.1.90'}
 
-  '@containerbase/base@14.61.0':
-    resolution: {integrity: sha512-xzfBD+2gVqU9reHELY5WbdCmDUCqjnPvCscG5/6iKnos7Jxg8M0E3rEdiYUMOHLWoww1+hZZFj5vHarjttTUTg==}
+  '@containerbase/base@14.62.0':
+    resolution: {integrity: sha512-S5b8KGMRz/jMwJ6IRiuLfV/ss+sHU+24BInz0C7OFC/SoiFvxNCO/RJPufCpjib3Pbw8+3oWOSMBVUEQDW2Skg==}
     engines: {node: '>=24.10.0'}
     peerDependencies:
       zod: ^4.0.0
@@ -2516,7 +2516,7 @@ snapshots:
   '@colors/colors@1.5.0':
     optional: true
 
-  '@containerbase/base@14.61.0':
+  '@containerbase/base@14.62.0':
     dependencies:
       semver: 7.8.5
 
