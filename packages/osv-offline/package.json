@@ -27,7 +27,7 @@
     "@types/node": "24.19.2",
     "@types/yauzl": "3.4.0",
     "adm-zip": "0.6.1",
-    "vitest": "4.1.12"
+    "vitest": "5.0.5"
   },
   "engines": {
     "node": ">=24.11.0",

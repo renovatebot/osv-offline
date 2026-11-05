@@ -27,7 +27,7 @@
     "@containerbase/semantic-release-pnpm": "1.4.4",
     "@tsconfig/node24": "24.0.5",
     "@tsconfig/strictest": "2.0.8",
-    "@vitest/coverage-v8": "4.1.12",
+    "@vitest/coverage-v8": "5.0.5",
     "conventional-changelog-conventionalcommits": "9.3.1",
     "husky": "9.1.7",
     "lint-staged": "17.6.0",
@@ -37,7 +37,7 @@
     "oxlint-tsgolint": "7.0.2005",
     "semantic-release": "25.0.9",
     "typescript": "6.0.3",
-    "vitest": "4.1.12"
+    "vitest": "5.0.5"
   },
   "engines": {
     "node": ">=24.11.0",
