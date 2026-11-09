@@ -30,3 +30,11 @@ export function packageToPurl(ecosystem: Ecosystem, packageName: string): string
 
   return `pkg:${purlType}/${urlEncode(packageNamePurl)}`;
 }
+
+/**
+ * Returns the purl without its qualifiers and subpath.
+ * OSV qualifies some purls, as with the registry in `pkg:composer/drupal/token?repository_url=https:%2F%2Fpackages.drupal.org%2F8`.
+ */
+export function purlWithoutQualifiers(purl: string): string {
+  return purl.replace(/[?#].*$/, '');
+}
