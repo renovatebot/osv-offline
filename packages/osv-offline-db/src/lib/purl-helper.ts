@@ -1,11 +1,12 @@
 import type { Ecosystem } from './ecosystem.ts';
 
-// https://github.com/google/osv.dev/blob/edacbd3c32b1d632bad8c5b506a14d0850b2e537/osv/purl_helpers.py#L18-L30
+// https://github.com/google/osv.dev/blob/27756cecae256ba0c024101048f152c341fb1e95/osv/purl_helpers.py#L26-L109
 const PURL_ECOSYSTEMS: Record<Ecosystem, string> = {
   'crates.io': 'cargo',
   Go: 'golang',
   Hackage: 'hackage',
   Hex: 'hex',
+  Julia: 'julia',
   Maven: 'maven',
   NuGet: 'nuget',
   npm: 'npm',

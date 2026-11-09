@@ -240,6 +240,27 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
         qualifiedVuln,
       ]);
     });
+
+    it('works with Julia', async () => {
+      const juliaVuln: Vulnerability & { _id: string } = {
+        id: 'JLSEC-2025-1',
+        published: '2025-10-08T17:41:37.190Z',
+        modified: '2026-07-18T03:00:04.241627862Z',
+        affected: [
+          {
+            package: {
+              name: 'HTTP',
+              ecosystem: 'Julia',
+              purl: 'pkg:julia/HTTP?uuid=cd3eb016-35fb-5094-929b-558a96fad6f3',
+            },
+          },
+        ],
+        _id: 'JLSEC20251000000',
+      };
+
+      osvOfflineDb = await createDbWithContent('julia.nedb', JSON.stringify(juliaVuln));
+      expect(await osvOfflineDb.query('Julia', 'HTTP')).toStrictEqual([juliaVuln]);
+    });
   });
 
   describe('precomputed index', () => {
