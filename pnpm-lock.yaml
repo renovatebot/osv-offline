@@ -105,7 +105,7 @@ importers:
     dependencies:
       '@containerbase/base':
         specifier: ^14.62.0
-        version: 14.66.14
+        version: 14.66.15
       debug:
         specifier: ^4.4.3
         version: 4.4.3(supports-color@7.2.0)
@@ -230,8 +230,8 @@ packages:
     resolution: {integrity: sha512-ooWCrlZP11i8GImSjTHYHLkvFDP48nS4+204nGb1RiX/WXYHmJA2III9/e2DWVabCESdW7hBAEzHRqUn9OUVvQ==}
     engines: {node: '>=0.1.90'}
 
-  '@containerbase/base@14.66.14':
-    resolution: {integrity: sha512-ukyoTYn0rNoNBqKS8A70uCJBukfgtkvUqjIT2qs9ncZja9tZThFy6m023YfLJtqU/QzCOd+PrFEPB52DuIkpBw==}
+  '@containerbase/base@14.66.15':
+    resolution: {integrity: sha512-e2Ib0VvpkMOYKhgUItv10BHy2p7QFoW2vZSIi0mo9Y+KrLvXULzjs6mJUmymk9xYienoh4aYn+d9tqCP+B5NQQ==}
     engines: {node: '>=24.10.0'}
     peerDependencies:
       zod: ^4.0.0
@@ -2480,7 +2480,7 @@ snapshots:
   '@colors/colors@1.5.0':
     optional: true
 
-  '@containerbase/base@14.66.14':
+  '@containerbase/base@14.66.15':
     dependencies:
       semver: 7.8.5
 
