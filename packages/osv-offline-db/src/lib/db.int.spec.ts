@@ -217,6 +217,61 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
         ecosystemVuln,
       ]);
     });
+
+    // The first two spellings occur in OSV npm data. The rest are not observed
+    // but allowed by the Package type; they document that the purl is ignored.
+    it.each`
+      description                   | purl
+      ${'scope separator as "/"'}   | ${'pkg:npm/%40better-auth/oauth-provider'}
+      ${'scope separator as %2F'}   | ${'pkg:npm/%40better-auth%2Foauth-provider'}
+      ${'unencoded "@" and "/"'}    | ${'pkg:npm/@better-auth/oauth-provider'}
+      ${'purl for another package'} | ${'pkg:npm/%40better-auth/core'}
+      ${'no purl'}                  | ${undefined}
+    `(
+      'matches by name and ecosystem with $description',
+      async ({ purl }: { purl: string | undefined }) => {
+        const scopedVuln: Vulnerability & { _id: string } = {
+          id: 'GHSA-p2fr-6hmx-4528',
+          published: '2026-08-05T20:34:26Z',
+          modified: '2026-08-05T20:34:26Z',
+          affected: [
+            {
+              package: {
+                name: '@better-auth/oauth-provider',
+                ecosystem: 'npm',
+                ...(purl === undefined ? {} : { purl }),
+              },
+            },
+          ],
+          _id: 'SCOPEDPURL0000001',
+        };
+
+        osvOfflineDb = await createDbWithContent('npm.nedb', JSON.stringify(scopedVuln));
+        expect(await osvOfflineDb.query('npm', '@better-auth/oauth-provider')).toStrictEqual([
+          scopedVuln,
+        ]);
+      },
+    );
+
+    it('does not match a purl-only record whose name differs', async () => {
+      const otherNameVuln: Vulnerability & { _id: string } = {
+        ...sampleVuln,
+        id: 'OTHER-NAME-VULN',
+        affected: [
+          {
+            package: {
+              name: '@better-auth/core',
+              ecosystem: 'npm',
+              purl: 'pkg:npm/%40better-auth/oauth-provider',
+            },
+          },
+        ],
+        _id: 'OTHERNAME00000001',
+      };
+
+      osvOfflineDb = await createDbWithContent('npm.nedb', JSON.stringify(otherNameVuln));
+      expect(await osvOfflineDb.query('npm', '@better-auth/oauth-provider')).toStrictEqual([]);
+    });
   });
 
   describe('precomputed index', () => {
@@ -285,66 +340,6 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
 
       expect(result.map(({ id }) => id)).toEqual(['VULN-1', 'VULN-2']);
       expect(scan).toHaveBeenCalledOnce();
-    });
-
-    // The first two spellings occur in OSV npm data. The rest are not observed
-    // but allowed by the Package type; they document that the purl is ignored.
-    it.each`
-      description                   | purl
-      ${'scope separator as "/"'}   | ${'pkg:npm/%40better-auth/oauth-provider'}
-      ${'scope separator as %2F'}   | ${'pkg:npm/%40better-auth%2Foauth-provider'}
-      ${'unencoded "@" and "/"'}    | ${'pkg:npm/@better-auth/oauth-provider'}
-      ${'purl for another package'} | ${'pkg:npm/%40better-auth/core'}
-      ${'no purl'}                  | ${undefined}
-    `('matches by name and ecosystem with $description', async ({ purl }) => {
-      const scopedVuln: Vulnerability & { _id: string } = {
-        id: 'GHSA-p2fr-6hmx-4528',
-        published: '2026-08-05T20:34:26Z',
-        modified: '2026-08-05T20:34:26Z',
-        affected: [
-          {
-            package: {
-              name: '@better-auth/oauth-provider',
-              ecosystem: 'npm',
-              ...(purl === undefined ? {} : { purl: purl as string }),
-            },
-          },
-        ],
-        _id: 'SCOPEDPURL0000001',
-      };
-
-      osvOfflineDb = await createDbWithContent(
-        'npm.nedb',
-        JSON.stringify(scopedVuln)
-      );
-      expect(
-        await osvOfflineDb.query('npm', '@better-auth/oauth-provider')
-      ).toStrictEqual([scopedVuln]);
-    });
-
-    it('does not match a purl-only record whose name differs', async () => {
-      const otherNameVuln: Vulnerability & { _id: string } = {
-        ...sampleVuln,
-        id: 'OTHER-NAME-VULN',
-        affected: [
-          {
-            package: {
-              name: '@better-auth/core',
-              ecosystem: 'npm',
-              purl: 'pkg:npm/%40better-auth/oauth-provider',
-            },
-          },
-        ],
-        _id: 'OTHERNAME00000001',
-      };
-
-      osvOfflineDb = await createDbWithContent(
-        'npm.nedb',
-        JSON.stringify(otherNameVuln)
-      );
-      expect(
-        await osvOfflineDb.query('npm', '@better-auth/oauth-provider')
-      ).toStrictEqual([]);
     });
   });
 

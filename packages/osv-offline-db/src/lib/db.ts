@@ -227,8 +227,7 @@ export class OsvOfflineDb {
       vuln.affected?.some(
         (a) =>
           a.package?.name === packageName &&
-          (a.package.ecosystem === ecosystem ||
-            a.package.ecosystem.startsWith(`${ecosystem}:`)),
+          (a.package.ecosystem === ecosystem || a.package.ecosystem.startsWith(`${ecosystem}:`)),
       ),
     );
   }
