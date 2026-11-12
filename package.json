@@ -43,5 +43,5 @@
     "node": ">=24.11.0",
     "pnpm": "^11.0.0"
   },
-  "packageManager": "pnpm@11.28.10"
+  "packageManager": "pnpm@11.28.11"
 }
