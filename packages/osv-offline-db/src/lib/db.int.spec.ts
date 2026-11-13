@@ -217,6 +217,50 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
         ecosystemVuln,
       ]);
     });
+
+    it('works with purl qualifiers', async () => {
+      const qualifiedVuln: Vulnerability & { _id: string } = {
+        id: 'DRUPAL-CONTRIB-2026-027',
+        published: '2026-03-04T18:02:59Z',
+        modified: '2026-03-04T19:01:55.854399Z',
+        affected: [
+          {
+            package: {
+              name: 'drupal/openid_connect',
+              ecosystem: 'Packagist:https://packages.drupal.org/8',
+              purl: 'pkg:composer/drupal/openid_connect?repository_url=https:%2F%2Fpackages.drupal.org%2F8',
+            },
+          },
+        ],
+        _id: '7ONtcn2IGYE8U39z',
+      };
+
+      osvOfflineDb = await createDbWithContent('packagist.nedb', JSON.stringify(qualifiedVuln));
+      expect(await osvOfflineDb.query('Packagist', 'drupal/openid_connect')).toStrictEqual([
+        qualifiedVuln,
+      ]);
+    });
+
+    it('works with Julia', async () => {
+      const juliaVuln: Vulnerability & { _id: string } = {
+        id: 'JLSEC-2025-1',
+        published: '2025-10-08T17:41:37.190Z',
+        modified: '2026-07-18T03:00:04.241627862Z',
+        affected: [
+          {
+            package: {
+              name: 'HTTP',
+              ecosystem: 'Julia',
+              purl: 'pkg:julia/HTTP?uuid=cd3eb016-35fb-5094-929b-558a96fad6f3',
+            },
+          },
+        ],
+        _id: 'JLSEC20251000000',
+      };
+
+      osvOfflineDb = await createDbWithContent('julia.nedb', JSON.stringify(juliaVuln));
+      expect(await osvOfflineDb.query('Julia', 'HTTP')).toStrictEqual([juliaVuln]);
+    });
   });
 
   describe('precomputed index', () => {

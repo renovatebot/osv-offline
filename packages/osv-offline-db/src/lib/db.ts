@@ -15,7 +15,7 @@ import {
 import { Ecosystem } from './ecosystem.ts';
 import { createLogger } from './logger.ts';
 import type { Vulnerability } from './osv.ts';
-import { packageToPurl } from './purl-helper.ts';
+import { packageToPurl, purlWithoutQualifiers } from './purl-helper.ts';
 
 const logger = createLogger('osv-offline:db');
 const readAsync = promisify(fsRead);
@@ -223,7 +223,7 @@ export class OsvOfflineDb {
         (a) =>
           a.package?.name === packageName &&
           (a.package.ecosystem === ecosystem || a.package.ecosystem.startsWith(`${ecosystem}:`)) &&
-          a.package.purl === targetPurl,
+          purlWithoutQualifiers(a.package.purl ?? '') === targetPurl,
       ),
     );
   }
