@@ -17,7 +17,7 @@ jobs:
       contents: write
 
     steps:
-      - uses: containerbase/internal-tools/setup@2fa95e65223319a38803eaf0efe6dccd5245ccb5 # v5.4.14
+      - uses: containerbase/internal-tools/setup@4c87abf84922fa924241b0d2e00f845fdddf5271 # v5.4.15
         with:
           pnpm-cache: |
             node_modules
