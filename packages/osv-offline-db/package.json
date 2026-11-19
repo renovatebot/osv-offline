@@ -16,7 +16,7 @@
     "debug": "^4.4.3"
   },
   "devDependencies": {
-    "@tsconfig/node24": "24.0.5",
+    "@tsconfig/node24": "24.0.6",
     "@tsconfig/strictest": "2.0.8",
     "@types/debug": "4.1.13",
     "@types/fs-extra": "11.0.4",
