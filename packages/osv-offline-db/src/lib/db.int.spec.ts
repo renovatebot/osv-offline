@@ -217,6 +217,84 @@ describe('packages/osv-offline-db/src/lib/db.int', () => {
         ecosystemVuln,
       ]);
     });
+
+    // The first two spellings occur in OSV npm data. The other two are allowed
+    // by the Package type.
+    it.each`
+      description                 | purl
+      ${'scope separator as "/"'} | ${'pkg:npm/%40better-auth/oauth-provider'}
+      ${'scope separator as %2F'} | ${'pkg:npm/%40better-auth%2Foauth-provider'}
+      ${'unencoded "@" and "/"'}  | ${'pkg:npm/@better-auth/oauth-provider'}
+      ${'no purl'}                | ${undefined}
+    `(
+      'matches by name and ecosystem with $description',
+      async ({ purl }: { purl: string | undefined }) => {
+        const scopedVuln: Vulnerability & { _id: string } = {
+          id: 'GHSA-p2fr-6hmx-4528',
+          published: '2026-08-05T20:34:26Z',
+          modified: '2026-08-05T20:34:26Z',
+          affected: [
+            {
+              package: {
+                name: '@better-auth/oauth-provider',
+                ecosystem: 'npm',
+                ...(purl === undefined ? {} : { purl }),
+              },
+            },
+          ],
+          _id: 'SCOPEDPURL0000001',
+        };
+
+        osvOfflineDb = await createDbWithContent('npm.nedb', JSON.stringify(scopedVuln));
+        expect(await osvOfflineDb.query('npm', '@better-auth/oauth-provider')).toStrictEqual([
+          scopedVuln,
+        ]);
+      },
+    );
+
+    it('returns only the advisories of the queried package', async () => {
+      const scopedVuln: Vulnerability & { _id: string } = {
+        id: 'GHSA-p2fr-6hmx-4528',
+        published: '2026-08-05T20:34:26Z',
+        modified: '2026-08-05T20:34:26Z',
+        affected: [
+          {
+            package: {
+              name: '@better-auth/oauth-provider',
+              ecosystem: 'npm',
+              purl: 'pkg:npm/%40better-auth%2Foauth-provider',
+            },
+          },
+        ],
+        _id: 'SCOPEDPURL0000001',
+      };
+
+      osvOfflineDb = await createDbWithContent(
+        'npm.nedb',
+        [sampleVuln, scopedVuln].map((vuln) => JSON.stringify(vuln)).join('\n'),
+      );
+      expect(await osvOfflineDb.query('npm', 'public')).toStrictEqual([sampleVuln]);
+      expect(await osvOfflineDb.query('npm', '@better-auth/oauth-provider')).toStrictEqual([
+        scopedVuln,
+      ]);
+    });
+
+    it('matches PyPI advisories by name and ecosystem', async () => {
+      const pypiVuln: Vulnerability & { _id: string } = {
+        id: 'GHSA-8q59-q68h-6hv4',
+        published: '2021-03-25T21:26:26Z',
+        modified: '2026-02-04T03:33:10.792778Z',
+        affected: [
+          {
+            package: { name: 'pyyaml', ecosystem: 'PyPI', purl: 'pkg:pypi/pyyaml' },
+          },
+        ],
+        _id: 'PYPIPURL00000001',
+      };
+
+      osvOfflineDb = await createDbWithContent('pypi.nedb', JSON.stringify(pypiVuln));
+      expect(await osvOfflineDb.query('PyPI', 'pyyaml')).toStrictEqual([pypiVuln]);
+    });
   });
 
   describe('precomputed index', () => {
