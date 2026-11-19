@@ -24,7 +24,7 @@
     "zstd-napi": "0.0.13"
   },
   "devDependencies": {
-    "@tsconfig/strictest": "2.0.8",
+    "@tsconfig/strictest": "2.0.9",
     "@types/adm-zip": "0.6.0",
     "@types/fs-extra": "11.0.4",
     "@types/luxon": "3.7.6",
