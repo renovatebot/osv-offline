@@ -30,7 +30,7 @@
     "@vitest/coverage-v8": "5.1.0",
     "conventional-changelog-conventionalcommits": "9.3.1",
     "husky": "9.1.7",
-    "lint-staged": "17.6.0",
+    "lint-staged": "17.6.1",
     "npm-run-all2": "9.0.4",
     "oxfmt": "0.78.0",
     "oxlint": "1.93.0",
