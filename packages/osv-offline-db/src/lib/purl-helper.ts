@@ -1,11 +1,12 @@
 import type { Ecosystem } from './ecosystem.ts';
 
-// https://github.com/google/osv.dev/blob/edacbd3c32b1d632bad8c5b506a14d0850b2e537/osv/purl_helpers.py#L18-L30
+// https://github.com/google/osv.dev/blob/27756cecae256ba0c024101048f152c341fb1e95/osv/purl_helpers.py#L26-L109
 const PURL_ECOSYSTEMS: Record<Ecosystem, string> = {
   'crates.io': 'cargo',
   Go: 'golang',
   Hackage: 'hackage',
   Hex: 'hex',
+  Julia: 'julia',
   Maven: 'maven',
   NuGet: 'nuget',
   npm: 'npm',
@@ -29,4 +30,12 @@ export function packageToPurl(ecosystem: Ecosystem, packageName: string): string
   }
 
   return `pkg:${purlType}/${urlEncode(packageNamePurl)}`;
+}
+
+/**
+ * Returns the purl without its qualifiers and subpath.
+ * OSV qualifies some purls, as with the registry in `pkg:composer/drupal/token?repository_url=https:%2F%2Fpackages.drupal.org%2F8`.
+ */
+export function purlWithoutQualifiers(purl: string): string {
+  return purl.replace(/[?#].*$/, '');
 }
